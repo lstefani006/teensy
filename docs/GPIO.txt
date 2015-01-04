@@ -1,0 +1,262 @@
+﻿Tutorial on digital I/O, ATMega PIN/PORT/DDR D/B registers vs. ARM GPIO_PDIR / _PDOR A/B/C/D/E registers!
+
+OR, "How to get a fast 8-bit-wide digital read/write!" 
+
+I spent the evening figuring this out so I'd like to pass it on to you if u r interested.
+
+My mission: read/write 8 digital I/O pins simultaneously and as fast as possible. I don't care WHICH 8 pins, 
+I just need 8 pins. And I need *fast*.
+
+On the ATMega based Arduino, I used PIND and PORTD, which are each 8 bit registers which read and write pins 
+0,1,2,3,4,5,6 and 7 packed into a single byte.
+
+On TEENSY3, the emulation code for PIND and PORTD is very inefficient. 
+Indeed, it is basically 8 digital reads. 
+The code (in avr_emulation.h) basically looks like this:
+
+int ret = 0;
+if (digitalReadFast(0)) ret |= (1<<0);
+if (digitalReadFast(1)) ret |= (1<<1);
+if (digitalReadFast(2)) ret |= (1<<2);
+if (digitalReadFast(3)) ret |= (1<<3);
+if (digitalReadFast(4)) ret |= (1<<4);
+if (digitalReadFast(5)) ret |= (1<<5);
+if (digitalReadFast(6)) ret |= (1<<6);
+if (digitalReadFast(7)) ret |= (1<<7);
+return ret;
+
+That is 8 digitalReadFast's, plus 8 IFs and ORs.
+The reason for this is that the actual bits corresponding to the TEENSY3 pins are scrambled in their order. And therein lies a tale!
+After a bunch of reading the "K20 Sub-Family Reference Manual" and studying the TEENSY3 schematics, it somehow makes sense!
+The ARM core has 5 registers much like the ATMel PIN/PORT registers. 
+They are GPIOA, GPIOB, GPIOC, GPIOD, and GPIOE. Each of these supports up to 32 pins. 
+They are *extremely* programmable, and can be mapped in whole or in part to various functions and various pins on the ARM chip.
+The TEENSY 3.0 software apparently sets them up as follows:
+(where: 
+	X = TEENSY3 external pin number, 
+	Y = which GPIO port that reads and writes it, and 
+	Z = which bit of that port reads and writes it)
+
+
+
+ X Y  Z
+---------------
+ 3 A 12
+ 4 A 13
+24 A  5
+33 A  4
+ 0 B 16
+ 1 B 17
+16 B  0
+17 B  1
+18 B  3
+19 B  2
+25 B 19
+32 B 18
+ 9 C  3
+10 C  4
+11 C  6
+12 C  7
+13 C  5
+15 C  0
+22 C  1
+23 C  2
+27 C  9
+28 C  8
+29 C 10
+30 C 11
+ 2 D  0
+ 5 D  7
+ 6 D  4
+ 7 D  2
+ 8 D  3
+14 D  1
+20 D  5
+21 D  6
+26 E  1
+31 E  0
+
+That's confusing. I'll explain the first four lines:
+
+ 3 A 12
+ 4 A 13
+24 A  5
+33 A  4
+
+These say that:
+GPIOA bit 12 is connected to pin 3 on the TEENSY3 circuit board,
+GPIOA bit 13 is connected to pin 4,
+GPIOA bit 5 is connected to pin 24 (which is on the backside of the board), and
+GPIOA bit 4 is connected to pin 33 (also on the backside of the board).
+
+And the 5th line,
+0 B 16
+
+says that GPIOB bit 16 connects to pin 0 on the TEENSY3.
+
+In other words, we are using only 4 of the possible 32 bits of GPIOA, 
+and they are connected to 4 pins of the TEENSY3, and in scrambled order! 
+In similar manner, GPIOB has 6 of its bits (16,17,0,1,3,2,19 and 18) 
+connected to 6 of the TEENSY3 external pins (0,1,16,17,18,19, and 25).
+
+If you sort the above table in order by first column (external pin number) 
+instead of second column you can see just how scrambled the pins are:
+
+Teensy-3 Pin, GPIO Port, GPIO Bit #
+---------------
+ 0 B 16
+ 1 B 17
+ 2 D  0
+ 3 A 12
+ 4 A 13
+ 5 D  7
+ 6 D  4
+ 7 D  2
+ 8 D  3
+ 9 C  3
+10 C  4
+11 C  6
+12 C  7
+13 C  5
+14 D  1
+15 C  0
+16 B  0
+17 B  1
+18 B  3
+19 B  2
+20 D  5
+21 D  6
+22 C  1
+23 C  2
+24 A  5
+25 B 19
+26 E  1
+27 C  9
+28 C  8
+
+How did I determine this table? Two answers: first, look at the 
+TEENSY3 circuit diagram: http://www.pjrc.com/teensy/schematic.html
+
+Going down the right side of the big chip, we see:
+PT C2 45 23/A9
+PT C1 44 22/A8
+PT D6 63 21/A7
+and so on. This corresponds to the lines in my table that read:
+23 C 2
+22 C 1
+21 D 6
+(The 45,44, and 63 are irrelevant in this discussion, 
+but are the pin numbers of the physical ARM chip. Just to further confuse you!)
+
+So, a few bits from each of the 5 ports are being used, 
+some more than others, and all in scrambled order!
+
+The other way to determine this table, and corroborating my observations, 
+is the #defines inside the core_pins.h file. Actually, that is where 
+I started from, then noticed the schematic had the same data.
+
+Armed with this understanding, the solution becomes apparent. 
+Let's look just at the lines from the above table which use 
+GPIO "D", and sort them by GPIOD bit number:
+
+2 D 0
+14 D 1
+7 D 2
+8 D 3
+6 D 4
+20 D 5
+21 D 6
+5 D 7
+
+In other words, the lower 8 bits of GPIOD map to 8 pins, 
+just like ATMega's PIND/PORTD registers, except that where PIND/PORTD 
+map to pins 7,6,5,4,3,2,1,0 in that order, 
+GPIOD maps to pins 5,21,20,6,8,7,14,2, in that order!
+
+Solution:
+
+1. connect my 8 wires to the TEENSY3 circuit board pins labeled digital 
+   5,21,20,6,8,7,14,2, IN THAT ORDER. 
+   The other ends of these 8 wires goes my own connector labeled 7,6,5,4,3,2,1,0.
+
+2. Execute this statement in my code:
+
+byte allEight = GPIOD_PDIR & 0xFF;
+
+QED! allEight bits 0 through 7 correspond to the data on my wires 0 through 7!
+
+Thus, by choosing this particular set of 8 pins, WE HAVE THE EXACT EQUIVALENT of what the ATMel processors call "PIND".
+
+Note also that I could have chosen port C and gotten TWELVE consecutive pins! Executing this statement:
+
+byte anotherEight = GPIOC_PDIR & 0xFF;
+
+then gives us what ATMel processors call "PINB", scrambled to pins 15,22,23,9,10,13,11 and 12 in that order!
+
+GPIOx_PDIR is the input register for port x, and 
+GPIOx_PDOR is the output register for port x. 
+I won't go into how one can set the direction, it is a bit more complex. 
+Since my application only needs the speed for the read/write, 
+I can use the normal "pinMode" calls to set the direction.
+
+============================
+I ran and tested the following code:
+
+// input test:
+byte pinTable[] = {2,14,7,8,6,20,21,5};
+
+void setup() {
+	Serial.begin(0);
+	for (int i=0; i<8; i++) { pinMode(pinTable[i],INPUT_PULLUP); } 
+}
+
+void loop() {
+	byte eight,prev_eight;
+	do {
+		eight = GPIOD_PDIR & 0xFF;
+
+		if (eight != prev_eight)
+		{
+			prev_eight = eight;
+			Serial.println(eight,HEX);
+		}
+	} while (1==1);
+}
+
+With nothing touching the above program prints "FF", all ones. 
+By connecting a jumper from ground and alternately touching it to any of the 
+pins in the "pinTable" above, it printed a new value with the given port bit 0.
+
+And the following program tests output. 
+I took an LED+resistor to ground and touched the other end alternately to one 
+of the specified pins, and within 8 seconds, when the program came 
+around to printing that pin's number, the LED lit!
+
+// output test:
+byte pinTable[] = {2,14,7,8,6,20,21,5};
+
+void setup() {
+	Serial.begin(0);
+	for (int i=0; i<8; i++) { pinMode(pinTable[i],OUTPUT); } 
+}
+
+void loop() {
+	do {
+		for (int i=0; i<=7; i++)
+		{
+			byte b = 1<<i;
+			GPIOD_PDOR = b;
+			Serial.println(pinTable[i]);
+			delay(1000);
+		}
+	} while (1==1);
+}
+
+=======================
+Thus, in summary:
+
+One can use "GPIOD_PDIR" and "GPIOD_PDOR" as almost exact replacements for "PIND" and "PORTD", 
+if you are willing to use a funny set of pins instead of a pins 0 through 7.
+
+=======================
+End of tutorial. Thanks for listening...

@@ -1,0 +1,35 @@
+# cpu =  cortex-m4
+# arch = armv7e-m
+#
+# path dell ambiente di sviluppo
+ARDUINO=/home/leo/teensy/arduino.1.0.6-teensy.1.20
+TEENSY=$(ARDUINO)/hardware/teensy/cores/teensy3
+
+CFLAGS?=-Os
+CXXFLAGS?=-Os
+
+CC=teensy-gcc
+CXX=teensy-g++
+AR=arm-none-eabi-ar
+
+ifdef VERBOSE
+ECHO_CXX=$(CXX) $(CXXFLAGS) $(notdir $<)
+ECHO_C=$(CC) $(CFLAGS) $(notdir $<)
+else
+ECHO_CXX ?=$(notdir $<)
+ECHO_C ?=$(notdir $<)
+endif
+
+obj/%.o : %.cpp
+	@echo $(ECHO_CXX)
+	@$(CXX) -c $(CXXFLAGS) $< -o $@
+
+obj/%.o : %.c
+	@echo $(ECHO_C)
+	@$(CC) -c $(CFLAGS) $< -o $@
+
+%.s : %.cpp
+	$(CXX) -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
+
+%.s : %.c
+	$(CC) -S -c $(CFLAGS) $< -o $@

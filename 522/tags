@@ -1,0 +1,174 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AnalogTestReg	MFRC522.h	/^		AnalogTestReg			= 0x38 << 1,	\/\/ controls the pins AUX1 and AUX2$/;"	e	enum:MFRC522::PCD_Register
+AutoTestReg	MFRC522.h	/^		AutoTestReg				= 0x36 << 1,	\/\/ controls the digital self test$/;"	e	enum:MFRC522::PCD_Register
+BitFramingReg	MFRC522.h	/^		BitFramingReg			= 0x0D << 1,	\/\/ adjustments for bit-oriented frames$/;"	e	enum:MFRC522::PCD_Register
+CRCResultRegH	MFRC522.h	/^		CRCResultRegH			= 0x21 << 1,	\/\/ shows the MSB and LSB values of the CRC calculation$/;"	e	enum:MFRC522::PCD_Register
+CRCResultRegL	MFRC522.h	/^		CRCResultRegL			= 0x22 << 1,$/;"	e	enum:MFRC522::PCD_Register
+CWGsPReg	MFRC522.h	/^		CWGsPReg				= 0x28 << 1,	\/\/ defines the conductance of the p-driver output during periods of no modulation$/;"	e	enum:MFRC522::PCD_Register
+CollReg	MFRC522.h	/^		CollReg					= 0x0E << 1,	\/\/ bit position of the first bit-collision detected on the RF interface$/;"	e	enum:MFRC522::PCD_Register
+ComIEnReg	MFRC522.h	/^		ComIEnReg				= 0x02 << 1,	\/\/ enable and disable interrupt request control bits$/;"	e	enum:MFRC522::PCD_Register
+ComIrqReg	MFRC522.h	/^		ComIrqReg				= 0x04 << 1,	\/\/ interrupt request bits$/;"	e	enum:MFRC522::PCD_Register
+CommandReg	MFRC522.h	/^		CommandReg				= 0x01 << 1,	\/\/ starts and stops command execution$/;"	e	enum:MFRC522::PCD_Register
+ControlReg	MFRC522.h	/^		ControlReg				= 0x0C << 1,	\/\/ miscellaneous control registers$/;"	e	enum:MFRC522::PCD_Register
+DemodReg	MFRC522.h	/^		DemodReg				= 0x19 << 1,	\/\/ defines demodulator settings$/;"	e	enum:MFRC522::PCD_Register
+DivIEnReg	MFRC522.h	/^		DivIEnReg				= 0x03 << 1,	\/\/ enable and disable interrupt request control bits$/;"	e	enum:MFRC522::PCD_Register
+DivIrqReg	MFRC522.h	/^		DivIrqReg				= 0x05 << 1,	\/\/ interrupt request bits$/;"	e	enum:MFRC522::PCD_Register
+ErrorReg	MFRC522.h	/^		ErrorReg				= 0x06 << 1,	\/\/ error bits showing the error status of the last command executed $/;"	e	enum:MFRC522::PCD_Register
+FIFODataReg	MFRC522.h	/^		FIFODataReg				= 0x09 << 1,	\/\/ input and output of 64 byte FIFO buffer$/;"	e	enum:MFRC522::PCD_Register
+FIFOLevelReg	MFRC522.h	/^		FIFOLevelReg			= 0x0A << 1,	\/\/ number of bytes stored in the FIFO buffer$/;"	e	enum:MFRC522::PCD_Register
+FIFO_SIZE	MFRC522.h	/^	static const byte FIFO_SIZE = 64;		\/\/ The FIFO is 64 bytes.$/;"	m	class:MFRC522
+GetStatusCodeName	MFRC522.cpp	/^const char *MFRC522::GetStatusCodeName(byte code	\/\/\/< One of the StatusCode enums.$/;"	f	class:MFRC522
+GsNReg	MFRC522.h	/^		GsNReg					= 0x27 << 1,	\/\/ selects the conductance of the antenna driver pins TX1 and TX2 for modulation $/;"	e	enum:MFRC522::PCD_Register
+MFRC522	MFRC522.cpp	/^MFRC522::MFRC522(	byte chipSelectPin,		\/\/\/< Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)$/;"	f	class:MFRC522
+MFRC522	MFRC522.h	/^class MFRC522 {$/;"	c
+MFRC522_h	MFRC522.h	75;"	d
+MF_ACK	MFRC522.h	/^		MF_ACK					= 0xA,		\/\/ The MIFARE Classic uses a 4 bit ACK\/NAK. Any other value than 0xA is NAK.$/;"	e	enum:MFRC522::MIFARE_Misc
+MF_KEY_SIZE	MFRC522.h	/^		MF_KEY_SIZE				= 6			\/\/ A Mifare Crypto1 key is 6 bytes.$/;"	e	enum:MFRC522::MIFARE_Misc
+MIFARE_Decrement	MFRC522.cpp	/^byte MFRC522::MIFARE_Decrement(	byte blockAddr, \/\/\/< The block (0-0xff) number.$/;"	f	class:MFRC522
+MIFARE_Increment	MFRC522.cpp	/^byte MFRC522::MIFARE_Increment(	byte blockAddr, \/\/\/< The block (0-0xff) number.$/;"	f	class:MFRC522
+MIFARE_Key	MFRC522.h	/^	} MIFARE_Key;$/;"	t	class:MFRC522	typeref:struct:MFRC522::__anon2
+MIFARE_Misc	MFRC522.h	/^	enum MIFARE_Misc {$/;"	g	class:MFRC522
+MIFARE_Read	MFRC522.cpp	/^byte MFRC522::MIFARE_Read(	byte blockAddr, 	\/\/\/< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The first page to return data from.$/;"	f	class:MFRC522
+MIFARE_Restore	MFRC522.cpp	/^byte MFRC522::MIFARE_Restore(	byte blockAddr \/\/\/< The block (0-0xff) number.$/;"	f	class:MFRC522
+MIFARE_SetAccessBits	MFRC522.cpp	/^void MFRC522::MIFARE_SetAccessBits(	byte *accessBitBuffer,	\/\/\/< Pointer to byte 6, 7 and 8 in the sector trailer. Bytes [0..2] will be set.$/;"	f	class:MFRC522
+MIFARE_Transfer	MFRC522.cpp	/^byte MFRC522::MIFARE_Transfer(	byte blockAddr \/\/\/< The block (0-0xff) number.$/;"	f	class:MFRC522
+MIFARE_TwoStepHelper	MFRC522.cpp	/^byte MFRC522::MIFARE_TwoStepHelper(	byte command,	\/\/\/< The command to use$/;"	f	class:MFRC522
+MIFARE_Ultralight_Write	MFRC522.cpp	/^byte MFRC522::MIFARE_Ultralight_Write(	byte page, 		\/\/\/< The page (2-15) to write to.$/;"	f	class:MFRC522
+MIFARE_Write	MFRC522.cpp	/^byte MFRC522::MIFARE_Write(	byte blockAddr, \/\/\/< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The page (2-15) to write to.$/;"	f	class:MFRC522
+MfRxReg	MFRC522.h	/^		MfRxReg					= 0x1D << 1,	\/\/ controls some MIFARE communication receive parameters$/;"	e	enum:MFRC522::PCD_Register
+MfTxReg	MFRC522.h	/^		MfTxReg					= 0x1C << 1,	\/\/ controls some MIFARE communication transmit parameters$/;"	e	enum:MFRC522::PCD_Register
+ModGsPReg	MFRC522.h	/^		ModGsPReg				= 0x29 << 1,	\/\/ defines the conductance of the p-driver output during periods of modulation$/;"	e	enum:MFRC522::PCD_Register
+ModWidthReg	MFRC522.h	/^		ModWidthReg				= 0x24 << 1,	\/\/ controls the ModWidth setting?$/;"	e	enum:MFRC522::PCD_Register
+ModeReg	MFRC522.h	/^		ModeReg					= 0x11 << 1,	\/\/ defines general modes for transmitting and receiving $/;"	e	enum:MFRC522::PCD_Register
+PCD_AntennaOn	MFRC522.cpp	/^void MFRC522::PCD_AntennaOn() {$/;"	f	class:MFRC522
+PCD_Authenticate	MFRC522.cpp	/^byte MFRC522::PCD_Authenticate(byte command,		\/\/\/< PICC_CMD_MF_AUTH_KEY_A or PICC_CMD_MF_AUTH_KEY_B$/;"	f	class:MFRC522
+PCD_CalcCRC	MFRC522.h	/^		PCD_CalcCRC				= 0x03,		\/\/ activates the CRC coprocessor or performs a self test$/;"	e	enum:MFRC522::PCD_Command
+PCD_CalculateCRC	MFRC522.cpp	/^byte MFRC522::PCD_CalculateCRC(	byte *data,		\/\/\/< In: Pointer to the data to transfer to the FIFO for CRC calculation.$/;"	f	class:MFRC522
+PCD_ClearRegisterBitMask	MFRC522.cpp	/^void MFRC522::PCD_ClearRegisterBitMask(	byte reg,	\/\/\/< The register to update. One of the PCD_Register enums.$/;"	f	class:MFRC522
+PCD_Command	MFRC522.h	/^	enum PCD_Command {$/;"	g	class:MFRC522
+PCD_CommunicateWithPICC	MFRC522.cpp	/^byte MFRC522::PCD_CommunicateWithPICC(	byte command,		\/\/\/< The command to execute. One of the PCD_Command enums.$/;"	f	class:MFRC522
+PCD_GenerateRandomID	MFRC522.h	/^		PCD_GenerateRandomID	= 0x02,		\/\/ generates a 10-byte random ID number$/;"	e	enum:MFRC522::PCD_Command
+PCD_GetVersion	MFRC522.cpp	/^byte MFRC522::PCD_GetVersion() {$/;"	f	class:MFRC522
+PCD_Idle	MFRC522.h	/^		PCD_Idle				= 0x00,		\/\/ no action, cancels current command execution$/;"	e	enum:MFRC522::PCD_Command
+PCD_Init	MFRC522.cpp	/^void MFRC522::PCD_Init() {$/;"	f	class:MFRC522
+PCD_MFAuthent	MFRC522.h	/^		PCD_MFAuthent 			= 0x0E,		\/\/ performs the MIFARE standard authentication as a reader$/;"	e	enum:MFRC522::PCD_Command
+PCD_MIFARE_Transceive	MFRC522.cpp	/^byte MFRC522::PCD_MIFARE_Transceive(	byte *sendData,		\/\/\/< Pointer to the data to transfer to the FIFO. Do NOT include the CRC_A.$/;"	f	class:MFRC522
+PCD_Mem	MFRC522.h	/^		PCD_Mem					= 0x01,		\/\/ stores 25 bytes into the internal buffer$/;"	e	enum:MFRC522::PCD_Command
+PCD_NoCmdChange	MFRC522.h	/^		PCD_NoCmdChange			= 0x07,		\/\/ no command change, can be used to modify the CommandReg register bits without affecting the command, for example, the PowerDown bit$/;"	e	enum:MFRC522::PCD_Command
+PCD_ReadRegister	MFRC522.cpp	/^byte MFRC522::PCD_ReadRegister(	byte reg	\/\/\/< The register to read from. One of the PCD_Register enums.$/;"	f	class:MFRC522
+PCD_ReadRegister	MFRC522.cpp	/^void MFRC522::PCD_ReadRegister(	byte reg,		\/\/\/< The register to read from. One of the PCD_Register enums.$/;"	f	class:MFRC522
+PCD_Receive	MFRC522.h	/^		PCD_Receive				= 0x08,		\/\/ activates the receiver circuits$/;"	e	enum:MFRC522::PCD_Command
+PCD_Register	MFRC522.h	/^	enum PCD_Register {$/;"	g	class:MFRC522
+PCD_Reset	MFRC522.cpp	/^void MFRC522::PCD_Reset() {$/;"	f	class:MFRC522
+PCD_SetRegisterBitMask	MFRC522.cpp	/^void MFRC522::PCD_SetRegisterBitMask(	byte reg,	\/\/\/< The register to update. One of the PCD_Register enums.$/;"	f	class:MFRC522
+PCD_SoftReset	MFRC522.h	/^		PCD_SoftReset			= 0x0F		\/\/ resets the MFRC522$/;"	e	enum:MFRC522::PCD_Command
+PCD_StopCrypto1	MFRC522.cpp	/^void MFRC522::PCD_StopCrypto1() {$/;"	f	class:MFRC522
+PCD_Transceive	MFRC522.h	/^		PCD_Transceive 			= 0x0C,		\/\/ transmits data from FIFO buffer to antenna and automatically activates the receiver after transmission$/;"	e	enum:MFRC522::PCD_Command
+PCD_TransceiveData	MFRC522.cpp	/^byte MFRC522::PCD_TransceiveData(	byte *sendData,		\/\/\/< Pointer to the data to transfer to the FIFO.$/;"	f	class:MFRC522
+PCD_Transmit	MFRC522.h	/^		PCD_Transmit			= 0x04,		\/\/ transmits data from the FIFO buffer$/;"	e	enum:MFRC522::PCD_Command
+PCD_WriteRegister	MFRC522.cpp	/^void MFRC522::PCD_WriteRegister(	byte reg,		\/\/\/< The register to write to. One of the PCD_Register enums.$/;"	f	class:MFRC522
+PICC_CMD_CT	MFRC522.h	/^		PICC_CMD_CT				= 0x88,		\/\/ Cascade Tag. Not really a command, but used during anti collision.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_HLTA	MFRC522.h	/^		PICC_CMD_HLTA			= 0x50,		\/\/ HaLT command, Type A. Instructs an ACTIVE PICC to go to state HALT.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_AUTH_KEY_A	MFRC522.h	/^		PICC_CMD_MF_AUTH_KEY_A	= 0x60,		\/\/ Perform authentication with Key A$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_AUTH_KEY_B	MFRC522.h	/^		PICC_CMD_MF_AUTH_KEY_B	= 0x61,		\/\/ Perform authentication with Key B$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_DECREMENT	MFRC522.h	/^		PICC_CMD_MF_DECREMENT	= 0xC0,		\/\/ Decrements the contents of a block and stores the result in the internal data register.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_INCREMENT	MFRC522.h	/^		PICC_CMD_MF_INCREMENT	= 0xC1,		\/\/ Increments the contents of a block and stores the result in the internal data register.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_READ	MFRC522.h	/^		PICC_CMD_MF_READ		= 0x30,		\/\/ Reads one 16 byte block from the authenticated sector of the PICC. Also used for MIFARE Ultralight.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_RESTORE	MFRC522.h	/^		PICC_CMD_MF_RESTORE		= 0xC2,		\/\/ Reads the contents of a block into the internal data register.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_TRANSFER	MFRC522.h	/^		PICC_CMD_MF_TRANSFER	= 0xB0,		\/\/ Writes the contents of the internal data register to a block.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_MF_WRITE	MFRC522.h	/^		PICC_CMD_MF_WRITE		= 0xA0,		\/\/ Writes one 16 byte block to the authenticated sector of the PICC. Called "COMPATIBILITY WRITE" for MIFARE Ultralight.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_REQA	MFRC522.h	/^		PICC_CMD_REQA			= 0x26,		\/\/ REQuest command, Type A. Invites PICCs in state IDLE to go to READY and prepare for anticollision or selection. 7 bit frame.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_SEL_CL1	MFRC522.h	/^		PICC_CMD_SEL_CL1		= 0x93,		\/\/ Anti collision\/Select, Cascade Level 1$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_SEL_CL2	MFRC522.h	/^		PICC_CMD_SEL_CL2		= 0x95,		\/\/ Anti collision\/Select, Cascade Level 1$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_SEL_CL3	MFRC522.h	/^		PICC_CMD_SEL_CL3		= 0x97,		\/\/ Anti collision\/Select, Cascade Level 1$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_UL_WRITE	MFRC522.h	/^		PICC_CMD_UL_WRITE		= 0xA2		\/\/ Writes one 4 byte page to the PICC.$/;"	e	enum:MFRC522::PICC_Command
+PICC_CMD_WUPA	MFRC522.h	/^		PICC_CMD_WUPA			= 0x52,		\/\/ Wake-UP command, Type A. Invites PICCs in state IDLE and HALT to go to READY(*) and prepare for anticollision or selection. 7 bit frame.$/;"	e	enum:MFRC522::PICC_Command
+PICC_Command	MFRC522.h	/^	enum PICC_Command {$/;"	g	class:MFRC522
+PICC_DumpMifareClassicSectorToSerial	MFRC522.cpp	/^void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			\/\/\/< Pointer to Uid struct returned from a successful PICC_Select().$/;"	f	class:MFRC522
+PICC_DumpMifareClassicToSerial	MFRC522.cpp	/^void MFRC522::PICC_DumpMifareClassicToSerial(	Uid *uid,		\/\/\/< Pointer to Uid struct returned from a successful PICC_Select().$/;"	f	class:MFRC522
+PICC_DumpMifareUltralightToSerial	MFRC522.cpp	/^void MFRC522::PICC_DumpMifareUltralightToSerial() {$/;"	f	class:MFRC522
+PICC_DumpToSerial	MFRC522.cpp	/^void MFRC522::PICC_DumpToSerial(Uid *uid	\/\/\/< Pointer to Uid struct returned from a successful PICC_Select().$/;"	f	class:MFRC522
+PICC_GetType	MFRC522.cpp	/^byte MFRC522::PICC_GetType(byte sak		\/\/\/< The SAK byte returned from PICC_Select().$/;"	f	class:MFRC522
+PICC_GetTypeName	MFRC522.cpp	/^const char *MFRC522::PICC_GetTypeName(byte piccType	\/\/\/< One of the PICC_Type enums.$/;"	f	class:MFRC522
+PICC_HaltA	MFRC522.cpp	/^byte MFRC522::PICC_HaltA() {$/;"	f	class:MFRC522
+PICC_IsNewCardPresent	MFRC522.cpp	/^bool MFRC522::PICC_IsNewCardPresent() {$/;"	f	class:MFRC522
+PICC_REQA_or_WUPA	MFRC522.cpp	/^byte MFRC522::PICC_REQA_or_WUPA(	byte command, 		\/\/\/< The command to send - PICC_CMD_REQA or PICC_CMD_WUPA$/;"	f	class:MFRC522
+PICC_ReadCardSerial	MFRC522.cpp	/^bool MFRC522::PICC_ReadCardSerial() {$/;"	f	class:MFRC522
+PICC_RequestA	MFRC522.cpp	/^byte MFRC522::PICC_RequestA(byte *bufferATQA,	\/\/\/< The buffer to store the ATQA (Answer to request) in$/;"	f	class:MFRC522
+PICC_Select	MFRC522.cpp	/^byte MFRC522::PICC_Select(	Uid *uid,			\/\/\/< Pointer to Uid struct. Normally output, but can also be used to supply a known UID.$/;"	f	class:MFRC522
+PICC_TYPE_ISO_14443_4	MFRC522.h	/^		PICC_TYPE_ISO_14443_4	= 1,	\/\/ PICC compliant with ISO\/IEC 14443-4 $/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_ISO_18092	MFRC522.h	/^		PICC_TYPE_ISO_18092		= 2, 	\/\/ PICC compliant with ISO\/IEC 18092 (NFC)$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_MIFARE_1K	MFRC522.h	/^		PICC_TYPE_MIFARE_1K		= 4,	\/\/ MIFARE Classic protocol, 1KB$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_MIFARE_4K	MFRC522.h	/^		PICC_TYPE_MIFARE_4K		= 5,	\/\/ MIFARE Classic protocol, 4KB$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_MIFARE_MINI	MFRC522.h	/^		PICC_TYPE_MIFARE_MINI	= 3,	\/\/ MIFARE Classic protocol, 320 bytes$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_MIFARE_PLUS	MFRC522.h	/^		PICC_TYPE_MIFARE_PLUS	= 7,	\/\/ MIFARE Plus$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_MIFARE_UL	MFRC522.h	/^		PICC_TYPE_MIFARE_UL		= 6,	\/\/ MIFARE Ultralight or Ultralight C$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_NOT_COMPLETE	MFRC522.h	/^		PICC_TYPE_NOT_COMPLETE	= 255	\/\/ SAK indicates UID is not complete.$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_TNP3XXX	MFRC522.h	/^		PICC_TYPE_TNP3XXX		= 8,	\/\/ Only mentioned in NXP AN 10833 MIFARE Type Identification Procedure$/;"	e	enum:MFRC522::PICC_Type
+PICC_TYPE_UNKNOWN	MFRC522.h	/^		PICC_TYPE_UNKNOWN		= 0,$/;"	e	enum:MFRC522::PICC_Type
+PICC_Type	MFRC522.h	/^	enum PICC_Type {$/;"	g	class:MFRC522
+PICC_WakeupA	MFRC522.cpp	/^byte MFRC522::PICC_WakeupA(	byte *bufferATQA,	\/\/\/< The buffer to store the ATQA (Answer to request) in$/;"	f	class:MFRC522
+RFCfgReg	MFRC522.h	/^		RFCfgReg				= 0x26 << 1,	\/\/ configures the receiver gain$/;"	e	enum:MFRC522::PCD_Register
+RST	522.cpp	6;"	d	file:
+RST_PIN	main.cpp	33;"	d	file:
+RxModeReg	MFRC522.h	/^		RxModeReg				= 0x13 << 1,	\/\/ defines reception data rate and framing$/;"	e	enum:MFRC522::PCD_Register
+RxSelReg	MFRC522.h	/^		RxSelReg				= 0x17 << 1,	\/\/ selects internal receiver settings$/;"	e	enum:MFRC522::PCD_Register
+RxThresholdReg	MFRC522.h	/^		RxThresholdReg			= 0x18 << 1,	\/\/ selects thresholds for the bit decoder$/;"	e	enum:MFRC522::PCD_Register
+SAD	522.cpp	5;"	d	file:
+SRC	Makefile	/^SRC=\\$/;"	m
+SS_PIN	main.cpp	32;"	d	file:
+STATUS_COLLISION	MFRC522.h	/^		STATUS_COLLISION		= 3,	\/\/ Collission detected$/;"	e	enum:MFRC522::StatusCode
+STATUS_CRC_WRONG	MFRC522.h	/^		STATUS_CRC_WRONG		= 8,	\/\/ The CRC_A does not match$/;"	e	enum:MFRC522::StatusCode
+STATUS_ERROR	MFRC522.h	/^		STATUS_ERROR			= 2,	\/\/ Error in communication$/;"	e	enum:MFRC522::StatusCode
+STATUS_INTERNAL_ERROR	MFRC522.h	/^		STATUS_INTERNAL_ERROR	= 6,	\/\/ Internal error in the code. Should not happen ;-)$/;"	e	enum:MFRC522::StatusCode
+STATUS_INVALID	MFRC522.h	/^		STATUS_INVALID			= 7,	\/\/ Invalid argument.$/;"	e	enum:MFRC522::StatusCode
+STATUS_MIFARE_NACK	MFRC522.h	/^		STATUS_MIFARE_NACK		= 9		\/\/ A MIFARE PICC responded with NAK.$/;"	e	enum:MFRC522::StatusCode
+STATUS_NO_ROOM	MFRC522.h	/^		STATUS_NO_ROOM			= 5,	\/\/ A buffer is not big enough.$/;"	e	enum:MFRC522::StatusCode
+STATUS_OK	MFRC522.h	/^		STATUS_OK				= 1,	\/\/ Success$/;"	e	enum:MFRC522::StatusCode
+STATUS_TIMEOUT	MFRC522.h	/^		STATUS_TIMEOUT			= 4,	\/\/ Timeout in communication.$/;"	e	enum:MFRC522::StatusCode
+SerialSpeedReg	MFRC522.h	/^		SerialSpeedReg			= 0x1F << 1,	\/\/ selects the speed of the serial UART interface$/;"	e	enum:MFRC522::PCD_Register
+Status1Reg	MFRC522.h	/^		Status1Reg				= 0x07 << 1,	\/\/ communication status bits$/;"	e	enum:MFRC522::PCD_Register
+Status2Reg	MFRC522.h	/^		Status2Reg				= 0x08 << 1,	\/\/ receiver and transmitter status bits$/;"	e	enum:MFRC522::PCD_Register
+StatusCode	MFRC522.h	/^	enum StatusCode {$/;"	g	class:MFRC522
+TARGET	Makefile	/^TARGET=522$/;"	m
+TCounterValueRegH	MFRC522.h	/^		TCounterValueRegH		= 0x2E << 1,	\/\/ shows the 16-bit timer value$/;"	e	enum:MFRC522::PCD_Register
+TCounterValueRegL	MFRC522.h	/^		TCounterValueRegL		= 0x2F << 1,$/;"	e	enum:MFRC522::PCD_Register
+TModeReg	MFRC522.h	/^		TModeReg				= 0x2A << 1,	\/\/ defines settings for the internal timer$/;"	e	enum:MFRC522::PCD_Register
+TPrescalerReg	MFRC522.h	/^		TPrescalerReg			= 0x2B << 1,	\/\/ the lower 8 bits of the TPrescaler value. The 4 high bits are in TModeReg.$/;"	e	enum:MFRC522::PCD_Register
+TReloadRegH	MFRC522.h	/^		TReloadRegH				= 0x2C << 1,	\/\/ defines the 16-bit timer reload value$/;"	e	enum:MFRC522::PCD_Register
+TReloadRegL	MFRC522.h	/^		TReloadRegL				= 0x2D << 1,$/;"	e	enum:MFRC522::PCD_Register
+TestADCReg	MFRC522.h	/^		TestADCReg				= 0x3B << 1		\/\/ shows the value of ADC I and Q channels$/;"	e	enum:MFRC522::PCD_Register
+TestBusReg	MFRC522.h	/^		TestBusReg				= 0x35 << 1,	\/\/ shows the status of the internal test bus$/;"	e	enum:MFRC522::PCD_Register
+TestDAC1Reg	MFRC522.h	/^		TestDAC1Reg				= 0x39 << 1,	\/\/ defines the test value for TestDAC1$/;"	e	enum:MFRC522::PCD_Register
+TestDAC2Reg	MFRC522.h	/^		TestDAC2Reg				= 0x3A << 1,	\/\/ defines the test value for TestDAC2$/;"	e	enum:MFRC522::PCD_Register
+TestPinEnReg	MFRC522.h	/^		TestPinEnReg			= 0x33 << 1,	\/\/ enables pin output driver on pins D1 to D7$/;"	e	enum:MFRC522::PCD_Register
+TestPinValueReg	MFRC522.h	/^		TestPinValueReg			= 0x34 << 1,	\/\/ defines the values for D1 to D7 when it is used as an I\/O bus$/;"	e	enum:MFRC522::PCD_Register
+TestSel1Reg	MFRC522.h	/^		TestSel1Reg				= 0x31 << 1,	\/\/ general test signal configuration$/;"	e	enum:MFRC522::PCD_Register
+TestSel2Reg	MFRC522.h	/^		TestSel2Reg				= 0x32 << 1,	\/\/ general test signal configuration$/;"	e	enum:MFRC522::PCD_Register
+TxASKReg	MFRC522.h	/^		TxASKReg				= 0x15 << 1,	\/\/ controls the setting of the transmission modulation$/;"	e	enum:MFRC522::PCD_Register
+TxControlReg	MFRC522.h	/^		TxControlReg			= 0x14 << 1,	\/\/ controls the logical behavior of the antenna driver pins TX1 and TX2$/;"	e	enum:MFRC522::PCD_Register
+TxModeReg	MFRC522.h	/^		TxModeReg				= 0x12 << 1,	\/\/ defines transmission data rate and framing$/;"	e	enum:MFRC522::PCD_Register
+TxSelReg	MFRC522.h	/^		TxSelReg				= 0x16 << 1,	\/\/ selects the internal sources for the antenna driver$/;"	e	enum:MFRC522::PCD_Register
+Uid	MFRC522.h	/^	} Uid;$/;"	t	class:MFRC522	typeref:struct:MFRC522::__anon1
+VersionReg	MFRC522.h	/^		VersionReg				= 0x37 << 1,	\/\/ shows the software version$/;"	e	enum:MFRC522::PCD_Register
+WaterLevelReg	MFRC522.h	/^		WaterLevelReg			= 0x0B << 1,	\/\/ level for FIFO underflow and overflow warning$/;"	e	enum:MFRC522::PCD_Register
+_chipSelectPin	MFRC522.h	/^	byte _chipSelectPin;		\/\/ Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)$/;"	m	class:MFRC522
+_read	io.cpp	/^	int _read(int fd, unsigned char *ptr, int len) {$/;"	f
+_resetPowerDownPin	MFRC522.h	/^	byte _resetPowerDownPin;	\/\/ Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)$/;"	m	class:MFRC522
+_write	io.cpp	/^	int _write(int fd, char *ptr, int len) {$/;"	f
+keyByte	MFRC522.h	/^		byte		keyByte[MF_KEY_SIZE];$/;"	m	struct:MFRC522::__anon2
+loop	522.cpp	/^void loop() $/;"	f
+loop	main.cpp	/^void loop() {$/;"	f
+ok	522.cpp	/^bool ok = false;$/;"	v
+sak	MFRC522.h	/^		byte		sak;			\/\/ The SAK (Select acknowledge) byte returned from the PICC after successful selection.$/;"	m	struct:MFRC522::__anon1
+setSPIConfig	MFRC522.cpp	/^void MFRC522::setSPIConfig() {$/;"	f	class:MFRC522
+setup	522.cpp	/^void setup() {$/;"	f
+setup	main.cpp	/^void setup() {$/;"	f
+size	MFRC522.h	/^		byte		size;			\/\/ Number of bytes in the UID. 4, 7 or 10.$/;"	m	struct:MFRC522::__anon1
+uid	MFRC522.h	/^	Uid uid;								\/\/ Used by PICC_ReadCardSerial().$/;"	m	class:MFRC522
+uidByte	MFRC522.h	/^		byte		uidByte[10];$/;"	m	struct:MFRC522::__anon1
