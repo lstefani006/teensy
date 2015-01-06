@@ -1,5 +1,6 @@
 all : 
 	@make -C TeensyLib
+	@make -C Test
 	@make -C Blink
 	@make -C RTC_Set
 	@make -C 522
@@ -9,6 +10,7 @@ all :
 
 clean : 
 	@make -C TeensyLib  clean
+	@make -C Test       clean
 	@make -C Blink      clean
 	@make -C RTC_Set    clean
 	@make -C 522        clean
