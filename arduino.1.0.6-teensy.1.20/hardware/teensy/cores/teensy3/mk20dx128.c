@@ -29,6 +29,7 @@
  */
 
 #include "kinetis.h"
+#include <errno.h>
 
 
 extern unsigned long _stext;
@@ -583,6 +584,10 @@ char *__brkval = (char *)&_ebss;
 void * _sbrk(int incr)
 {
 	char *prev = __brkval;
+	if (prev + incr + 512 > (char *)&prev) {
+		errno = ENOMEM;
+		return (char *)-1;
+	}
 	__brkval += incr;
 	return prev;
 }

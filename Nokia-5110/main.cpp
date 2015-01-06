@@ -33,6 +33,13 @@ void setup()
 
 	lcd.clear();
 	lcd.gotoXY(0, 0);
+
+	lcd.print("funziona");
+	delay(2000);
+	lcd.clear();
+	lcd.gotoXY(0, 0);
+
+
 	int nFound = scanAddr();
 	if (nFound)
 		lcd.print("Device OK");
