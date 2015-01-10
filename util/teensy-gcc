@@ -1,0 +1,124 @@
+#!/bin/bash
+set -e
+
+# dump dei comandi quando vengono eseguito
+#set -x
+
+#set +e
+#set -e
+
+ARDUINO=/home/leo/teensy/arduino.1.0.6-teensy.1.20
+TEENSY=${ARDUINO}/hardware/teensy/cores/teensy3
+TEENSY_LIB=/home/leo/teensy/TeensyLib
+
+link=1
+w=2
+v=0
+options=()
+for i in "$@"
+do
+	case $i in
+		-V)
+			v=1
+			;;
+		-c)
+			link=0
+			options+=("$i")
+			;;
+		-W0)
+			w=0
+			;;
+		-W1)
+			w=1
+			;;
+		-W2)
+			w=2
+			;;
+		-W3)
+			w=3
+			;;
+		*)
+			options+=("$i")
+			;;
+	esac
+done
+
+if [ $w -ge 0 ] ; then
+	W=""
+fi
+if [ $w -ge 1 ] ; then
+	W+="-Wall "
+fi
+if [ $w -ge 2 ] ; then
+	W+="\
+		-Wwrite-strings \
+		-Winit-self \
+		-Wcast-align \
+		-Wcast-qual \
+		-Wpointer-arith \
+		-Wstrict-aliasing \
+		-Wformat=2 \
+		-Wmissing-include-dirs \
+		-Wno-unused-parameter \
+		-Wuninitialized \
+		"
+fi
+if [ $w -ge 3 ] ; then
+	W+="-Wextra -Wpedantic "
+fi
+
+
+D="\
+	-DF_CPU=96000000 \
+	-DUSB_SERIAL \
+	-DLAYOUT_US_ENGLISH \
+	\
+	-D__MK20DX256__ \
+	-DARDUINO=106 \
+	-DTEENSYDUINO=120 \
+	-DTIME_T=1412425835 \
+	\
+	-DUSB_VID=null \
+	-DUSB_PID=null \
+	"
+
+#	-MMD 
+
+C="\
+	-mcpu=cortex-m4 \
+	-mthumb \
+	-mfloat-abi=soft \
+	-ffunction-sections \
+	-fdata-sections \
+	"
+
+I="\
+	-I ${TEENSY} \
+	"
+
+
+if [ ${link} -eq 1 ] ; then
+	if [ $v -eq 1 ] ; then
+		echo arm-none-eabi-gcc ${I} ${C} ${W} ${D} \
+			-Wl,--gc-sections -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
+			${TEENSY_LIB}/t_io.o ${TEENSY_LIB}/mk20dx128.o \
+			"${options[@]}" -lTeensy
+	fi
+	arm-none-eabi-g++ ${I} ${C} ${W} ${D} \
+		-Wl,--gc-sections -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
+		${TEENSY_LIB}/t_io.o ${TEENSY_LIB}/mk20dx128.o \
+		"${options[@]}" -lTeensy
+else
+	if [ $v -eq 1 ] ; then
+		echo arm-none-eabi-gcc ${I} ${C} ${W} ${D} "${options[@]}"
+	fi
+	arm-none-eabi-gcc ${I} ${C} ${W} ${D} "${options[@]}"
+fi
+
+
+
+
+#arm-none-eabi-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load \
+	#		--no-change-warnings --change-section-lma .eeprom=0 \
+	#		$(TARGET).elf $(TARGET).eep 
+#arm-none-eabi-objcopy -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex 
