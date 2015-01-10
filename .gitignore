@@ -1,0 +1,8 @@
+*.hex
+*.dis
+*.eep
+*.elf
+*.dix
+*.a
+*.o
+*/obj
