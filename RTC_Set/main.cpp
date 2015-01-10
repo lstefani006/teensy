@@ -1,5 +1,6 @@
 ﻿#include <Arduino.h>
 #include "RTC_DS1302.h"
+#include "t_io.h"
 
 const int led = 13;
 void blink(int msec) {
@@ -18,6 +19,8 @@ DS1302 rtc(DS1302_SCLK_PIN, DS1302_IO_PIN, DS1302_CE_PIN);
 int main()
 {
 	Serial.begin(9600);
+	t::SetPrint(&Serial);
+
 	rtc.begin();
 
 	pinMode(led, OUTPUT);     
