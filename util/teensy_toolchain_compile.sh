@@ -4,23 +4,27 @@ set -e
 set +x
 
 export MYTOOLS=$PWD/arm-none-eabi-4.9.2
-TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
 export PATH=$MYTOOLS/bin:$PATH
+TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
 
-SRC=.
 
-
-x=0
-for i in "$@"
-do
-	case $i in
-		-x)
+OPTIND=1
+while getopts "xh?f:" opt; do
+	case "$opt" in
+		h|\?)
+			echo "usage"
+			echo "$0 [-x]"
+			echo "-x     clear previous $0 runs"
+			exit 0
+			;;
+		x)
 			x=1
 			;;
 		*)
-			echo Unknow option "$i"
+			echo syntax error
+			echo usage:
+			echo "$0 [-x]"
 			exit 1
-			;;
 	esac
 done
 
