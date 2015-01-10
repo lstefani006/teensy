@@ -9,6 +9,7 @@ export PATH=$MYTOOLS/bin:$PATH
 
 SRC=.
 
+
 x=0
 for i in "$@"
 do
@@ -43,21 +44,21 @@ fi
 #######################
 
 if [ ! -e gcc-4.9.2 ] ; then
-	tar xvf $SRC/gcc-4.9.2.tar.gz
+	tar xvf gcc-4.9.2.tar.gz
 	pushd gcc-4.9.2
 	./contrib/download_prerequisites
 	popd
 fi
 
 if [ ! -e binutils-2.25 ] ; then
-	tar xvf $SRC/binutils-2.25.tar.gz
+	tar xvf binutils-2.25.tar.gz
 	pushd binutils-2.25
 	../gcc-4.9.2/contrib/download_prerequisites
 	popd
 fi
 
 if [ ! -e newlib-2.2.0 ] ; then
-	tar xvf $SRC/newlib-2.2.0.tar.gz
+	tar xvf newlib-2.2.0.tar.gz
 fi
 
 #######################
