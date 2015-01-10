@@ -15,7 +15,6 @@ void setup() {
 	pinMode(led, OUTPUT);     
 	Serial.begin(9600);
 	t::SetPrint(&Serial);
-
 	delay(3000);
 	printf("Test gcc/newlib\n");
 	delay(1000);
