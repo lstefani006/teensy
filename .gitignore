@@ -6,3 +6,4 @@
 *.a
 *.o
 */obj
+teensy_loader_cli
