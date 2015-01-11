@@ -5,7 +5,8 @@ set +x
 
 export MYTOOLS=$PWD/arm-none-eabi-4.9.2
 export PATH=$MYTOOLS/bin:$PATH
-TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
+#TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
+TARGET=""
 
 
 OPTIND=1
@@ -95,6 +96,88 @@ if [ ! -e gcc-first.ok ] ; then
 	rm -rf gcc
 	mkdir gcc
 	pushd gcc
+	cat <<EOF > ../../gcc-4.9.2/gcc/config/arm/t-arm-elf
+MULTILIB_OPTIONS     = marm/mthumb
+MULTILIB_DIRNAMES    = arm thumb
+MULTILIB_EXCEPTIONS  = 
+MULTILIB_MATCHES     =
+
+MULTILIB_OPTIONS      += march=armv7
+MULTILIB_DIRNAMES     += thumb2
+MULTILIB_EXCEPTIONS   += march=armv7* marm/*march=armv7*
+MULTILIB_EXCEPTIONS   += m*/march=armv7/march*
+
+MULTILIB_MATCHES      += march?armv7=march?armv7-a
+MULTILIB_MATCHES      += march?armv7=march?armv7-r
+MULTILIB_MATCHES      += march?armv7=march?armv7-m
+MULTILIB_MATCHES      += march?armv7=mcpu?cortex-a8
+MULTILIB_MATCHES      += march?armv7=mcpu?cortex-a9
+MULTILIB_MATCHES      += march?armv7=mcpu?cortex-r4
+MULTILIB_MATCHES      += march?armv7=mcpu?cortex-m3
+MULTILIB_MATCHES      += march?armv7=mcpu?cortex-m4
+
+# FPv4-SP-D16-M Floating point unit (found on Cortex-M4F)
+MULTILIB_OPTIONS      += mfloat-abi=hard mfpu=fpv4-sp-d16
+MULTILIB_DIRNAMES     += fpu fpv4spd16
+MULTILIB_MATCHES      += mfloat-abi?hard=mhard-float
+MULTILIB_EXCEPTIONS   += mfloat* mthumb/mfloat*
+MULTILIB_EXCEPTIONS   += mfpu* mthumb/mfpu*
+MULTILIB_EXCEPTIONS   += mthumb/march=armv7/mfloat-abi=hard
+MULTILIB_EXCEPTIONS   += mthumb/march=armv7/mfpu=fpv4-sp-d16*
+
+MULTILIB_EXCEPTIONS   += mfloat* mno-thumb-interwork/mfloat*
+MULTILIB_EXCEPTIONS   += mthumb/mno-thumb-interwork/mfloat-abi=hard
+MULTILIB_EXCEPTIONS   += mthumb/mno-thumb-interwork/mfpu=fpv4-sp-d16*
+MULTILIB_EXCEPTIONS   += mthumb/mno-thumb-interwork/mfloat-abi=hard/mfpu=fpv4-sp-d16*
+
+#MULTILIB_EXCEPTIONS   += mfloat* mno-thumb-interwork/mfloat*
+MULTILIB_EXCEPTIONS   += mno-thumb-interwork/mfloat-abi=hard
+MULTILIB_EXCEPTIONS   += mno-thumb-interwork/mfpu=fpv4-sp-d16*
+MULTILIB_EXCEPTIONS   += mno-thumb-interwork/mfloat-abi=hard/mfpu=fpv4-sp-d16*
+
+MULTILIB_EXCEPTIONS   += *arm7*mfloat-abi* *arm7*mfpu*
+MULTILIB_EXCEPTIONS   += *arm9*mfloat-abi* *arm9*mfpu*
+MULTILIB_EXCEPTIONS   += *xscale*mfloat-abi* *xscale*mfpu*
+ 	
+MULTILIB_OPTIONS     += mlittle-endian/mbig-endian
+MULTILIB_DIRNAMES    += le be
+MULTILIB_MATCHES     += mbig-endian=mbe mlittle-endian=mle
+MULTILIB_EXCEPTIONS  += *march=armv7*/*mbig-endian*
+
+# we choose not to build big-endian on armv7 nor arm9/arm9e to save space
+MULTILIB_EXCEPTIONS += *mbig-endian*/*mcpu=arm9*
+MULTILIB_EXCEPTIONS += *mbig-endian*/*mfloat-abi=hard
+MULTILIB_EXCEPTIONS += *mbig-endian*/*mfpu=fpv4-sp-d16
+MULTILIB_EXCEPTIONS += *mbig-endian*/*mno-thumb-interwork*/*mfpu=fpv4-sp-d16
+MULTILIB_EXCEPTIONS += *mbig-endian*/*mfloat-abi=hard/*mfpu=fpv4-sp-d16
+
+MULTILIB_OPTIONS      += mno-thumb-interwork
+MULTILIB_DIRNAMES     += nointerwork
+MULTILIB_EXCEPTIONS   += *marm/*mno-thumb-interwork*
+MULTILIB_EXCEPTIONS   += *march=armv7*/*mno-thumb-interwork*
+
+MULTILIB_OPTIONS    += mcpu=arm9/mcpu=arm9e/mcpu=xscale
+MULTILIB_DIRNAMES   += arm9 arm9e xscale
+
+# Disallow armv7 with any of these alternative cores
+MULTILIB_EXCEPTIONS += *march=armv7*/*mcpu=arm7*
+MULTILIB_EXCEPTIONS += *march=armv7*/*mcpu=arm9*
+MULTILIB_EXCEPTIONS += *march=armv7*/*mcpu=xscale*
+
+# Match relevant arm9 cores
+MULTILIB_MATCHES    += mcpu?arm9=mcpu?arm9tdmi
+MULTILIB_MATCHES    += mcpu?arm9=mcpu?arm920
+MULTILIB_MATCHES    += mcpu?arm9=mcpu?arm920t
+MULTILIB_MATCHES    += mcpu?arm9=mcpu?arm922t
+MULTILIB_MATCHES    += mcpu?arm9=mcpu?arm940t
+
+# Match relevant arm9e cores (also arm9ej)
+MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm946e-s
+MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm966e-s
+MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm968e-s
+MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm926ej-s
+MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm1026ej-s
+EOF
 	../../gcc-4.9.2/configure \
 		--target=arm-none-eabi \
 		--prefix=$MYTOOLS \
@@ -138,7 +221,8 @@ if [ ! -e newlib.ok ] ; then
 		--enable-newlib-io-long-long       \
 		--disable-newlib-multithread       \
 		--disable-newlib-supplied-syscalls \
-		$TARGET
+		CFLAGS="-D__thumb2__"
+	$TARGET
 	make -j5
 	make install
 	popd
