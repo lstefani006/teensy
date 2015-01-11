@@ -9,6 +9,7 @@ TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
 
 
 OPTIND=1
+x=0
 while getopts "xh?f:" opt; do
 	case "$opt" in
 		h|\?)
