@@ -5,5 +5,7 @@
 *.dix
 *.a
 *.o
+*.s
+*.d
 */obj
 teensy_loader_cli
