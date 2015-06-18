@@ -2,8 +2,12 @@
 # arch = armv7e-m
 #
 # path dell ambiente di sviluppo
-ARDUINO=/home/leo/teensy/arduino.1.0.6-teensy.1.20
-TEENSY=$(ARDUINO)/hardware/teensy/cores/teensy3
+
+#ARDUINO=/home/leo/teensy/arduino.1.0.6-teensy.1.20
+#TEENSY=$(ARDUINO)/hardware/teensy/cores/teensy3
+
+TEENSY=/home/leo/arduino-1.6.4/hardware/teensy/avr/cores/teensy3
+ARDUINO=/home/leo/arduino-1.6.4
 
 CFLAGS?=-Os
 CXXFLAGS?=-Os

@@ -3,11 +3,14 @@
 set -e
 set +x
 
-export MYTOOLS=$PWD/arm-none-eabi-4.9.2
+export V=5.1.0
+export B=2.25
+export N=2.2.0-1
+
+export MYTOOLS=$PWD/arm-none-eabi-$V
 export PATH=$MYTOOLS/bin:$PATH
 #TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
 TARGET=""
-
 
 OPTIND=1
 x=0
@@ -36,35 +39,35 @@ if [ $x -gt 0 ] ; then
 	rm -rf build
 fi
 
-if [ ! -e gcc-4.9.2.tar.gz ] ; then
-	wget ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-4.9.2/gcc-4.9.2.tar.gz
+if [ ! -e gcc-$V.tar.gz ] ; then
+	wget ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-$V/gcc-$V.tar.gz
 fi
-if [ ! -e binutils-2.25.tar.gz ] ; then
-	wget http://ftp.gnu.org/gnu/binutils/binutils-2.25.tar.gz
+if [ ! -e binutils-$B.tar.gz ] ; then
+	wget http://ftp.gnu.org/gnu/binutils/binutils-$B.tar.gz
 fi
-if [ ! -e newlib-2.2.0.tar.gz ] ; then
-	wget  ftp://sources.redhat.com/pub/newlib/newlib-2.2.0.tar.gz
+if [ ! -e newlib-$N.tar.gz ] ; then
+	wget  ftp://sources.redhat.com/pub/newlib/newlib-$N.tar.gz
 fi
 
 
 #######################
 
-if [ ! -e gcc-4.9.2 ] ; then
-	tar xvf gcc-4.9.2.tar.gz
-	pushd gcc-4.9.2
+if [ ! -e gcc-$V ] ; then
+	tar xvf gcc-$V.tar.gz
+	pushd gcc-$V
 	./contrib/download_prerequisites
 	popd
 fi
 
-if [ ! -e binutils-2.25 ] ; then
-	tar xvf binutils-2.25.tar.gz
-	pushd binutils-2.25
-	../gcc-4.9.2/contrib/download_prerequisites
+if [ ! -e binutils-$B ] ; then
+	tar xvf binutils-$B.tar.gz
+	pushd binutils-$B
+	../gcc-$V/contrib/download_prerequisites
 	popd
 fi
 
-if [ ! -e newlib-2.2.0 ] ; then
-	tar xvf newlib-2.2.0.tar.gz
+if [ ! -e newlib-$N ] ; then
+	tar xvf newlib-$N.tar.gz
 fi
 
 #######################
@@ -79,7 +82,7 @@ if [ ! -e binutils.ok ] ; then
 	rm -rf binutils
 	mkdir binutils
 	pushd binutils
-	../../binutils-2.25/configure \
+	../../binutils-$B/configure \
 		--prefix=$MYTOOLS  \
 		--disable-werror   \
 		--disable-nls      \
@@ -96,7 +99,7 @@ if [ ! -e gcc-first.ok ] ; then
 	rm -rf gcc
 	mkdir gcc
 	pushd gcc
-	cat <<EOF > ../../gcc-4.9.2/gcc/config/arm/t-arm-elf
+	cat <<EOF > ../../gcc-$V/gcc/config/arm/t-arm-elf
 MULTILIB_OPTIONS     = marm/mthumb
 MULTILIB_DIRNAMES    = arm thumb
 MULTILIB_EXCEPTIONS  = 
@@ -178,7 +181,7 @@ MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm968e-s
 MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm926ej-s
 MULTILIB_MATCHES    += mcpu?arm9e=mcpu?arm1026ej-s
 EOF
-	../../gcc-4.9.2/configure \
+	../../gcc-$V/configure \
 		--target=arm-none-eabi \
 		--prefix=$MYTOOLS \
 		--enable-interwork \

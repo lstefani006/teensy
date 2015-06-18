@@ -1,9 +1,9 @@
 CXXFLAGS = -I. #-V
-CXXFLAGS+= -I$(ARDUINO)/libraries/SPI
+CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 CXXFLAGS+= -W3
 CXXFLAGS+= -Os
 
-VPATH+=$(ARDUINO)/libraries/SPI
+VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 
 TARGET=522.hex
 SRC=\

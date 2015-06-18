@@ -15,7 +15,7 @@ all : $(TARGET)
 #	-Wl,-v   --> verboso
 $(FTARGET).hex : $(OBJ) $(TEENSYLIB)/mk20dx128.o $(TEENSYLIB)/libTeensy.a
 	@echo link $(FTARGET)
-	@teensy-g++ $(OBJ) -lm -o $(FTARGET).elf
+	teensy-g++ $(OBJ) -lm -o $(FTARGET).elf
 	@arm-none-eabi-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load \
 		--no-change-warnings --change-section-lma .eeprom=0 \
 		$(FTARGET).elf $(FTARGET).eep 

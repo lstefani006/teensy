@@ -1,9 +1,9 @@
 ﻿CXXFLAGS += -I RF24-master
-CXXFLAGS += -I $(ARDUINO)/libraries/SPI
+CXXFLAGS += -I $(ARDUINO)/hardware/arduino/avr/libraries/SPI
 CXXFLAGS += -W3
 CXXFLAGS += -Os
 
-VPATH    += $(ARDUINO)/libraries/SPI
+VPATH    += $(ARDUINO)/hardware/arduino/avr/libraries/SPI
 VPATH    += ./RF24-master
 
 SRC = RF24.cpp main.cpp
