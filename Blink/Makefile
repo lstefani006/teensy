@@ -1,4 +1,4 @@
-CXXFLAGS=-W3 -Os
+CXXFLAGS=-W3 -Os -I../TeensyLib
 
 TARGET=Blink.hex
 SRC=\

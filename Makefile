@@ -7,6 +7,7 @@ all :
 	@make -C SDFat
 	@make -C NRF24L01
 	@make -C Nokia-5110
+	@make -C Dallas
 
 clean : 
 	@make -C TeensyLib  clean
@@ -17,3 +18,4 @@ clean :
 	@make -C SDFat      clean
 	@make -C NRF24L01   clean
 	@make -C Nokia-5110 clean
+	@make -C Dallas     clean

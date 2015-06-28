@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <math.h>
+#include <t_io.h>
 
 // Pin 13 has an LED connected on most Arduino boards.
 // Pin 11 has the LED on Teensy 2.0
@@ -12,6 +13,7 @@ void setup()
 {
 	pinMode(led, OUTPUT);     
 	Serial.begin(9600);
+	t::SetPrint(&Serial);
 }
 
 
