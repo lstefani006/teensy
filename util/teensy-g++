@@ -7,8 +7,11 @@ set -e
 #set +e
 #set -e
 
-ARDUINO=/home/leo/teensy/arduino.1.0.6-teensy.1.20
-TEENSY=${ARDUINO}/hardware/teensy/cores/teensy3
+#ARDUINO=/home/leo/teensy/arduino.1.0.6-teensy.1.20
+#TEENSY=${ARDUINO}/hardware/teensy/cores/teensy3
+#TEENSY_LIB=/home/leo/teensy/TeensyLib
+ARDUINO=/home/leo/arduino-1.6.4
+TEENSY=${ARDUINO}/hardware/teensy/avr/cores/teensy3
 TEENSY_LIB=/home/leo/teensy/TeensyLib
 
 link=1
@@ -77,12 +80,13 @@ D="\
 	-DF_CPU=96000000 \
 	-DUSB_VID=null \
 	-DUSB_PID=null \
-	-DARDUINO=106 \
+	-DARDUINO=10604 \
 	-D__MK20DX256__ \
-	-DTEENSYDUINO=120 \
+	-DTEENSYDUINO=123 \
 	-DTIME_T=1412425835 \
 	-DUSB_SERIAL \
 	-DLAYOUT_US_ENGLISH \
+	-DARDUINO_ARCH_AVR \
 	"
 
 #	-MMD 
@@ -107,13 +111,13 @@ I="\
 if [ ${link} -eq 1 ] ; then
 	if [ $v -eq 1 ] ; then
 		echo arm-none-eabi-g++ ${I} ${C} ${W} ${D} \
-			-Wl,--gc-sections -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
+			-Wl,--gc-sections,--defsym=__rtc_localtime=0 -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
 			${TEENSY_LIB}/mk20dx128.o \
 			${TEENSY_LIB}/t_io.o \
 			"${options[@]}" -lTeensy
 	fi
 	arm-none-eabi-g++ ${I} ${C} ${W} ${D} \
-		-Wl,--gc-sections -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
+		-Wl,--gc-sections,--defsym=__rtc_localtime=0 -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
 		${TEENSY_LIB}/mk20dx128.o \
 		${TEENSY_LIB}/t_io.o \
 		"${options[@]}" -lTeensy
