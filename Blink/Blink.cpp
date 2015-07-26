@@ -13,6 +13,7 @@ void setup()
 {
 	pinMode(led, OUTPUT);     
 	Serial.begin(9600);
+	while (!Serial) ; // wait for Arduino Serial Monitor
 	t::SetPrint(&Serial);
 }
 
@@ -25,10 +26,16 @@ void blink(int msec)
 	delay(msec);            
 }
 
+int nn = 0;
+
 double f = 0.0;
 
 void loop() {
+	printf("sizeof(float)=%d\n", sizeof(float));
+	printf("sizeof(double)=%d\n", sizeof(double));
+	printf("%d\n", nn);
 	blink(100);
+	if (++nn < 20) return;
 
 	f += 1.1;
 	if (f > 10) {

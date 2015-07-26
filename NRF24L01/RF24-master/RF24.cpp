@@ -346,7 +346,7 @@ void RF24::setChannel(uint8_t channel)
 
 void RF24::setPayloadSize(uint8_t size)
 {
-  payload_size = min(size,32);
+  payload_size = min(size,(uint8_t)32);
 }
 
 /****************************************************************************/
@@ -804,7 +804,7 @@ uint8_t RF24::getDynamicPayloadSize(void)
 
 bool RF24::available(void)
 {
-  return available(NULL);
+  return available(nullptr);
 }
 
 /****************************************************************************/
@@ -1048,7 +1048,7 @@ void RF24::writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
 {
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
-  uint8_t data_len = min(len,32);
+  uint8_t data_len = min(len,(uint8_t)32);
 
   #if defined (__arm__) && ! defined( CORE_TEENSY )
 	SPI.transfer(csn_pin, W_ACK_PAYLOAD | ( pipe & B111 ), SPI_CONTINUE);

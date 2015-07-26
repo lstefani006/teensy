@@ -11,6 +11,7 @@ OBJ:=$(patsubst %.o,obj/%.o,$(OBJ))
 FTARGET=$(basename $(TARGET))
 
 all : $(TARGET)
+	echo $(TARGET)
 
 #	-Wl,-v   --> verboso
 $(FTARGET).hex : $(OBJ) $(TEENSYLIB)/mk20dx128.o $(TEENSYLIB)/libTeensy.a
