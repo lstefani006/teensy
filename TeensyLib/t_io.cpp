@@ -25,7 +25,7 @@ extern "C" {
 	int _write(int fd, char *ptr, int len) 
 	{
 		if (((fd == 1 || fd == 2) && s_Out != nullptr) || 
-			(Print *)fd == s_Out) 
+				(Print *)fd == s_Out) 
 		{
 			for (int i = 0; i < len; ++i) {
 				uint8_t ch = ((uint8_t*)ptr)[i];
@@ -35,7 +35,7 @@ extern "C" {
 			}
 			return len;
 		}
-		
+
 		errno = EBADF;
 		return -1;
 	}
@@ -73,5 +73,18 @@ extern "C" {
 			errno = EBADF;
 			return -1;
 		}
+	}
+
+	extern char *__brkval;
+
+	void * _sbrk(int incr)
+	{
+		char t = 0;
+		char *prev = __brkval;
+		if (prev + incr + 128 > &t) {
+			return (void *)-1;
+		}
+		__brkval += incr;
+		return prev;
 	}
 }

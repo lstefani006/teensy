@@ -50,7 +50,7 @@ LIB_OBJ:=$(patsubst %.o,obj/%.o,$(LIB_OBJ))
 
 TARGET=libTeensy.a
 
-all : mk20dx128.o \
+all : t_mk20dx128.o \
 	t_io.o \
 	$(TARGET) \
 	teensy_loader_cli
@@ -60,7 +60,10 @@ mk20dx128.o : obj/mk20dx128.o
 t_io.o : obj/t_io.o
 	cp obj/t_io.o .
 
-obj/mk20dx128.o : | obj
+t_mk20dx128.c : mk20dx128.c
+	awk -f teensy_patch.awk $< > t_mk20dx128.c
+
+obj/t_mk20dx128.o : | obj
 obj/t_io.o : | obj
 $(LIB_OBJ): | obj
 
@@ -76,7 +79,7 @@ $(TARGET) : $(LIB_OBJ)
 
 clean : 
 	-rm -f $(TARGET)
-	-rm -f mk20dx128.o
+	-rm -f t_mk20dx128.o
 	-rm -f t_io.o
 	-rm -rf obj
 	-rm -f teensy_loader_cli

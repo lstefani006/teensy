@@ -4,13 +4,7 @@ set -e
 # dump dei comandi quando vengono eseguito
 #set -x
 
-#set +e
-#set -e
-
-#ARDUINO=/home/leo/teensy/arduino.1.0.6-teensy.1.20
-#TEENSY=${ARDUINO}/hardware/teensy/cores/teensy3
-#TEENSY_LIB=/home/leo/teensy/TeensyLib
-ARDUINO=/home/leo/arduino-1.6.4
+ARDUINO=/home/leo/arduino-1.6.5
 TEENSY=${ARDUINO}/hardware/teensy/avr/cores/teensy3
 TEENSY_LIB=/home/leo/teensy/TeensyLib
 
@@ -112,13 +106,13 @@ if [ ${link} -eq 1 ] ; then
 	if [ $v -eq 1 ] ; then
 		echo arm-none-eabi-g++ ${I} ${C} ${W} ${D} \
 			-Wl,--gc-sections,--defsym=__rtc_localtime=0 -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
-			${TEENSY_LIB}/mk20dx128.o \
+			${TEENSY_LIB}/t_mk20dx128.o \
 			${TEENSY_LIB}/t_io.o \
 			"${options[@]}" -lTeensy
 	fi
 	arm-none-eabi-g++ ${I} ${C} ${W} ${D} \
-		-Wl,--gc-sections,--defsym=_rtc_localtime=0 -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
-		${TEENSY_LIB}/mk20dx128.o \
+		-Wl,--gc-sections,--defsym=__rtc_localtime=0 -L ${TEENSY_LIB} -T ${TEENSY}/mk20dx256.ld \
+		${TEENSY_LIB}/t_mk20dx128.o \
 		${TEENSY_LIB}/t_io.o \
 		"${options[@]}" -lTeensy
 else
