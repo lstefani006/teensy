@@ -2,6 +2,16 @@
 #include <math.h>
 #include <t_io.h>
 
+extern "C" {
+	extern char *__brkval;
+	/*
+	void *_sbrk(int incr) {
+
+		return nullptr;
+	}
+	*/
+}
+
 // Pin 13 has an LED connected on most Arduino boards.
 // Pin 11 has the LED on Teensy 2.0
 // Pin 6  has the LED on Teensy++ 2.0
