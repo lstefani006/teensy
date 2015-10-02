@@ -1,5 +1,0 @@
-/home/leo/teensy/SerialIP/TcpServer/TcpServer/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/home/leo/teensy/SerialIP/TcpServer/TcpServer/bin/Debug/TcpServer.exe.mdb
-/home/leo/teensy/SerialIP/TcpServer/TcpServer/bin/Debug/TcpServer.exe
-/home/leo/teensy/SerialIP/TcpServer/TcpServer/obj/x86/Debug/TcpServer.exe
-/home/leo/teensy/SerialIP/TcpServer/TcpServer/obj/x86/Debug/TcpServer.exe.mdb
