@@ -1,0 +1,162 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+HEIGHT	ILI9341_t3.cpp	27;"	d	file:
+HLine	ILI9341_t3.h	/^	void HLine(int16_t x, int16_t y, int16_t w, uint16_t color)$/;"	f	class:ILI9341_t3
+ILI9341_BLACK	ILI9341_t3.h	85;"	d
+ILI9341_BLUE	ILI9341_t3.h	86;"	d
+ILI9341_CASET	ILI9341_t3.h	49;"	d
+ILI9341_CYAN	ILI9341_t3.h	89;"	d
+ILI9341_DFUNCTR	ILI9341_t3.h	62;"	d
+ILI9341_DISPOFF	ILI9341_t3.h	46;"	d
+ILI9341_DISPON	ILI9341_t3.h	47;"	d
+ILI9341_FRMCTR1	ILI9341_t3.h	58;"	d
+ILI9341_FRMCTR2	ILI9341_t3.h	59;"	d
+ILI9341_FRMCTR3	ILI9341_t3.h	60;"	d
+ILI9341_GAMMASET	ILI9341_t3.h	45;"	d
+ILI9341_GMCTRN1	ILI9341_t3.h	78;"	d
+ILI9341_GMCTRP1	ILI9341_t3.h	77;"	d
+ILI9341_GREEN	ILI9341_t3.h	88;"	d
+ILI9341_INVCTR	ILI9341_t3.h	61;"	d
+ILI9341_INVOFF	ILI9341_t3.h	43;"	d
+ILI9341_INVON	ILI9341_t3.h	44;"	d
+ILI9341_MADCTL	ILI9341_t3.h	55;"	d
+ILI9341_MAGENTA	ILI9341_t3.h	90;"	d
+ILI9341_NOP	ILI9341_t3.h	27;"	d
+ILI9341_NORON	ILI9341_t3.h	35;"	d
+ILI9341_PASET	ILI9341_t3.h	50;"	d
+ILI9341_PIXFMT	ILI9341_t3.h	56;"	d
+ILI9341_PTLAR	ILI9341_t3.h	54;"	d
+ILI9341_PTLON	ILI9341_t3.h	34;"	d
+ILI9341_PWCTR1	ILI9341_t3.h	64;"	d
+ILI9341_PWCTR2	ILI9341_t3.h	65;"	d
+ILI9341_PWCTR3	ILI9341_t3.h	66;"	d
+ILI9341_PWCTR4	ILI9341_t3.h	67;"	d
+ILI9341_PWCTR5	ILI9341_t3.h	68;"	d
+ILI9341_RAMRD	ILI9341_t3.h	52;"	d
+ILI9341_RAMWR	ILI9341_t3.h	51;"	d
+ILI9341_RDDID	ILI9341_t3.h	29;"	d
+ILI9341_RDDST	ILI9341_t3.h	30;"	d
+ILI9341_RDID1	ILI9341_t3.h	72;"	d
+ILI9341_RDID2	ILI9341_t3.h	73;"	d
+ILI9341_RDID3	ILI9341_t3.h	74;"	d
+ILI9341_RDID4	ILI9341_t3.h	75;"	d
+ILI9341_RDIMGFMT	ILI9341_t3.h	40;"	d
+ILI9341_RDMADCTL	ILI9341_t3.h	38;"	d
+ILI9341_RDMODE	ILI9341_t3.h	37;"	d
+ILI9341_RDPIXFMT	ILI9341_t3.h	39;"	d
+ILI9341_RDSELFDIAG	ILI9341_t3.h	41;"	d
+ILI9341_RED	ILI9341_t3.h	87;"	d
+ILI9341_SLPIN	ILI9341_t3.h	32;"	d
+ILI9341_SLPOUT	ILI9341_t3.h	33;"	d
+ILI9341_SWRESET	ILI9341_t3.h	28;"	d
+ILI9341_TFTHEIGHT	ILI9341_t3.h	25;"	d
+ILI9341_TFTWIDTH	ILI9341_t3.h	24;"	d
+ILI9341_VMCTR1	ILI9341_t3.h	69;"	d
+ILI9341_VMCTR2	ILI9341_t3.h	70;"	d
+ILI9341_WHITE	ILI9341_t3.h	92;"	d
+ILI9341_YELLOW	ILI9341_t3.h	91;"	d
+ILI9341_t3	ILI9341_t3.cpp	/^ILI9341_t3::ILI9341_t3(uint8_t cs, uint8_t dc, uint8_t rst, uint8_t mosi, uint8_t sclk, uint8_t miso)$/;"	f	class:ILI9341_t3
+ILI9341_t3	ILI9341_t3.h	/^class ILI9341_t3 : public Print$/;"	c
+MADCTL_BGR	ILI9341_t3.cpp	166;"	d	file:
+MADCTL_MH	ILI9341_t3.cpp	167;"	d	file:
+MADCTL_ML	ILI9341_t3.cpp	164;"	d	file:
+MADCTL_MV	ILI9341_t3.cpp	163;"	d	file:
+MADCTL_MX	ILI9341_t3.cpp	162;"	d	file:
+MADCTL_MY	ILI9341_t3.cpp	161;"	d	file:
+MADCTL_RGB	ILI9341_t3.cpp	165;"	d	file:
+Pixel	ILI9341_t3.h	/^	void Pixel(int16_t x, int16_t y, uint16_t color)$/;"	f	class:ILI9341_t3
+SPICLOCK	ILI9341_t3.cpp	24;"	d	file:
+TFT_CS	main.cpp	12;"	d	file:
+TFT_DC	main.cpp	11;"	d	file:
+TFT_RESET	main.cpp	10;"	d	file:
+VLine	ILI9341_t3.h	/^	void VLine(int16_t x, int16_t y, int16_t h, uint16_t color)$/;"	f	class:ILI9341_t3
+WIDTH	ILI9341_t3.cpp	26;"	d	file:
+_ILI9341_t3H_	ILI9341_t3.h	20;"	d
+_cs	ILI9341_t3.h	/^	uint8_t _cs, _dc;$/;"	m	class:ILI9341_t3
+_dc	ILI9341_t3.h	/^	uint8_t _cs, _dc;$/;"	m	class:ILI9341_t3
+_height	ILI9341_t3.h	/^		_width, _height, \/\/ Display w\/h as modified by current rotation$/;"	m	class:ILI9341_t3
+_miso	ILI9341_t3.h	/^	uint8_t _miso, _mosi, _sclk;$/;"	m	class:ILI9341_t3
+_mosi	ILI9341_t3.h	/^	uint8_t _miso, _mosi, _sclk;$/;"	m	class:ILI9341_t3
+_rst	ILI9341_t3.h	/^	uint8_t  _rst;$/;"	m	class:ILI9341_t3
+_sclk	ILI9341_t3.h	/^	uint8_t _miso, _mosi, _sclk;$/;"	m	class:ILI9341_t3
+_width	ILI9341_t3.h	/^		_width, _height, \/\/ Display w\/h as modified by current rotation$/;"	m	class:ILI9341_t3
+begin	ILI9341_t3.cpp	/^void ILI9341_t3::begin(void)$/;"	f	class:ILI9341_t3
+color565	ILI9341_t3.h	/^	static uint16_t color565(uint8_t r, uint8_t g, uint8_t b) { return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3); }$/;"	f	class:ILI9341_t3
+cursor_x	ILI9341_t3.h	/^		cursor_x, cursor_y;$/;"	m	class:ILI9341_t3
+cursor_y	ILI9341_t3.h	/^		cursor_x, cursor_y;$/;"	m	class:ILI9341_t3
+drawBitmap	ILI9341_t3.cpp	/^void ILI9341_t3::drawBitmap(int16_t x, int16_t y,$/;"	f	class:ILI9341_t3
+drawChar	ILI9341_t3.cpp	/^void ILI9341_t3::drawChar(int16_t x, int16_t y, unsigned char c,$/;"	f	class:ILI9341_t3
+drawCircle	ILI9341_t3.cpp	/^void ILI9341_t3::drawCircle(int16_t x0, int16_t y0, int16_t r,$/;"	f	class:ILI9341_t3
+drawCircleHelper	ILI9341_t3.cpp	/^void ILI9341_t3::drawCircleHelper( int16_t x0, int16_t y0,$/;"	f	class:ILI9341_t3
+drawFastHLine	ILI9341_t3.cpp	/^void ILI9341_t3::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)$/;"	f	class:ILI9341_t3
+drawFastVLine	ILI9341_t3.cpp	/^void ILI9341_t3::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)$/;"	f	class:ILI9341_t3
+drawImg	ILI9341_t3.cpp	/^void ILI9341_t3::drawImg(const uint16_t *p)$/;"	f	class:ILI9341_t3
+drawLine	ILI9341_t3.cpp	/^void ILI9341_t3::drawLine(int16_t x0, int16_t y0,$/;"	f	class:ILI9341_t3
+drawPixel	ILI9341_t3.cpp	/^void ILI9341_t3::drawPixel(int16_t x, int16_t y, uint16_t color) {$/;"	f	class:ILI9341_t3
+drawRect	ILI9341_t3.cpp	/^void ILI9341_t3::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)$/;"	f	class:ILI9341_t3
+drawRoundRect	ILI9341_t3.cpp	/^void ILI9341_t3::drawRoundRect(int16_t x, int16_t y, int16_t w,$/;"	f	class:ILI9341_t3
+drawTriangle	ILI9341_t3.cpp	/^void ILI9341_t3::drawTriangle(int16_t x0, int16_t y0,$/;"	f	class:ILI9341_t3
+fillCircle	ILI9341_t3.cpp	/^void ILI9341_t3::fillCircle(int16_t x0, int16_t y0, int16_t r,$/;"	f	class:ILI9341_t3
+fillCircleHelper	ILI9341_t3.cpp	/^void ILI9341_t3::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,$/;"	f	class:ILI9341_t3
+fillRect	ILI9341_t3.cpp	/^void ILI9341_t3::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)$/;"	f	class:ILI9341_t3
+fillRoundRect	ILI9341_t3.cpp	/^void ILI9341_t3::fillRoundRect(int16_t x, int16_t y, int16_t w,$/;"	f	class:ILI9341_t3
+fillScreen	ILI9341_t3.cpp	/^void ILI9341_t3::fillScreen(uint16_t color)$/;"	f	class:ILI9341_t3
+fillTriangle	ILI9341_t3.cpp	/^void ILI9341_t3::fillTriangle ( int16_t x0, int16_t y0,$/;"	f	class:ILI9341_t3
+getRotation	ILI9341_t3.cpp	/^uint8_t ILI9341_t3::getRotation(void) {$/;"	f	class:ILI9341_t3
+height	ILI9341_t3.h	/^	int16_t height(void) { return _height; }$/;"	f	class:ILI9341_t3
+init_commands	ILI9341_t3.cpp	/^static const uint8_t init_commands[] = {$/;"	v	file:
+invertDisplay	ILI9341_t3.cpp	/^void ILI9341_t3::invertDisplay(boolean i)$/;"	f	class:ILI9341_t3
+loop	main.cpp	/^void loop(void) {$/;"	f
+pcs_command	ILI9341_t3.h	/^	uint8_t pcs_data, pcs_command;$/;"	m	class:ILI9341_t3
+pcs_data	ILI9341_t3.h	/^	uint8_t pcs_data, pcs_command;$/;"	m	class:ILI9341_t3
+pushColor	ILI9341_t3.cpp	/^void ILI9341_t3::pushColor(uint16_t color)$/;"	f	class:ILI9341_t3
+readPixel	ILI9341_t3.cpp	/^uint16_t ILI9341_t3::readPixel(int16_t x, int16_t y)$/;"	f	class:ILI9341_t3
+readRect	ILI9341_t3.cpp	/^void ILI9341_t3::readRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t *pcolors) $/;"	f	class:ILI9341_t3
+readcommand8	ILI9341_t3.cpp	/^uint8_t ILI9341_t3::readcommand8(uint8_t c, uint8_t index)$/;"	f	class:ILI9341_t3
+rotation	ILI9341_t3.h	/^		rotation;$/;"	m	class:ILI9341_t3
+setAddr	ILI9341_t3.h	/^	void setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)$/;"	f	class:ILI9341_t3
+setAddrWindow	ILI9341_t3.cpp	/^void ILI9341_t3::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)$/;"	f	class:ILI9341_t3
+setCursor	ILI9341_t3.cpp	/^void ILI9341_t3::setCursor(int16_t x, int16_t y) {$/;"	f	class:ILI9341_t3
+setRotation	ILI9341_t3.cpp	/^void ILI9341_t3::setRotation(uint8_t m)$/;"	f	class:ILI9341_t3
+setTextColor	ILI9341_t3.cpp	/^void ILI9341_t3::setTextColor(uint16_t c) {$/;"	f	class:ILI9341_t3
+setTextColor	ILI9341_t3.cpp	/^void ILI9341_t3::setTextColor(uint16_t c, uint16_t b) {$/;"	f	class:ILI9341_t3
+setTextSize	ILI9341_t3.cpp	/^void ILI9341_t3::setTextSize(uint8_t s) {$/;"	f	class:ILI9341_t3
+setTextWrap	ILI9341_t3.cpp	/^void ILI9341_t3::setTextWrap(boolean w) {$/;"	f	class:ILI9341_t3
+setup	main.cpp	/^void setup() {$/;"	f
+show_img	main.cpp	/^void show_img()$/;"	f
+start	main.cpp	/^void start() {$/;"	f
+step	main.cpp	/^static int step = 0;$/;"	v	file:
+swap	ILI9341_t3.h	258;"	d
+testCircles	main.cpp	/^unsigned long testCircles(uint8_t radius, uint16_t color) {$/;"	f
+testFastLines	main.cpp	/^unsigned long testFastLines(uint16_t color1, uint16_t color2) {$/;"	f
+testFillScreen	main.cpp	/^unsigned long testFillScreen() {$/;"	f
+testFilledCircles	main.cpp	/^unsigned long testFilledCircles(uint8_t radius, uint16_t color) {$/;"	f
+testFilledRects	main.cpp	/^unsigned long testFilledRects(uint16_t color1, uint16_t color2) {$/;"	f
+testFilledRoundRects	main.cpp	/^unsigned long testFilledRoundRects() {$/;"	f
+testFilledTriangles	main.cpp	/^unsigned long testFilledTriangles() {$/;"	f
+testLines	main.cpp	/^unsigned long testLines(uint16_t color) {$/;"	f
+testRects	main.cpp	/^unsigned long testRects(uint16_t color) {$/;"	f
+testRoundRects	main.cpp	/^unsigned long testRoundRects() {$/;"	f
+testText	main.cpp	/^unsigned long testText() {$/;"	f
+testTriangles	main.cpp	/^unsigned long testTriangles() {$/;"	f
+textbgcolor	ILI9341_t3.h	/^		textcolor, textbgcolor;$/;"	m	class:ILI9341_t3
+textcolor	ILI9341_t3.h	/^		textcolor, textbgcolor;$/;"	m	class:ILI9341_t3
+textsize	ILI9341_t3.h	/^		textsize,$/;"	m	class:ILI9341_t3
+waitFifoEmpty	ILI9341_t3.h	/^	void waitFifoEmpty(void) {$/;"	f	class:ILI9341_t3
+waitFifoNotFull	ILI9341_t3.h	/^	void waitFifoNotFull(void) {$/;"	f	class:ILI9341_t3
+waitTransmitComplete	ILI9341_t3.h	/^	void waitTransmitComplete(uint32_t mcr) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3
+waitTransmitComplete	ILI9341_t3.h	/^	void waitTransmitComplete(void) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3
+width	ILI9341_t3.h	/^	int16_t width(void)  { return _width; }$/;"	f	class:ILI9341_t3
+wrap	ILI9341_t3.h	/^		wrap; \/\/ If set, 'wrap' text at right edge of display$/;"	m	class:ILI9341_t3
+write	ILI9341_t3.cpp	/^size_t ILI9341_t3::write(uint8_t c) {$/;"	f	class:ILI9341_t3
+writeRect	ILI9341_t3.cpp	/^void ILI9341_t3::writeRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t *pcolors) $/;"	f	class:ILI9341_t3
+writecommand_cont	ILI9341_t3.h	/^	void writecommand_cont(uint8_t c) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3
+writecommand_last	ILI9341_t3.h	/^	void writecommand_last(uint8_t c) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3
+writedata16_cont	ILI9341_t3.h	/^	void writedata16_cont(uint16_t d) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3
+writedata16_last	ILI9341_t3.h	/^	void writedata16_last(uint16_t d) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3
+writedata8_cont	ILI9341_t3.h	/^	void writedata8_cont(uint8_t c) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3
+writedata8_last	ILI9341_t3.h	/^	void writedata8_last(uint8_t c) __attribute__((always_inline)) {$/;"	f	class:ILI9341_t3

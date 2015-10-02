@@ -30,7 +30,7 @@ $(FTARGET).a : $(OBJ)
 	@rm -f $@
 	@$(AR) -cvq $@ $^
 
-PHONY: clean upload distclean
+.PHONY: clean upload distclean all
 
 $(OBJ): | obj
 

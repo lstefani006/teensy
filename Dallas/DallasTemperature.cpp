@@ -325,7 +325,7 @@ void DallasTemperature::requestTemperatures()
 
 	// ASYNC mode?
 	if (!waitForConversion) return; 
-	blockTillConversionComplete(&bitResolution, 0);
+	blockTillConversionComplete(&bitResolution, nullptr);
 
 	return;
 }
@@ -356,12 +356,12 @@ bool DallasTemperature::requestTemperaturesByAddress(uint8_t* deviceAddress)
 
 void DallasTemperature::blockTillConversionComplete(uint8_t* bitResolution, uint8_t* deviceAddress)
 {
-	if(deviceAddress != 0 && checkForConversion && !parasite)
+	if(deviceAddress != nullptr && checkForConversion && !parasite)
 	{
 		// Continue to check if the IC has responded with a temperature
 		// NB: Could cause issues with multiple devices (one device may respond faster)
 		unsigned long start = millis();
-		while(!isConversionAvailable(0) && ((millis() - start) < 750));	
+		while(!isConversionAvailable(nullptr) && ((millis() - start) < 750));	
 	}
 
 	// Wait a fix number of cycles till conversion is complete (based on IC datasheet)
@@ -417,18 +417,10 @@ float DallasTemperature::calculateTemperature(uint8_t* deviceAddress, uint8_t* s
 	case DS1822MODEL:
 		switch (scratchPad[CONFIGURATION])
 		{
-		case TEMP_12_BIT:
-			return (float)rawTemperature * 0.0625;
-			break;
-		case TEMP_11_BIT:
-			return (float)(rawTemperature >> 1) * 0.125;
-			break;
-		case TEMP_10_BIT:
-			return (float)(rawTemperature >> 2) * 0.25;
-			break;
-		case TEMP_9_BIT:
-			return (float)(rawTemperature >> 3) * 0.5;
-			break;
+		case TEMP_12_BIT: return (float)rawTemperature * 0.0625;
+		case TEMP_11_BIT: return (float)(rawTemperature >> 1) * 0.125;
+		case TEMP_10_BIT: return (float)(rawTemperature >> 2) * 0.25;
+		case TEMP_9_BIT: return (float)(rawTemperature >> 3) * 0.5;
 		}
 		break;
 	case DS18S20MODEL:
@@ -451,6 +443,7 @@ float DallasTemperature::calculateTemperature(uint8_t* deviceAddress, uint8_t* s
 		return (float)(rawTemperature >> 1) - 0.25 +((float)(scratchPad[COUNT_PER_C] - scratchPad[COUNT_REMAIN]) / (float)scratchPad[COUNT_PER_C] );
 		break;
 	}
+	return -1;
 }
 
 // returns temperature in degrees C or DEVICE_DISCONNECTED if the
@@ -508,7 +501,7 @@ the next temperature conversion.
 // sets the high alarm temperature for a device in degrees celsius
 // accepts a float, but the alarm resolution will ignore anything
 // after a decimal point.  valid range is -55C - 125C
-void DallasTemperature::setHighAlarmTemp(uint8_t* deviceAddress, char celsius)
+void DallasTemperature::setHighAlarmTemp(uint8_t* deviceAddress, int8_t celsius)
 {
 	// make sure the alarm temperature is within the device's range
 	if (celsius > 125) celsius = 125;
@@ -525,7 +518,7 @@ void DallasTemperature::setHighAlarmTemp(uint8_t* deviceAddress, char celsius)
 // sets the low alarm temperature for a device in degreed celsius
 // accepts a float, but the alarm resolution will ignore anything
 // after a decimal point.  valid range is -55C - 125C
-void DallasTemperature::setLowAlarmTemp(uint8_t* deviceAddress, char celsius)
+void DallasTemperature::setLowAlarmTemp(uint8_t* deviceAddress, int8_t celsius)
 {
 	// make sure the alarm temperature is within the device's range
 	if (celsius > 125) celsius = 125;

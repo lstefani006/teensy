@@ -1,0 +1,14 @@
+﻿<Properties StartupItem="TcpServer/TcpServer.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="TcpServer/Program.cs">
+    <Files>
+      <File FileName="TcpServer/Program.cs" Line="168" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/home/leo/teensy/SerialIP/TcpServer/TcpServer/Program.cs" line="162" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

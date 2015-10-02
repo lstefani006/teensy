@@ -59,7 +59,6 @@ if [ $w -ge 2 ] ; then
 		-Wno-unused-parameter \
 		-Wuninitialized \
 		-Wzero-as-null-pointer-constant \
-		-ffunction-sections -fdata-sections \
 		"
 fi
 if [ $w -ge 3 ] ; then

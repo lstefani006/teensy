@@ -1,0 +1,105 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ISO_2	smtp-socket.c	69;"	d	file:
+ISO_3	smtp-socket.c	70;"	d	file:
+ISO_4	smtp-socket.c	71;"	d	file:
+ISO_5	smtp-socket.c	72;"	d	file:
+ISO_cr	smtp-socket.c	65;"	d	file:
+ISO_nl	smtp-socket.c	64;"	d	file:
+ISO_period	smtp-socket.c	67;"	d	file:
+MAIL_ERASE	email.c	59;"	d	file:
+MAIL_ERASE	email.c	61;"	d	file:
+MAIL_HEIGHT	email.c	53;"	d	file:
+MAIL_HEIGHT	email.c	55;"	d	file:
+MAIL_WIDTH	email.c	47;"	d	file:
+MAIL_WIDTH	email.c	49;"	d	file:
+PROCESS_THREAD	email.c	/^PROCESS_THREAD(email_process, ev, data)$/;"	f
+SEND_STRING	smtp-socket.c	75;"	d	file:
+SMTP_ERR_OK	smtp.h	39;"	d
+TEXTENTRY_WIDTH	email.c	65;"	d	file:
+TEXTENTRY_WIDTH	email.c	67;"	d	file:
+UIP_APPCALL	smtp.h	53;"	d
+UIP_APPSTATE_SIZE	smtp.h	57;"	d
+__EMAIL_DSC_H__	email-dsc.h	35;"	d
+__EMAIL_H__	email.h	35;"	d
+__SMTP_H__	smtp.h	34;"	d
+applyconfig	email.c	/^applyconfig(void)$/;"	f	file:
+cc	email.c	/^static char cc[40];$/;"	v	file:
+cc	smtp-socket.c	/^  char *cc;$/;"	m	struct:smtp_state	file:
+cclabel	email.c	/^static struct ctk_label cclabel =$/;"	v	typeref:struct:ctk_label	file:
+cctextentry	email.c	/^static struct ctk_textentry cctextentry =$/;"	v	typeref:struct:ctk_textentry	file:
+composewindow	email.c	/^static struct ctk_window composewindow;$/;"	v	typeref:struct:ctk_window	file:
+connected	smtp-socket.c	/^  char connected;$/;"	m	struct:smtp_state	file:
+email_dsc	email-dsc.h	/^DSC_HEADER(email_dsc);$/;"	v
+email_icon	email-dsc.c	/^static struct ctk_icon email_icon =$/;"	v	typeref:struct:ctk_icon	file:
+email_process	email.c	/^AUTOSTART_PROCESSES(&email_process);$/;"	v
+email_process	email.h	/^PROCESS_NAME(email_process);$/;"	v
+email_quit	email.c	/^email_quit(void)$/;"	f	file:
+erase_message	email.c	/^erase_message(void)$/;"	f	file:
+erasebutton	email.c	/^static struct ctk_button erasebutton =$/;"	v	typeref:struct:ctk_button	file:
+erasedialog	email.c	/^static struct ctk_window erasedialog;$/;"	v	typeref:struct:ctk_window	file:
+erasedialoglabel1	email.c	/^static struct ctk_label erasedialoglabel1 =$/;"	v	typeref:struct:ctk_label	file:
+erasedialoglabel2	email.c	/^static struct ctk_label erasedialoglabel2 =$/;"	v	typeref:struct:ctk_label	file:
+erasenobutton	email.c	/^static struct ctk_button erasenobutton =$/;"	v	typeref:struct:ctk_button	file:
+eraseyesbutton	email.c	/^static struct ctk_button eraseyesbutton =$/;"	v	typeref:struct:ctk_button	file:
+from	smtp-socket.c	/^  char *from;$/;"	m	struct:smtp_state	file:
+fromaddress	email.c	/^static char fromaddress[40];$/;"	v	file:
+fromaddresslabel	email.c	/^static struct ctk_label fromaddresslabel =$/;"	v	typeref:struct:ctk_label	file:
+fromaddresstextentry	email.c	/^static struct ctk_textentry fromaddresstextentry =$/;"	v	typeref:struct:ctk_textentry	file:
+inputbuffer	smtp-socket.c	/^  char inputbuffer[4];$/;"	m	struct:smtp_state	file:
+line	smtp-socket.c	/^  uint8_t line;$/;"	m	struct:smtp_state	file:
+localhostname	smtp-socket.c	/^static char *localhostname;$/;"	v	file:
+mail	email.c	/^static char mail[MAIL_WIDTH * MAIL_HEIGHT];$/;"	v	file:
+mailtextentry	email.c	/^struct ctk_textentry mailtextentry =$/;"	v	typeref:struct:ctk_textentry
+menu	email.c	/^static struct ctk_menu menu;$/;"	v	typeref:struct:ctk_menu	file:
+menuitem_compose	email.c	/^unsigned char menuitem_compose, menuitem_setup, menuitem_quit;$/;"	v
+menuitem_quit	email.c	/^unsigned char menuitem_compose, menuitem_setup, menuitem_quit;$/;"	v
+menuitem_setup	email.c	/^unsigned char menuitem_compose, menuitem_setup, menuitem_quit;$/;"	v
+msg	smtp-socket.c	/^  char *msg;$/;"	m	struct:smtp_state	file:
+msgheight	smtp-socket.c	/^  uint8_t msgheight;$/;"	m	struct:smtp_state	file:
+msgwidth	smtp-socket.c	/^  uint8_t msgwidth;$/;"	m	struct:smtp_state	file:
+prepare_message	email.c	/^prepare_message(void)$/;"	f	file:
+psock	smtp-socket.c	/^  struct psock psock;$/;"	m	struct:smtp_state	typeref:struct:smtp_state::psock	file:
+s	smtp-socket.c	/^static struct smtp_state s;$/;"	v	typeref:struct:smtp_state	file:
+sendbutton	email.c	/^static struct ctk_button sendbutton =$/;"	v	typeref:struct:ctk_button	file:
+sep1	email.c	/^static struct ctk_separator sep1 =$/;"	v	typeref:struct:ctk_separator	file:
+setupokbutton	email.c	/^static struct ctk_button setupokbutton =$/;"	v	typeref:struct:ctk_button	file:
+setupwindow	email.c	/^static struct ctk_window setupwindow;$/;"	v	typeref:struct:ctk_window	file:
+smtp_220	smtp-strings.c	/^const char smtp_220[4] = $/;"	v
+smtp_appcall	smtp-socket.c	/^smtp_appcall(void *state)$/;"	f
+smtp_cc	smtp-strings.c	/^const char smtp_cc[5] = $/;"	v
+smtp_configure	smtp-socket.c	/^smtp_configure(char *lhostname, uip_ipaddr_t *server)$/;"	f
+smtp_crnl	smtp-strings.c	/^const char smtp_crnl[3] = $/;"	v
+smtp_crnlperiodcrnl	smtp-strings.c	/^const char smtp_crnlperiodcrnl[6] = $/;"	v
+smtp_data	smtp-strings.c	/^const char smtp_data[7] = $/;"	v
+smtp_done	email.c	/^smtp_done(unsigned char error)$/;"	f
+smtp_from	smtp-strings.c	/^const char smtp_from[7] = $/;"	v
+smtp_helo	smtp-strings.c	/^const char smtp_helo[6] = $/;"	v
+smtp_init	smtp-socket.c	/^smtp_init(void)$/;"	f
+smtp_mail_from	smtp-strings.c	/^const char smtp_mail_from[12] = $/;"	v
+smtp_quit	smtp-strings.c	/^const char smtp_quit[7] = $/;"	v
+smtp_rcpt_to	smtp-strings.c	/^const char smtp_rcpt_to[10] = $/;"	v
+smtp_send	smtp-socket.c	/^smtp_send(char *to, char *cc, char *from, char *subject,$/;"	f
+smtp_state	smtp-socket.c	/^struct smtp_state {$/;"	s	file:
+smtp_subject	smtp-strings.c	/^const char smtp_subject[10] = $/;"	v
+smtp_thread	smtp-socket.c	/^PT_THREAD(smtp_thread(void))$/;"	f	file:
+smtp_to	smtp-strings.c	/^const char smtp_to[5] = $/;"	v
+smtpserver	email.c	/^static char smtpserver[40];$/;"	v	file:
+smtpserver	smtp-socket.c	/^static uip_ipaddr_t smtpserver;$/;"	v	file:
+smtpserverlabel	email.c	/^static struct ctk_label smtpserverlabel =$/;"	v	typeref:struct:ctk_label	file:
+smtpservertextentry	email.c	/^static struct ctk_textentry smtpservertextentry =$/;"	v	typeref:struct:ctk_textentry	file:
+statuslabel	email.c	/^static struct ctk_label statuslabel =$/;"	v	typeref:struct:ctk_label	file:
+subject	email.c	/^static char subject[40];$/;"	v	file:
+subject	smtp-socket.c	/^  char *subject;$/;"	m	struct:smtp_state	file:
+subjectlabel	email.c	/^static struct ctk_label subjectlabel =$/;"	v	typeref:struct:ctk_label	file:
+subjecttextentry	email.c	/^static struct ctk_textentry subjecttextentry =$/;"	v	typeref:struct:ctk_textentry	file:
+tcpipconficon_bitmap	email-dsc.c	/^static unsigned char tcpipconficon_bitmap[3*3*8] = {$/;"	v	file:
+tcpipconficon_textmap	email-dsc.c	/^static char tcpipconficon_textmap[9] = {$/;"	v	file:
+to	email.c	/^static char to[40];$/;"	v	file:
+to	smtp-socket.c	/^  char *to;$/;"	m	struct:smtp_state	file:
+tolabel	email.c	/^static struct ctk_label tolabel =$/;"	v	typeref:struct:ctk_label	file:
+totextentry	email.c	/^static struct ctk_textentry totextentry =$/;"	v	typeref:struct:ctk_textentry	file:

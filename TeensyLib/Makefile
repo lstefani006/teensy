@@ -4,43 +4,43 @@ include Makefile.base
 VPATH=$(TEENSY)
 
 LIB_SRC= \
-	analog.c \
-	eeprom.c \
-	keylayouts.c \
-	math_helper.c \
-	nonstd.c \
-	pins_teensy.c \
-	serial1.c \
-	serial2.c \
-	serial3.c \
-	touch.c \
-	usb_desc.c \
-	usb_dev.c \
-	usb_joystick.c \
-	usb_keyboard.c \
-	usb_mem.c \
-	usb_midi.c \
-	usb_mouse.c \
-	usb_rawhid.c \
-	usb_seremu.c \
-	usb_serial.c \
-	yield.c \
-	AudioStream.cpp \
-	avr_emulation.cpp \
-	HardwareSerial1.cpp \
-	HardwareSerial2.cpp \
-	HardwareSerial3.cpp \
-	IntervalTimer.cpp \
-	IPAddress.cpp \
-	main.cpp \
-	new.cpp \
-	Print.cpp \
-	Stream.cpp \
-	Tone.cpp \
-	usb_flightsim.cpp \
-	usb_inst.cpp \
-	WMath.cpp \
-	WString.cpp
+		 analog.c \
+		 eeprom.c \
+		 keylayouts.c \
+		 math_helper.c \
+		 nonstd.c \
+		 pins_teensy.c \
+		 serial1.c \
+		 serial2.c \
+		 serial3.c \
+		 touch.c \
+		 usb_desc.c \
+		 usb_dev.c \
+		 usb_joystick.c \
+		 usb_keyboard.c \
+		 usb_mem.c \
+		 usb_midi.c \
+		 usb_mouse.c \
+		 usb_rawhid.c \
+		 usb_seremu.c \
+		 usb_serial.c \
+		 yield.c \
+		 AudioStream.cpp \
+		 avr_emulation.cpp \
+		 HardwareSerial1.cpp \
+		 HardwareSerial2.cpp \
+		 HardwareSerial3.cpp \
+		 IntervalTimer.cpp \
+		 IPAddress.cpp \
+		 main.cpp \
+		 new.cpp \
+		 Print.cpp \
+		 Stream.cpp \
+		 Tone.cpp \
+		 usb_flightsim.cpp \
+		 usb_inst.cpp \
+		 WMath.cpp \
+		 WString.cpp
 
 
 # si usa := per evitare la ricursione infinita che si avrebbe con =
@@ -57,11 +57,11 @@ all : t_mk20dx128.o \
 
 mk20dx128.o : obj/mk20dx128.o
 	cp obj/mk20dx128.o .
-t_io.o : obj/t_io.o
+	t_io.o : obj/t_io.o
 	cp obj/t_io.o .
 
 t_mk20dx128.c : mk20dx128.c
-	awk -f teensy_patch.awk $< > t_mk20dx128.c
+	awk -f teensy_patch.awk $< > $@
 
 obj/t_mk20dx128.o : | obj
 obj/t_io.o : | obj
@@ -80,6 +80,7 @@ $(TARGET) : $(LIB_OBJ)
 clean : 
 	-rm -f $(TARGET)
 	-rm -f t_mk20dx128.o
+	-rm -f t_mk20dx128.c
 	-rm -f t_io.o
 	-rm -rf obj
 	-rm -f teensy_loader_cli

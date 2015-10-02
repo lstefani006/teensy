@@ -146,11 +146,11 @@ public:
 
 	// sets the high alarm temperature for a device
 	// accepts a char.  valid range is -55C - 125C
-	void setHighAlarmTemp(uint8_t*, const char);
+	void setHighAlarmTemp(uint8_t*, const int8_t);
 
 	// sets the low alarm temperature for a device
 	// accepts a char.  valid range is -55C - 125C
-	void setLowAlarmTemp(uint8_t*, const char);
+	void setLowAlarmTemp(uint8_t*, const int8_t);
 
 	// returns a signed char with the current high alarm temperature for a device
 	// in the range -55C - 125C
