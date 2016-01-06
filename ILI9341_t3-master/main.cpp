@@ -263,9 +263,9 @@ void setup() {
 	tft.setTextSize(2);
 	tft.println("Waiting for Arduino Serial Monitor...");
 
-	Serial.begin(9600);
-	while (!Serial) ; // wait for Arduino Serial Monitor
-	Serial.println("ILI9341 Test!"); 
+	//Serial.begin(9600);
+	//while (!Serial) ; // wait for Arduino Serial Monitor
+	//Serial.println("ILI9341 Test!"); 
 
 	start();
 }

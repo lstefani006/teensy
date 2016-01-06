@@ -85,7 +85,7 @@ D="\
 #	-MMD 
 
 C="\
-	-std=gnu++11 \
+	-std=gnu++14 \
 	-mcpu=cortex-m4 \
 	-mthumb \
 	-mfloat-abi=soft \

@@ -50,10 +50,15 @@ LIB_OBJ:=$(patsubst %.o,obj/%.o,$(LIB_OBJ))
 
 TARGET=libTeensy.a
 
-all : t_mk20dx128.o \
+all : .patched_itoa \
+	t_mk20dx128.o \
 	t_io.o \
 	$(TARGET) \
 	teensy_loader_cli
+
+.patched_itoa:
+	patch $(TEENSY)/avr_functions.h patch_atoi.txt
+	echo non cancellare questo file do aver fatto questa patch >  .patched_itoa
 
 mk20dx128.o : obj/mk20dx128.o
 	cp obj/mk20dx128.o .
@@ -84,6 +89,10 @@ clean :
 	-rm -f t_io.o
 	-rm -rf obj
 	-rm -f teensy_loader_cli
+	if [ -e .patched_itoa ]; then \
+		patch -R $(TEENSY)/avr_functions.h patch_atoi.txt ; \
+		rm .patched_itoa; \
+	fi
 
 ifeq ($(shell uname),Linux)
 DD=-DUSE_LIBUSB=1
