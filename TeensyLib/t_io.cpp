@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include <errno.h>
+
+#ifdef ARDUINO_ARCH_AVR
+#define EBADF -3
+#else
 #include <sys/stat.h>
+#endif
 
 #include "t_io.h"
 
