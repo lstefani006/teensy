@@ -1,10 +1,11 @@
 ifdef TEENSY
 CXXFLAGS=-W2 -Os -I../TeensyLib -V
+VPATH=../TeensyLib
 else
-CXXFLAGS=-I../TeensyLib
+CXXFLAGS=-I../AvrLib
+VPATH=../AvrLib
 endif
 
-VPATH=../TeensyLib
 TARGET=Blink.hex
 SRC=\
 	Blink.cpp \
