@@ -95,7 +95,7 @@
 
 class ILI9341_t3 : public Print
 {
-  public:
+public:
 	ILI9341_t3(uint8_t _CS, uint8_t _DC, uint8_t _RST = 255, uint8_t _MOSI=11, uint8_t _SCLK=13, uint8_t _MISO=12);
 	void begin(void);
 	void pushColor(uint16_t color);
@@ -117,8 +117,8 @@ class ILI9341_t3 : public Print
 
 	// Added functions to read pixel data...
 	uint16_t readPixel(int16_t x, int16_t y);
-    void readRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t *pcolors);
-    void writeRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t *pcolors);
+	void readRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t *pcolors);
+	void writeRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t *pcolors);
 
 	// from Adafruit_GFX.h
 	void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
@@ -147,39 +147,39 @@ class ILI9341_t3 : public Print
 	void setupScroll(uint16_t c, uint16_t bg);
 	void resetScroll(uint16_t bg);
 
- protected:
+protected:
 	uint16_t scrollUp(uint16_t up);
-  int16_t _scroll;
+	int16_t _scroll;
 	int16_t
-    _width, _height, // Display w/h as modified by current rotation
-    cursor_x, cursor_y;
-  uint16_t
-    textcolor, textbgcolor;
-  uint8_t
-    textsize,
-    rotation;
-  boolean
-    wrap; // If set, 'wrap' text at right edge of display
+		_width, _height, // Display w/h as modified by current rotation
+		cursor_x, cursor_y;
+	uint16_t
+		textcolor, textbgcolor;
+	uint8_t
+		textsize,
+		rotation;
+	boolean
+		wrap; // If set, 'wrap' text at right edge of display
 
-  	uint8_t  _rst;
-  	uint8_t _cs, _dc;
+	uint8_t  _rst;
+	uint8_t _cs, _dc;
 	uint8_t pcs_data, pcs_command;
-    uint8_t _miso, _mosi, _sclk;
+	uint8_t _miso, _mosi, _sclk;
 
 	uint16_t _scrollVSP;
 
 	void setAddr(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
-	  __attribute__((always_inline)) {
-		//y0 = (y0 + _scrollVSP) % 320;
-		//y1 = (y1 + _scrollVSP) % 320;
-		//if (y1 < y0) { uint16_t t = y1; y1 = y0; y0 = t; }
-		writecommand_cont(ILI9341_CASET); // Column addr set
-		writedata16_cont(x0);   // XSTART
-		writedata16_cont(x1);   // XEND
-		writecommand_cont(ILI9341_PASET); // Row addr set
-		writedata16_cont(y0);   // YSTART
-		writedata16_cont(y1);   // YEND
-	}
+		__attribute__((always_inline)) {
+			//y0 = (y0 + _scrollVSP) % 320;
+			//y1 = (y1 + _scrollVSP) % 320;
+			//if (y1 < y0) { uint16_t t = y1; y1 = y0; y0 = t; }
+			writecommand_cont(ILI9341_CASET); // Column addr set
+			writedata16_cont(x0);   // XSTART
+			writedata16_cont(x1);   // XEND
+			writecommand_cont(ILI9341_PASET); // Row addr set
+			writedata16_cont(y0);   // YSTART
+			writedata16_cont(y1);   // YEND
+		}
 	//void waitFifoNotFull(void) __attribute__((always_inline)) {
 	void waitFifoNotFull(void) {
 		uint32_t sr;
@@ -242,20 +242,17 @@ class ILI9341_t3 : public Print
 		KINETISK_SPI0.PUSHR = d | (pcs_data << 16) | SPI_PUSHR_CTAS(1) | SPI_PUSHR_EOQ;
 		waitTransmitComplete(mcr);
 	}
-	void HLine(int16_t x, int16_t y, int16_t w, uint16_t color)
-	  __attribute__((always_inline)) {
+	void HLine(int16_t x, int16_t y, int16_t w, uint16_t color) __attribute__((always_inline)) {
 		setAddr(x, y, x+w-1, y);
 		writecommand_cont(ILI9341_RAMWR);
 		do { writedata16_cont(color); } while (--w > 0);
 	}
-	void VLine(int16_t x, int16_t y, int16_t h, uint16_t color)
-	  __attribute__((always_inline)) {
+	void VLine(int16_t x, int16_t y, int16_t h, uint16_t color) __attribute__((always_inline)) {
 		setAddr(x, y, x, y+h-1);
 		writecommand_cont(ILI9341_RAMWR);
 		do { writedata16_cont(color); } while (--h > 0);
 	}
-	void Pixel(int16_t x, int16_t y, uint16_t color)
-	  __attribute__((always_inline)) {
+	void Pixel(int16_t x, int16_t y, uint16_t color) __attribute__((always_inline)) {
 		setAddr(x, y, x, y);
 		writecommand_cont(ILI9341_RAMWR);
 		writedata16_cont(color);

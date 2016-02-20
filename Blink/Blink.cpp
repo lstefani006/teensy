@@ -27,7 +27,6 @@ void setup()
 	t::SetPrint(&Serial);
 }
 
-
 void blink(int msec)
 {
 	digitalWrite(led, HIGH);
@@ -36,21 +35,13 @@ void blink(int msec)
 	delay(msec);            
 }
 
-int nn = 0;
-
-double f = 0.0;
+int n = 0;
+float f = 0;
 
 void loop() {
-	printf("sizeof(float)=%d\n", sizeof(float));
-	printf("sizeof(double)=%d\n", sizeof(double));
-	printf("%d\n", nn);
 	blink(100);
-	if (++nn < 20) return;
+	printf("ciao %d %f\n", n++, f++);
+	if (f > 10)
+	blink(1000);
 
-	f += 1.1;
-	if (f > 10) {
-		blink(500);
-	}
-	printf(" -- %d\n", int(f));
-	printf(" -- %f\n", f);
 }

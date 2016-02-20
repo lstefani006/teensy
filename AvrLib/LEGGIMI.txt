@@ -1,0 +1,11 @@
+
+
+La libc degli avr non funziona come l'arm
+
+non serve definire read/write/sbrk.....
+
+per scrivere con printf c'e' una funzione fd_set_xxxx
+
+(googla per trovarla)
+
+PER cui bisogna rifare t_io.cpp/hpp

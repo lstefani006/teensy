@@ -14,4 +14,4 @@ SRC+=DallasTemperature.cpp
 
 TARGET=Dallas.hex
 
-include /home/leo/teensy/TeensyLib/Makefile.inc
+include /home/leo/teensy/TeensyLib/Makefile.base

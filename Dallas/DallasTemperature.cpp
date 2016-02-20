@@ -114,7 +114,7 @@ void DallasTemperature::readScratchPad(uint8_t* deviceAddress, uint8_t* scratchP
 	//         DS18B20 & DS1822: configuration register
 	// byte 5: internal use & crc
 	// byte 6: DS18S20: COUNT_REMAIN
-		//         DS18B20 & DS1822: store for crc
+	//         DS18B20 & DS1822: store for crc
 	// byte 7: DS18S20: COUNT_PER_C
 	//         DS18B20 & DS1822: store for crc
 	// byte 8: SCRATCHPAD_CRC

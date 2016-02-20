@@ -4,7 +4,7 @@ set -e
 # dump dei comandi quando vengono eseguito
 #set -x
 
-ARDUINO=/home/leo/arduino-1.6.5
+ARDUINO=/home/leo/arduino-1.6.7
 TEENSY=${ARDUINO}/hardware/teensy/avr/cores/teensy3
 TEENSY_LIB=/home/leo/teensy/TeensyLib
 
