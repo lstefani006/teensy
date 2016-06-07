@@ -31,20 +31,22 @@ namespace ArduionoSerialMonitor
 
 			Task.Run(async () => {
 					try {
-					var c = new UdpClient(cPort);
-					for (;;) {
-					var r = await c.ReceiveAsync();
-
-					if (r.Buffer[0] == 'S')
-					this.Cmd = 'S';
-					else if (r.Buffer[0] == 'R')
-					this.Cmd = 'R';
-					else
-					this.Cmd = '?';
-					}
+						var c = new UdpClient(cPort);
+						for (;;) {
+							var r = await c.ReceiveAsync();
+							if (r.Buffer.Length > 0)
+							{
+							if (r.Buffer[0] == 'S')
+							this.Cmd = 'S';
+							else if (r.Buffer[0] == 'R')
+							this.Cmd = 'R';
+							else
+							this.Cmd = '?';
+							}
+						}
 					}
 					catch (Exception ex) {
-					Console.WriteLine("UdpClient error. {0}", ex);
+						Console.WriteLine("UdpClient error. {0}", ex);
 					}
 					});
 
@@ -60,7 +62,9 @@ namespace ArduionoSerialMonitor
 					try {
 					port = string.Format("/dev/ttyUSB{0}", p);
 					_s = new SerialPort(port);
-					_s.BaudRate = 9600;
+					//_s.BaudRate = 19200;
+					_s.BaudRate = 115200;
+					//_s.BaudRate = 38400;
 					_s.DataBits = 8;
 					_s.Parity = Parity.None;
 					_s.StopBits = StopBits.One;
@@ -139,14 +143,14 @@ namespace ArduionoSerialMonitor
 				byte[] b = new byte[1];
 				b[0] = (byte)cmd;
 				c.Send(b, 1, "localhost", cPort);
-				Thread.Sleep(300);
+				Thread.Sleep(500);
 			}
 		}
 
 		public static void Main(string[] args) {
 			if (args.Length == 1 && args[0] == "-stop")
 				sendCmd('S');
-			else 	if (args.Length == 1 && args[0] == "-run")
+			else if (args.Length == 1 && args[0] == "-run")
 				sendCmd('R');
 			else
 				new MainClass().begin();

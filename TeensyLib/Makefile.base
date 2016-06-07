@@ -25,7 +25,7 @@ obj/%.o : %.c
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 %.s : %.cpp
-	$(CXX) -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
+	$(CXX) -fverbose-asm -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
 
 %.s : %.c
 	$(CC) -S -c $(CFLAGS) $< -o $@

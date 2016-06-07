@@ -1,0 +1,76 @@
+TRATTO DA http://arduino.vom-kuhberg.de/
+
+
+Ci sono 3 indirzzamenti possibili
+rda_adrs  = 0x10;                 // I2C-Address RDA Chip for sequential  Access
+rda_adrr  = 0x11;                 // I2C-Address RDA Chip for random      Access
+rda_adrt  = 0x60;                 // I2C-Address RDA Chip for TEA5767like Access
+
+====================================================
+Con rda_adrs si scrivono/leggono i registri iniziando dal
+   R02 in scrittura  fino a R07 incluso
+   R0A in lettura    fino a R0F incluso
+Nella rda_adrs pratica resetta il puntatore a R02 o R0A 
+
+Scrittura === inizia sempre da R02
+	Wire.beginTransmission(rda_adrs); <-- inizia automaticamente dal REG 02
+	WireWrite16(0xD009);              <== R02
+	WireWrite16(aui_RDA5807_Reg[3]);  <== R03
+	Wire.endTransmission();
+
+int RDA5807::WriteAllRegs()
+{
+  Wire.beginTransmission(rda_adrs);
+  for (int i=2;i<=7;i++){ WireWrite16(aui_RDA5807_Reg[i]);}   <== inizia da R02 in su fino al R07
+  return Wire.endTransmission();
+}
+
+Lettura === inizia dal registo 0A
+void RDA5807::WireRead_Status()
+{
+   Wire.requestFrom(rda_adrs,4);                    // Read sequentiell 4 Statusbyte =Reg0A,Reg0B
+   ui_RDA_Reg0A=256*Wire.read()+Wire.read();        // Read RDA5807 Register 0Ah=10d
+   ui_RDA_Reg0B=256*Wire.read()+Wire.read();        // Read RDA5807 Register 0Bh=11d
+   Wire.endTransmission();
+}
+====================================================
+Con rda_adrr si leggono/scrivono un qualunque registro.
+
+Nella pratica con rda_adrr scrivo il puntatore e poi scrivo/leggo i dati
+
+Scrittura ======
+int RDA5807::WriteReg(int i_reg)                <= da R02 a R07 inclusi
+{
+  Wire.beginTransmission(rda_adrr);
+  Wire.write(i_reg); 
+  WireWrite16(aui_RDA5807_Reg[i_reg]);
+  return Wire.endTransmission();
+}
+
+Lettura ==== da qualunque registro (da 0A-0B reg di stato    e  0C-0D-0E-0F registri RDA)
+void RDA5807::WireRead_RDS_ABCD()
+{
+   Wire.beginTransmission(rda_adrr);                // Device 0x11 for random access
+   Wire.write(0x0C);                                // Start at Register 0x0C
+   Wire.endTransmission(0);                         // restart condition
+   Wire.requestFrom(rda_adrr,8,1);                  // Retransmit device address with READ by 8 bytes
+   ui_RDSA=256*Wire.read()+Wire.read();             // Read RDS Data Block A
+   ui_RDSB=256*Wire.read()+Wire.read();             // Read RDS Data Block B
+   ui_RDSC=256*Wire.read()+Wire.read();             // Read RDS Data Block C
+   ui_RDSD=256*Wire.read()+Wire.read();             // Read RDS Data Block D
+   Wire.endTransmission();
+}
+
+============================================================
+Nel data sheet c'e' scritto che il 3A è l'ultimo regiistro, poi si wrappa in 00 
+
+=====================================================
+for (int i = 1; i < 120; i++) //loop through possible addresses
+{
+	Wire.beginTransmission (i);
+	if (Wire.endTransmission () == 0) //returns 0 if device found
+	{
+		Serial.print ("Adsress Found: ");
+		Serial.println (i);
+	}
+}

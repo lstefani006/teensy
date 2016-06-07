@@ -67,22 +67,28 @@ CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++11 -fno-threadsafe-statics \
 	-fno-exceptions
 
 .obj/%.o : %.cpp | .obj
+	@echo $<
 	avr-g++ -c $(CXXFLAGS) $< -o $@
 
 .obj/%.o : %.c | .obj
-	avr-gcc -c $(CFLAGS) $< -o $@
+	@echo $<
+	@avr-gcc -c $(CFLAGS) $< -o $@
 
 .lib/%.o : %.cpp | .lib
-	avr-g++ -c $(CXXFLAGS) $< -o $@
+	@echo $<
+	@avr-g++ -c $(CXXFLAGS) $< -o $@
 
 .lib/%.o : %.c | .lib
-	avr-gcc -c $(CFLAGS) $< -o $@
+	@echo $<
+	@avr-gcc -c $(CFLAGS) $< -o $@
 
 %.s : %.cpp
-	avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
+	@echo $<
+	@avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
 
 %.s : %.c
-	avr-gcc -S -c $(CFLAGS) $< -o $@
+	@echo $<
+	@avr-gcc -S -c $(CFLAGS) $< -o $@
 
 VPATH+=$(ARDUINO)/hardware/arduino/avr/cores/arduino
 
@@ -113,6 +119,7 @@ $(TARGET).hex : libArduinoPro.a $(OBJ)
 	avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(TARGET).elf $(TARGET).eep
 	avr-objcopy -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex
 	avr-size $(TARGET).elf
+	avr-size --mcu=atmega328 --format=avr $(TARGET).elf
 
 libArduinoPro.a : $(LIB_OBJ)
 	rm -f $@
