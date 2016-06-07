@@ -1,6 +1,8 @@
 CXXFLAGS = -I. #-V
 CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+ifdef TEENSY
 CXXFLAGS+= -W3
+endif
 CXXFLAGS+= -Os
 
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
@@ -11,7 +13,11 @@ SRC=\
 	522.cpp \
 	SPI.cpp
 
-include ../TeensyLib/Makefile.inc
+ifdef TEENSY
+include ../TeensyLib/teensy_makefile.mk
+else
+include ../AvrLib/avr_makefile.mk
+endif
 
 tags : 
 	hdrtag *.c *.cpp *.h *.hpp \
