@@ -9,10 +9,13 @@ endif
 TARGET=DHT11.hex
 SRC=\
 	DHT11.cpp \
-	idDHTLib.cpp \
-	timer.cpp \
-	t_io.cpp
+	idDHTLib.cpp
+#	t_io.cpp
 
+ifdef TEENSY
+else
+	SRC+= timer.cpp 
+endif
 
 ifdef TEENSY
 include ../TeensyLib/teensy_makefile.mk

@@ -38,7 +38,9 @@ void setup()
 	Serial.begin(115200);
 
 	pinMode(LED_BUILTIN, OUTPUT);
+#ifdef __AVR__
 	timer2.setup_overflow(1000ul);
+#endif
 
 	Serial.println("idDHTLib Example program");
 	Serial.print("LIB version: ");

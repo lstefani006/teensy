@@ -1,6 +1,8 @@
 
 #include <Arduino.h>
 
+#ifdef __AVR__
+
 // Timer2 supporta solo overflow 0xff=>0x00 scatta l'interrupt
 class Timer2
 {
@@ -165,3 +167,5 @@ public:
 
 extern Timer2 timer2;
 void timer2_tick();
+
+#endif

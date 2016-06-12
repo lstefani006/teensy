@@ -9,6 +9,9 @@ endif
 TARGET=Blink.hex
 SRC=\
 	Blink.cpp
+ifndef TEENSY
+	SRC += t_io.cpp
+endif
 
 
 ifdef TEENSY
