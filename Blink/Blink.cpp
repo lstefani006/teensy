@@ -43,8 +43,10 @@ void loop() {
 	blink(100);
 	printf("ciao %d %f\n", n++, f++);
 	if (f > 10)
+	{
 		if (n&1)
 			blink(200);
 		else
 			blink(1000);
+	}
 }

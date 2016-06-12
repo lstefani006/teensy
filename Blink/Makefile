@@ -8,8 +8,7 @@ endif
 
 TARGET=Blink.hex
 SRC=\
-	Blink.cpp \
-	t_io.cpp
+	Blink.cpp
 
 
 ifdef TEENSY

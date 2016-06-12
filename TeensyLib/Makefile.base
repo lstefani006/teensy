@@ -16,11 +16,11 @@ ECHO_CXX ?=$(notdir $<)
 ECHO_C ?=$(notdir $<)
 endif
 
-obj/%.o : %.cpp
+obj/%.o : %.cpp | obj
 	@echo $(ECHO_CXX)
 	@$(CXX) -c $(CXXFLAGS) $< -o $@
 
-obj/%.o : %.c
+obj/%.o : %.c | obj
 	@echo $(ECHO_C)
 	@$(CC) -c $(CFLAGS) $< -o $@
 

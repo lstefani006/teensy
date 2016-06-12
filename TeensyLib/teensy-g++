@@ -4,7 +4,7 @@ set -e
 # dump dei comandi quando vengono eseguito
 #set -x
 
-ARDUINO=/home/leo/arduino-1.6.7
+ARDUINO=/home/leo/arduino-1.6.8
 TEENSY=${ARDUINO}/hardware/teensy/avr/cores/teensy3
 TEENSY_LIB=/home/leo/teensy/TeensyLib
 
@@ -79,7 +79,6 @@ D="\
 	-DTIME_T=1412425835 \
 	-DUSB_SERIAL \
 	-DLAYOUT_US_ENGLISH \
-	-DARDUINO_ARCH_AVR \
 	"
 
 #	-MMD 

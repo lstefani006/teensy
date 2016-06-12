@@ -50,7 +50,13 @@ LIB_OBJ:=$(patsubst %.o,obj/%.o,$(LIB_OBJ))
 
 TARGET=libTeensy.a
 
-all : .patched_itoa \
+all : \
+	t_mk20dx128.o \
+	t_io.o \
+	$(TARGET) \
+	teensy_loader_cli
+
+all_old : .patched_itoa \
 	t_mk20dx128.o \
 	t_io.o \
 	$(TARGET) \
@@ -58,7 +64,7 @@ all : .patched_itoa \
 
 .patched_itoa:
 	patch $(TEENSY)/avr_functions.h patch_atoi.txt
-	echo non cancellare questo file do aver fatto questa patch >  .patched_itoa
+	echo non cancellare questo file dopo aver fatto questa patch >  .patched_itoa
 
 mk20dx128.o : obj/mk20dx128.o
 	cp obj/mk20dx128.o .
