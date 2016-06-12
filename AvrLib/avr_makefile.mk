@@ -72,23 +72,23 @@ CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++11 -fno-threadsafe-statics \
 
 .obj/%.o : %.c | .obj
 	@echo $<
-	@avr-gcc -c $(CFLAGS) $< -o $@
+	avr-gcc -c $(CFLAGS) $< -o $@
 
 .lib/%.o : %.cpp | .lib
 	@echo $<
-	@avr-g++ -c $(CXXFLAGS) $< -o $@
+	avr-g++ -c $(CXXFLAGS) $< -o $@
 
 .lib/%.o : %.c | .lib
 	@echo $<
-	@avr-gcc -c $(CFLAGS) $< -o $@
+	avr-gcc -c $(CFLAGS) $< -o $@
 
 %.s : %.cpp
 	@echo $<
-	@avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
+	avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
 
 %.s : %.c
 	@echo $<
-	@avr-gcc -S -c $(CFLAGS) $< -o $@
+	avr-gcc -S -c $(CFLAGS) $< -o $@
 
 VPATH+=$(ARDUINO)/hardware/arduino/avr/cores/arduino
 

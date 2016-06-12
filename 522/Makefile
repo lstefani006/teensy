@@ -1,11 +1,11 @@
-CXXFLAGS = -I. #-V
+CXXFLAGS = -I. -V
 CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+
 ifdef TEENSY
-CXXFLAGS+= -W3
+CXXFLAGS+= -W3 -Os
 endif
 CXXFLAGS+= -Os
-
-VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 
 TARGET=522.hex
 SRC=\
