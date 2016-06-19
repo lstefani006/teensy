@@ -1,5 +1,4 @@
-﻿//#include "t_SPI.h"
-#include "OneWire.h"
+﻿#include "OneWire.h"
 #include "DallasTemperature.h"
 #include "t_io.h"
 
@@ -10,12 +9,6 @@
 #define PIN_SCLK  13
 #define PIN_RESET  9
 #define PIN_DC    14
-
-//#if 1
-//t::hwSPI<PIN_CE, PIN_SCLK, PIN_SDIN, -1> spi;
-//#else
-//t::swSPI<PIN_CE, PIN_SCLK, PIN_SDIN, -1> spi;
-//#endif
 
 static OneWire ds(22);
 static DallasTemperature sensors(&ds);

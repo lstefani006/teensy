@@ -79,6 +79,7 @@ namespace t
 
 		bool begin() 
 		{
+#if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
 			if (SPI.pinIsChipSelect(cs) == false)
 				return false;
 
@@ -87,6 +88,7 @@ namespace t
 			SPI.setMOSI(mosi);
 			if (miso != 0xff) SPI.setMISO(miso);
 			SPI.setSCK(clk);
+#endif
 
 			SPI.begin();
 			//SPISettings s(4*1000*1000, MSBFIRST, SPI_MODE0);

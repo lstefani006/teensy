@@ -68,7 +68,6 @@ if [ $w -ge 3 ] ; then
 		"
 fi
 
-
 D="\
 	-DF_CPU=96000000 \
 	-DUSB_VID=null \

@@ -27,33 +27,196 @@
  * The reader can be found on eBay for around 5 dollars. Search for "mf-rc522" on ebay.com. 
  */
 
+#include <t_io.h>
 #include <MFRC522.h>
 
+#include "crypto/des.h"
+#include "crypto/des3.h"
+#include "crypto/aes.h"
+#include "crypto/rsa.h"
+
 #define SS_PIN 10
-#define RST_PIN 14
-MFRC522 mfrc522(SS_PIN, RST_PIN);	// Create MFRC522 instance.
+#define RST_PIN 9
+MFRC522 pdc(SS_PIN, RST_PIN);	// Create MFRC522 instance.
 
-void setup() {
-	Serial.begin(9600);	// Initialize serial communications with the PC
-	SPI.begin();			// Init SPI bus
-	mfrc522.PCD_Init();	// Init MFRC522 card
 
-	delay(1000*10);
+
+void kk()
+{
+	if (true)
+	{
+		DesContext dc;
+		desInit(&dc, (const uint8_t *)"ww", 2);
+
+		const uint8_t *in = nullptr;
+		uint8_t *out = nullptr;
+		desEncryptBlock(&dc, in, out);
+		desDecryptBlock(&dc, in, out);
+
+	}
+
+	if (true)
+	{
+		Des3Context dc3;
+		des3Init(&dc3, (const uint8_t *)"ww", 2);
+
+		const uint8_t *in = nullptr;
+		uint8_t *out = nullptr;
+		des3EncryptBlock(&dc3, in, out);
+		des3DecryptBlock(&dc3, in, out);
+	}
+	if (true)
+	{
+		AesContext dc3;
+		aesInit(&dc3, (const uint8_t *)"ww", 2);
+
+		const uint8_t *in = nullptr;
+		uint8_t *out = nullptr;
+		aesEncryptBlock(&dc3, in, out);
+		aesDecryptBlock(&dc3, in, out);
+	}
+	if (true)
+	{
+	}
+}
+
+void setup() 
+{
+	delay(1000*2);
+	Serial.begin(38400);	// Initialize serial communications with the PC
+	while (!Serial);
+	Serial.println("Start");
+	t::SetPrint(&Serial);
+
+	SPI.begin();		// Init SPI bus
+	pdc.PCD_Init();	// Init MFRC522 card
+
+	int v = pdc.PCD_GetVersion();
+	Serial.print("Version = ");
+	Serial.println(v, HEX);
+	if (!(v == 0x91 || v == 0x92))
+	{
+		Serial.println("522 not found");
+		delay(1000*10);
+		while(1);
+	}
+
+	kk();
+
 
 	Serial.println("Scan PICC to see UID and type...");
 }
 
-void loop() {
-	// Look for new cards
-	if ( ! mfrc522.PICC_IsNewCardPresent()) {
-		return;
+void dumpUL()
+{
+	uint8_t LB1 = 0, LB2 = 0;
+	for (int page = 0; page < 16; page++)
+	{
+		byte bb[20];
+		byte bsz = sizeof(bb);
+		if (pdc.MIFARE_Read(page, bb, &bsz) == MFRC522::STATUS_OK)
+		{
+			if (bsz == 18)
+			{
+				Serial.print(page);
+				Serial.print(" ");
+				for (int i = 0; i < 4; ++i)
+					printf(" %02x", bb[i]);
+				printf("\n");
+			}
+			else
+				printf("Ritorna %d\n", bsz);
+		}
+		else
+			printf("Errore\n");
+
+		if (page == 3) {
+			LB1 = bb[2];
+			LB2 = bb[3];
+		}
 	}
+
+	if (true)
+	{
+		printf("LOCK BITS\n");
+		printf("Lock Bit - se settato la pagina e' a sola lettura\n");
+		uint8_t m = 0b1000'0000;
+		for (int i = 7; i >= 3; i--)
+		{
+			if (i == 3)
+				printf("L%01x OTP", i);
+			else
+				printf("L%01x    ", i);
+			if (LB1 & m) printf(" LOCKED"); else printf(" unlocked");
+			printf("\n");
+			m>>=1;
+		}
+		m = 0b1000'0000;
+		for (int i = 7; i >= 0; i--)
+		{
+			printf("L%01x    ", i+8);
+			if (LB2 & m) printf(" LOCKED"); else printf(" unlocked");
+			printf("\n");
+			m>>=1;
+		}
+		printf("BLOCK BITS\n");
+		printf("Block Bits - se settato blocca la modifica ai LOCK BITS\n");
+		
+		printf("\nLB for 0xf to 0xa pages %s", ((LB1 & 0b100) ? "FROZEN" : "free"));
+		printf("\nLB for 0x9 to 0x4 pages %s", ((LB1 & 0b010) ? "FROZEN" : "free"));
+		printf("\nLB for 0x3 (OTP)        %s", ((LB1 & 0b001) ? "FROZEN" : "free"));
+
+		printf("\nOTP\n");
+		printf("Sono bit settati a ZERO in fabbrica\n");
+		printf("se scritti a UNO rimangono a UNO");
+		printf("se si fa write con un ZERO su di un UNO rimane uno\n");
+	}
+}
+
+
+void loop() {
+	delay(100);
+
+	// Look for new cards
+	if (! pdc.PICC_IsNewCardPresent())
+		return;
 
 	// Select one of the cards
-	if ( ! mfrc522.PICC_ReadCardSerial()) {
+	if (! pdc.PICC_ReadCardSerial())
 		return;
-	}
 
 	// Dump debug info about the card. PICC_HaltA() is automatically called.
-	mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+	printf("\n\n");
+	pdc.PICC_DumpToSerial(&(pdc.uid));
+
+	if (pdc.PICC_GetType(pdc.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL)
+	{
+		Serial.println("Ci provo");
+		dumpUL();
+
+
+		byte bb[18];
+		byte bbsz = sizeof(bb);
+
+		byte addr = 0x6;
+		auto st = pdc.MIFARE_Read(addr, bb, &bbsz);
+		if (st == MFRC522::STATUS_OK)
+		{
+			printf("Leggo pagina=%02x ==> %02x\n", addr, bb[0]);
+
+			bb[0] += 1;
+			st = pdc.MIFARE_Ultralight_Write(addr, bb, 4);
+			if (st == MFRC522::STATUS_OK)
+			{
+				printf("OK\n");
+				delay(1000*3);
+			}
+			else
+				printf("error %s\n", pdc.GetStatusCodeName(st));
+		}
+		else
+			printf("error %s\n", pdc.GetStatusCodeName(st));
+	}
 }
+
+

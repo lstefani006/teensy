@@ -212,7 +212,8 @@ public:
 		PICC_TYPE_MIFARE_UL		= 6,	// MIFARE Ultralight or Ultralight C
 		PICC_TYPE_MIFARE_PLUS	= 7,	// MIFARE Plus
 		PICC_TYPE_TNP3XXX		= 8,	// Only mentioned in NXP AN 10833 MIFARE Type Identification Procedure
-		PICC_TYPE_NOT_COMPLETE	= 255	// SAK indicates UID is not complete.
+		PICC_TYPE_MIFARE_DESFIRE= 9,	// DESFIRE
+		PICC_TYPE_NOT_COMPLETE	= 255,	// SAK indicates UID is not complete.
 	};
 	
 	// Return codes from the functions in this class. Remember to update GetStatusCodeName() if you add more.
@@ -233,6 +234,12 @@ public:
 		byte		size;			// Number of bytes in the UID. 4, 7 or 10.
 		byte		uidByte[10];
 		byte		sak;			// The SAK (Select acknowledge) byte returned from the PICC after successful selection.
+
+		void Dump() const {
+			printf("UID len=%d, sak=%02x, uid=", size, sak);
+			for (int i = 0; i < size; ++i) printf(" %02x", uidByte[i]);
+			printf("\n");
+		}
 	};
 	
 	// A struct used for passing a MIFARE Crypto1 key
@@ -275,12 +282,12 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for communicating with PICCs
 	/////////////////////////////////////////////////////////////////////////////////////
-	StatusCode PCD_TransceiveData(byte *sendData, byte sendLen, byte *backData, byte *backLen, byte *validBits = nullptr, byte rxAlign = 0, bool checkCRC = false);
-	StatusCode PCD_CommunicateWithPICC(byte command, byte waitIRq, byte *sendData, byte sendLen, byte *backData = nullptr, byte *backLen = nullptr, byte *validBits = nullptr, byte rxAlign = 0, bool checkCRC = false);
+	StatusCode PCD_TransceiveData(const byte *sendData, byte sendLen, byte *backData, byte *backLen, byte *validBits = nullptr, byte rxAlign = 0, bool checkCRC = false);
+	StatusCode PCD_CommunicateWithPICC(byte command, byte waitIRq, const byte *sendData, byte sendLen, byte *backData = nullptr, byte *backLen = nullptr, byte *validBits = nullptr, byte rxAlign = 0, bool checkCRC = false);
 
 	StatusCode PICC_RequestA(byte *bufferATQA, byte *bufferSize);
 	StatusCode PICC_WakeupA(byte *bufferATQA, byte *bufferSize);
-	StatusCode PICC_REQA_or_WUPA(	byte command, byte *bufferATQA, byte *bufferSize);	
+	StatusCode PICC_REQA_or_WUPA(byte command, byte *bufferATQA, byte *bufferSize);	
 	StatusCode PICC_Select(Uid *uid, byte validBits = 0);
 	StatusCode PICC_HaltA();
 
@@ -288,10 +295,10 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Functions for communicating with MIFARE PICCs
 	/////////////////////////////////////////////////////////////////////////////////////
-	StatusCode PCD_Authenticate(byte command, byte blockAddr, MIFARE_Key *key, Uid *uid);
+	StatusCode PCD_Authenticate(byte command, byte blockAddr, MIFARE_Key *key, const Uid *uid);
 	void PCD_StopCrypto1();
 	StatusCode MIFARE_Read(byte blockAddr, byte *buffer, byte *bufferSize);
-	StatusCode MIFARE_Write(byte blockAddr, byte *buffer, byte bufferSize);
+	StatusCode MIFARE_Write(byte blockAddr, const byte *buffer, byte bufferSize);
  	StatusCode MIFARE_Decrement(byte blockAddr, long delta);
 	StatusCode MIFARE_Increment(byte blockAddr, long delta);
  	StatusCode MIFARE_Restore(byte blockAddr);
@@ -301,13 +308,13 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Support functions
 	/////////////////////////////////////////////////////////////////////////////////////
-	StatusCode PCD_MIFARE_Transceive(byte *sendData, byte sendLen, bool acceptTimeout = false);
+	StatusCode PCD_MIFARE_Transceive(const byte *sendData, byte sendLen, bool acceptTimeout = false);
 	const char *GetStatusCodeName(StatusCode code);
 	PICC_Type PICC_GetType(byte sak);
 	const char *PICC_GetTypeName(byte type);
-	void PICC_DumpToSerial(Uid *uid);
-	void PICC_DumpMifareClassicToSerial(Uid *uid, byte piccType, MIFARE_Key *key);
-	void PICC_DumpMifareClassicSectorToSerial(Uid *uid, MIFARE_Key *key, byte sector);
+	void PICC_DumpToSerial(const Uid *uid);
+	void PICC_DumpMifareClassicToSerial(const Uid *uid, byte piccType, MIFARE_Key *key);
+	void PICC_DumpMifareClassicSectorToSerial(const Uid *uid, MIFARE_Key *key, byte sector);
 	void PICC_DumpMifareUltralightToSerial();
 	void MIFARE_SetAccessBits(byte *accessBitBuffer, byte g0, byte g1, byte g2, byte g3);
 	

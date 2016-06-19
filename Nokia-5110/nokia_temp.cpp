@@ -1,4 +1,6 @@
-﻿#include "t_SPI.h"
+﻿#include <Arduino.h>
+
+#include "t_SPI.h"
 #include "t_5110.h"
 #include "OneWire.h"
 #include "t_io.h"
@@ -45,8 +47,10 @@ void setup()
 		lcd.print("Device OK");
 	delay(1000);
 
+#if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
 	analogReadRes(12);
 	analogReadAveraging(10);
+#endif
 }
 
 char ch = '*';
@@ -59,12 +63,16 @@ void loop()
 	if (ok)
 	{
 		lcd.clear();
-		lcd.printf("%c %d.%02dC\n", ch, t /100, t%100);
+		char b[10];
+		sprintf(b, "%c %d.%02dC\n", ch, t /100, t%100);
+		lcd.print(b);
 		ch = ch == '*' ? '+' : '*';
 
-		lcd.printf("dt=%d", t::G_t);
+		sprintf(b, "dt=%d", t::G_t);
+		lcd.print(b);
 	}
 
+#if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
 	int v = analogRead(A9);
 	lcd.printf("\na=%d", v);
 
@@ -81,6 +89,7 @@ void loop()
 		nn += 40;
 		if (nn > 255) nn = 255;
 	}
+#endif
 }
 
 byte G_addr[8];

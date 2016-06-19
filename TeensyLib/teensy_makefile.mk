@@ -42,8 +42,9 @@ $(TEENSYLIB)/libTeensy.a $(TEENSYLIB)/mk20dx128.o $(TEENSYLIB)/teensy_loader_cli
 	make -C $(TEENSYLIB)
 
 upload : $(FTARGET).hex $(TEENSYLIB)/teensy_loader_cli
-	echo $(TEENSYLIB)/teensy_loader_cli -mmcu=mk20dx256 -v -w $(FTARGET).hex
+	ArduinoSerialMonitor.exe -stop
 	$(TEENSYLIB)/teensy_loader_cli -mmcu=mk20dx256 -v -w $(FTARGET).hex
+	ArduinoSerialMonitor.exe -run
 
 -include $(OBJ:.o=.d)
 

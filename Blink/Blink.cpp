@@ -25,6 +25,7 @@ void setup()
 	pinMode(led, OUTPUT);
 	Serial.begin(9600);
 	while (!Serial) ; // wait for Arduino Serial Monitor
+	Serial.println("Ciao");
 	t::SetPrint(&Serial);
 }
 

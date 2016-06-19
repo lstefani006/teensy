@@ -1,0 +1,24 @@
+
+RSA
+===
+algo chiavi pubblica privata.
+Le chiavi sono lunghe 512, 1024, 2048 bit
+512 bit sono crakcabili in poche ore.
+1024 bit sono considerate a rischio
+2048 bit sono considerate sicure
+
+DES
+===
+Simmetrico
+Cifra blocchi a 64 indipendenti usando una chiave a 56bit
+
+3DES
+====
+Cifra blocchi 64bit facendo 3 crypt DES con 3 chiavi diverse (che possono essere correlate)
+
+AES
+===
+E' il metodo consigliato.
+Chiavi a 128/196/256 bit. 128 e' non sicuro.
+Crypt di blocchi a 128bit.
+Notare che se si vuole criptare roba piu' grande di 128bits bisogna fare lo "split" in blocchi di 128bit

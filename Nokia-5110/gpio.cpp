@@ -1,4 +1,6 @@
 ﻿
+#if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
+
 #include <kinetis.h> 
 
 /*
@@ -95,3 +97,4 @@ bool Trest() {
 	GPIOA::Write(3, false);
 	return GPIOA::Read(3);
 }
+#endif

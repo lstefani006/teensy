@@ -1,17 +1,22 @@
-CXXFLAGS = -I. -V
+CXXFLAGS = -I.
 CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+CXXFLAGS+= -Os
+VPATH+=./crypto
 
 ifdef TEENSY
+VPATH   +=../TeensyLib
+CXXFLAGS+= -DUSE_NO_RTOS
 CXXFLAGS+= -W3 -Os
+CXXFLAGS+=-I../TeensyLib -V
 endif
-CXXFLAGS+= -Os
 
 TARGET=522.hex
 SRC=\
 	MFRC522.cpp \
-	522.cpp \
-	SPI.cpp
+	main.cpp \
+	SPI.cpp \
+	des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp
 
 ifdef TEENSY
 include ../TeensyLib/teensy_makefile.mk

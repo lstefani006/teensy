@@ -6,8 +6,6 @@ else
 	VPATH=../AvrLib
 endif
 
-
-
 CXXFLAGS+= -I. -DONEWIRE_CRC8_TABLE=0
 CXXFLAGS+= -I$(TEENSYLIB)
 CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree

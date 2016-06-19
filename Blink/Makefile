@@ -1,9 +1,14 @@
 ifdef TEENSY
-CXXFLAGS=-W2 -Os -I../TeensyLib -V
-VPATH=../TeensyLib
+	CXXFLAGS=-W2 -Os -I../TeensyLib -V
+	VPATH=../TeensyLib
+else  
+ifdef ESP8266
+	CXXFLAGS=-I../EspLib
+	VPATH=../EspLib
 else
-CXXFLAGS=-I../AvrLib
-VPATH=../AvrLib
+	CXXFLAGS=-I../AvrLib
+	VPATH=../AvrLib
+endif
 endif
 
 TARGET=Blink.hex
@@ -15,9 +20,11 @@ endif
 
 
 ifdef TEENSY
-include ../TeensyLib/teensy_makefile.mk
+	include ../TeensyLib/teensy_makefile.mk
+else ifdef ESP8266
+	include ../EspLib/esp_makefile.mk
 else
-include ../AvrLib/avr_makefile.mk
+	include ../AvrLib/avr_makefile.mk
 endif
 
 tags : 

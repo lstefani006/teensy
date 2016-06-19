@@ -2,7 +2,11 @@
 #define __t_5110_h__
 
 #include "t_SPI.h"
-#include <TimerThree.h>
+#if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
+#	include <TimerThree.h>
+#else
+#	include <TimerOne.h>
+#endif
 
 namespace t 
 {
@@ -80,11 +84,19 @@ namespace t
 			writeCommand(0x20);
 			writeCommand(0x0C);
 
+#if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
 			if (timerUpdate) {
 				Timer3.initialize(1000 * 20);
 				sThis = this;
 				Timer3.attachInterrupt(s_update);
 			}
+#else
+			if (timerUpdate) {
+				Timer1.initialize(1000 * 20);
+				sThis = this;
+				Timer1.attachInterrupt(s_update);
+			}
+#endif
 
 			clear();
 			if (!timerUpdate)

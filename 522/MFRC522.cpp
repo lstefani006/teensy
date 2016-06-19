@@ -252,7 +252,7 @@ byte MFRC522::PCD_GetVersion()
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
 MFRC522::StatusCode MFRC522::PCD_TransceiveData(
-		byte *sendData,		///< Pointer to the data to transfer to the FIFO.
+		const byte *sendData,///< Pointer to the data to transfer to the FIFO.
 		byte sendLen,		///< Number of bytes to transfer to the FIFO.
 		byte *backData,		///< nullptr or pointer to buffer if data should be read back after executing the command.
 		byte *backLen,		///< In: Max number of bytes to write to *backData. Out: The number of bytes returned.
@@ -273,7 +273,7 @@ MFRC522::StatusCode MFRC522::PCD_TransceiveData(
 MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(
 		byte command,		///< The command to execute. One of the PCD_Command enums.
 		byte waitIRq,		///< The bits in the ComIrqReg register that signals successful completion of the command.
-		byte *sendData,		///< Pointer to the data to transfer to the FIFO.
+		const byte *sendData,		///< Pointer to the data to transfer to the FIFO.
 		byte sendLen,		///< Number of bytes to transfer to the FIFO.
 		byte *backData,		///< nullptr or pointer to buffer if data should be read back after executing the command.
 		byte *backLen,		///< In: Max number of bytes to write to *backData. Out: The number of bytes returned.
@@ -696,7 +696,7 @@ MFRC522::StatusCode MFRC522::PCD_Authenticate(
 		byte command,		///< PICC_CMD_MF_AUTH_KEY_A or PICC_CMD_MF_AUTH_KEY_B
 		byte blockAddr, 	///< The block number. See numbering in the comments in the .h file.
 		MIFARE_Key *key,	///< Pointer to the Crypteo1 key to use (6 bytes)
-		Uid *uid)			///< Pointer to Uid struct. The first 4 bytes of the UID is used.
+		const Uid *uid)			///< Pointer to Uid struct. The first 4 bytes of the UID is used.
 {
 	// Build command buffer
 	byte sendData[12];
@@ -775,8 +775,8 @@ MFRC522::StatusCode MFRC522::MIFARE_Read(
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
 MFRC522::StatusCode MFRC522::MIFARE_Write(
-		byte blockAddr, ///< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The page (2-15) to write to.
-		byte *buffer,	///< The 16 bytes to write to the PICC
+		byte blockAddr,		///< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The page (2-15) to write to.
+		const byte *buffer,	///< The 16 bytes to write to the PICC
 		byte bufferSize)	///< Buffer size, must be at least 16 bytes. Exactly 16 bytes are written.
 {
 	// Sanity check
@@ -919,9 +919,9 @@ MFRC522::StatusCode MFRC522::MIFARE_Transfer(byte blockAddr) ///< The block (0-0
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
 MFRC522::StatusCode MFRC522::PCD_MIFARE_Transceive(
-		byte *sendData,		///< Pointer to the data to transfer to the FIFO. Do NOT include the CRC_A.
-		byte sendLen,		///< Number of bytes in sendData.
-		bool acceptTimeout)	///< True => A timeout is also success
+		const byte *sendData,	///< Pointer to the data to transfer to the FIFO. Do NOT include the CRC_A.
+		byte sendLen,			///< Number of bytes in sendData.
+		bool acceptTimeout)		///< True => A timeout is also success
 {
 	StatusCode result;
 	byte cmdBuffer[18]; // We need room for 16 bytes data and 2 bytes CRC_A.
@@ -998,6 +998,7 @@ MFRC522::PICC_Type MFRC522::PICC_GetType(
 		case 0x00:	return PICC_TYPE_MIFARE_UL;		break;
 		case 0x10:
 		case 0x11:	return PICC_TYPE_MIFARE_PLUS;	break;
+		case 0x20:	return PICC_TYPE_MIFARE_DESFIRE;break;
 		case 0x01:	return PICC_TYPE_TNP3XXX;		break;
 		default:	break;
 	}
@@ -1024,6 +1025,7 @@ const char *MFRC522::PICC_GetTypeName(byte piccType	///< One of the PICC_Type en
 	case PICC_TYPE_MIFARE_PLUS:		return "MIFARE Plus";								break;
 	case PICC_TYPE_TNP3XXX:			return "MIFARE TNP3XXX";							break;
 	case PICC_TYPE_NOT_COMPLETE:	return "SAK indicates UID is not complete.";		break;
+	case PICC_TYPE_MIFARE_DESFIRE:	return "MIFARE DESFIRE";
 	case PICC_TYPE_UNKNOWN:
 	default:						return "Unknown type";								break;
 	}
@@ -1034,10 +1036,11 @@ const char *MFRC522::PICC_GetTypeName(byte piccType	///< One of the PICC_Type en
  * On success the PICC is halted after dumping the data.
  * For MIFARE Classic the factory default key of 0xFFFFFFFFFFFF is tried. 
  */
-void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned from a successful PICC_Select().
-								) 
+void MFRC522::PICC_DumpToSerial(const Uid *uid) 
 {
 	MIFARE_Key key;
+
+	uid->Dump();
 	
 	// UID
 	Serial.print("Card UID:");
@@ -1052,6 +1055,9 @@ void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned fro
 	byte piccType = PICC_GetType(uid->sak);
 	Serial.print("PICC type: ");
 	Serial.println(PICC_GetTypeName(piccType));
+
+	if (true)  // LEO ritorno senza il dump della carta.
+		return;
 	
 	// Dump contents
 	switch (piccType) 
@@ -1073,7 +1079,12 @@ void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned fro
 	case PICC_TYPE_ISO_18092:
 	case PICC_TYPE_MIFARE_PLUS:
 	case PICC_TYPE_TNP3XXX:
-		Serial.println("Dumping memory contents not implemented for that PICC type.");
+		Serial.print("Dumping memory contents not implemented for that PICC type.");
+		Serial.println(piccType, HEX);
+		break;
+
+	case PICC_TYPE_MIFARE_DESFIRE:
+		Serial.println("DEVO ANCORA FARLO IL DUMP");
 		break;
 
 	case PICC_TYPE_UNKNOWN:
@@ -1091,7 +1102,7 @@ void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned fro
  * On success the PICC is halted after dumping the data.
  */
 void MFRC522::PICC_DumpMifareClassicToSerial(
-		Uid *uid,		///< Pointer to Uid struct returned from a successful PICC_Select().
+		const Uid *uid,		///< Pointer to Uid struct returned from a successful PICC_Select().
 		byte piccType,	///< One of the PICC_Type enums.
 		MIFARE_Key *key)///< Key A used for all sectors.
 {
@@ -1134,9 +1145,9 @@ void MFRC522::PICC_DumpMifareClassicToSerial(
  * Always uses PICC_CMD_MF_AUTH_KEY_A because only Key A can always read the sector trailer access bits.
  */
 void MFRC522::PICC_DumpMifareClassicSectorToSerial(
-		Uid *uid,			///< Pointer to Uid struct returned from a successful PICC_Select().
+		const Uid *uid,		///< Pointer to Uid struct returned from a successful PICC_Select().
 		MIFARE_Key *key,	///< Key A for the sector.
-		byte sector)			///< The sector to dump, 0..39.
+		byte sector)		///< The sector to dump, 0..39.
 {
 	StatusCode status;
 	byte firstBlock;		// Address of lowest address to dump actually last block dumped)
@@ -1339,6 +1350,10 @@ bool MFRC522::PICC_IsNewCardPresent()
 	byte bufferATQA[2];
 	byte bufferSize = sizeof(bufferATQA);
 	StatusCode result = PICC_RequestA(bufferATQA, &bufferSize);
+
+	//if (result == STATUS_OK || result == STATUS_COLLISION)
+	//	printf("ATQA=%02x-%02x\n", bufferATQA[0], bufferATQA[1]);
+
 	return (result == STATUS_OK || result == STATUS_COLLISION);
 }
 

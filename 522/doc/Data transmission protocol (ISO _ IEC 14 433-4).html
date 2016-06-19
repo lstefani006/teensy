@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0068)http://www.gorferay.com/data-transmission-protocol-iso-iec-14-433-4/ -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head profile="http://"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>  Data transmission protocol (ISO / IEC 14 433-4)</title>
+
+<link rel="stylesheet" href="./Data transmission protocol (ISO _ IEC 14 433-4)_files/language-selector.css" type="text/css" media="all">
+	
+
+<link rel="stylesheet" href="./Data transmission protocol (ISO _ IEC 14 433-4)_files/style.css" type="text/css" media="screen">
+
+
+<!--google fonts-->
+
+
+<!--[if lt IE 7]>       
+<script type="text/javascript" src="http://www.gorferay.com/wp-content/themes/maximum/scripts/unitpngfix.js"></script>	
+<![endif]--> 
+
+
+<link rel="alternate" type="application/rss+xml" title=" » Data transmission protocol (ISO / IEC 14 433-4) Comments Feed" href="http://www.gorferay.com/data-transmission-protocol-iso-iec-14-433-4/feed/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.gorferay.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.gorferay.com/wp-includes/wlwmanifest.xml"> 
+<link rel="index" title="" href="http://www.gorferay.com/">
+<link rel="start" title="Mifare 1K Card" href="http://www.gorferay.com/mifare-1k-card/">
+<link rel="prev" title="Initialization and anticollision (ISO / IEC 14433-3)" href="http://www.gorferay.com/initialization-and-anticollision-iso-iec-14433-3/">
+<link rel="next" title="Vicinity integrated circuits cards (ISO / IEC 15693)" href="http://www.gorferay.com/vicinity-integrated-circuits-cards-iso-iec-15693/">
+<meta name="Gorferay" content="Gorferay Card Service Co.,Ltd">
+<link rel="canonical" href="http://www.gorferay.com/data-transmission-protocol-iso-iec-14-433-4/">
+<link rel="shortlink" href="http://www.gorferay.com/?p=1756">
+<script type="text/javascript">var icl_lang = 'en';var icl_home = 'http://www.gorferay.com/';</script>
+<script type="text/javascript" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/sitepress.js"></script>
+<meta name="generator" content="WPML ver:2.0.4.1 stt:1,3;0;0;0">
+	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+</head>
+<body>
+
+
+
+<div id="header">
+<a id="" href="http://www.gorferay.com/"></a>
+<div id="">
+<ul>
+</ul>
+
+</div><!--top-nav-->
+<div id="access" role="navigation">
+<div class="menu"><ul><li class="page_item page-item-2481"><a href="http://www.gorferay.com/" title="About us">About us</a></li><li class="page_item page-item-12"><a href="http://www.gorferay.com/products/" title="Products">Products</a></li><li class="page_item page-item-8"><a href="http://www.gorferay.com/contact-us/" title="Contact us">Contact us</a></li></ul></div>
+</div><!-- #access -->
+</div><!--header--><div id="main">
+<div id="main-container">
+<div id="crumbs"><a href="http://www.gorferay.com/">Home</a> » <a href="http://www.gorferay.com/technical-knowledge/" title="Technical Knowledge">Technical Knowledge</a> » <span class="current">Data transmission protocol (ISO / IEC 14 433-4)</span></div>
+<div class="post-title"><a href="http://www.gorferay.com/data-transmission-protocol-iso-iec-14-433-4/">Data transmission protocol (ISO / IEC 14 433-4) </a>
+
+
+</div><!--post-title-->
+<div class="post-content">
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span>Data transmission protocol (ISO/IEC 14 433-4)<br>
+A half-duplex block transmission protocol that is tailored to the specific requirements of a contactless system is defined in Part 4 of ISO/IEC 14 433-4. This protocol is largely based on the T = 1 protocol defined in the ISO/IEC 7816-3 standard, which is widely used throughout the world. This simplifies the implementation of dual-interface cards, since they anyhow must support a contact-type transmission protocol. For Type-A cards, the standard defines an activation sequence that must be executed before starting the actual protocol. During this sequence, parameters for the subsequent data transmission are specified and exchanged between the terminal and the card. These parameters relate to things such as the bit rate in each direction and the required waiting times between frames. Type-B cards do not need any special activation sequence. They can immediately initiate the actual data transmission protocol after being selected. With such cards, the necessary parameters for data transmission are specified and exchanged during the initialization and selection processes, as described in the previous section.</span></span></span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span><img title="Mifare DESFire EV1 8K Pre-printed Cards,Mifare DESFire EV1 8K Proximity Cards,Mifare DESFire EV1 8K Contactless Smart Cards" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_113.jpg" alt="Mifare DESFire EV1 8K Pre-printed Cards,Mifare DESFire EV1 8K Proximity Cards,Mifare DESFire EV1 8K Contactless Smart Cards"></span></span></span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span>Figure 3.121 Example of an anticollision sequence with three Type-B cards (Part 1 of 2)</span></span></span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span></span></span></span></span>&nbsp;</p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span>Protocol activation for Type-A cards<br>
+After a Type-A PICC has been successfully selected, as previously described, the terminal executes an activation sequence as illustrated by the flow chart shown in Figure 3.122.<br>
+From the SAK (Select Acknowledge) transmitted by the card at the end of the anticollision loop, the terminal can recognize whether the card supports the standard data transmission<br>
+protocol. If it does not, the terminal issues a HLTA command to place the card in the Halt state. If the protocol defined in ISO/IEC 14 433-4 is supported, the terminal sends a RATS (request for answer to select) command to the card. The RATS command and the ATS (answer to reset) returned by the card are used to exchange data and parameters in order to determine the data transmission options supported by the card and the terminal. Following this, the values of the modifiable parameters can be selected using PPS (protocol and parameter selection) to make optimum use of the capabilities of the card and the terminal. In order to make inexpensive, technically simple implementations possible, default values are defined for the modifiable parameters. In the simplest case, the card supports only these default values. In this case, the PPS sequence is unnecessary, and the terminal can immediately start exchanging data using the block protocol after receiving the ATS.</span></span></span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span><img title="Mifare DESFire EV1 8K Smart Card,Mifare DESFire EV1 8K Proximity Cards,Mifare DESFire EV1 8K ISO Printing cards,HF 13.56MHz DESFire 8K Proximity Cards" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_115.jpg" alt="Mifare DESFire EV1 8K Smart Card,Mifare DESFire EV1 8K Proximity Cards,Mifare DESFire EV1 8K ISO Printing cards,HF 13.56MHz DESFire 8K Proximity Cards" width="382" height="601"></span></span></span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;">&nbsp;</span></span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;">Figure 3.122 Activation of a Type-A card by a terminal</span></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Request for answer to select (RATS)<br>
+The RATS command contains a parameter byte specifying the maximum frame size that the terminal can receive (‘frame size for proximity coupling card’, or FSDI) and the card identifier (CID) assigned to the card for the duration of its active state. Starting with the reception of the RATS command, the card uses this CID as its logical identifier.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_116.jpg" alt="Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card" width="195" height="51"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Figure 3.123 Format of the RATS (Request for Answer to Select) command</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards," src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_117.jpg" alt="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards," width="319" height="47"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Figure 3.124 Format of the Parameter byte of the RATS command. The CID defines the logical number of the addressed card and has a range of 0 through 14; 15 is reserved for future use. FSDI codes the maximum frame size (FSD) that the terminal can receive</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Table 3.28 Coding of bits b8–b5 of the Parameter byte of the RATS command</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire EV1 8K Card,NXP MF3ICD81 Cards,Mifare DESFire 8K ISO14443A Cards,Mifare DESFire EV1 8K Offset Printing Cards," src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_118.jpg" alt="Mifare DESFire EV1 8K Card,NXP MF3ICD81 Cards,Mifare DESFire 8K ISO14443A Cards,Mifare DESFire EV1 8K Offset Printing Cards," width="390" height="56"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Answer to Select (ATS)<br>
+A Type-A card responds to a RATS command with an Answer to Select (ATS). The ATS<br>
+identifies the set of parameters supported by the card. These parameters may include:<br>
+–the maximum frame size<br>
+–the bit rates in both directions supported by the card<br>
+–the waiting time between frames<br>
+–the specific frame guard time<br>
+–support for NAD and CID.<br>
+Default values are specified for cards that do not offer any selection of parameters. In the<br>
+simplest case, which is when only the default values are supported, the ATS consists of only<br>
+the length byte and the CRC bytes.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire EV1 8K Smart Card,Mifare DESFire EV1 8K Plain White Cards,Mifare DESFire EV1 8K Printed Cards" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_119.jpg" alt="Mifare DESFire EV1 8K Smart Card,Mifare DESFire EV1 8K Plain White Cards,Mifare DESFire EV1 8K Printed Cards" width="373" height="277"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Figure 3.125 Format of ATS</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Table 3.29 The data elements of the ATS and their designations according to ISO/IEC 14 433-4</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards," src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_120.jpg" alt="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards," width="299" height="139"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Length byte The length byte (TL) indicates the number of bytes transmitted in the ATS, including the TL byte but excluding the two CRC bytes. The length of the ATS is not allowed to exceed the maximum frame length (FSD) given in the RATS command. This means that the maximum value of TL is not allowed to be greater than FSD – 2.<br>
+Format byte: If the length given in TL is greater than 1, the format byte (T0) is sent next. T0 consists of three parts, as follows:<br>
+–The most significant bit (b8) has a value of 0. The value 1 is reserved for future use.<br>
+–Bits b7–b5 indicate the presence of subsequent interface bytes TC1, TC2 and TC3.<br>
+–The lower nibble (b4–b1) is called the ‘frame size for proximity card integer’ (FSCI). It codes the value of ‘frame size for proximity card’ (FSC), which is the maximum frame size that can be received by the card. The default value for FSCI is 2, which corresponds to a maximum frame size of 32 bytes.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_121.jpg" alt="Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card" width="581" height="308"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">TA1 interface byte The TA1 interface byte consists of four parts, as follows:<br>
+–The most significant bit (b8) indicates whether different divider values can be used for the two transmission directions. The value of the etu (elementary time unit, equal to the duration of one bit) is determined by the divider D according to the formula 1 etu = 128 ÷ (D × fC). The initial value of D is 1, which yields an etu value of 128/ fC.<br>
+–Bits b7–b5, which are called ‘divisor send’ (DS), specify the bit rates supported by the card for data transmission from the card to the terminal.<br>
+–Bit b4 is set to 0. The value 1 is RFU.<br>
+–Bits b3–b1, which are called ‘divisor receive’ (DR), specify the bit rates supported by the card for data transmission from the terminal to the card. The divider values are selected by the terminal in the subsequent PPS command.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Table 3.32 Coding of the TA1 interface byte</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_122.jpg" alt="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards" width="574" height="218"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">TB1 interface byte The TB1 interface byte is used to transfer parameters that define the frame waiting time and the start-up frame guard time. Consequently, the TB1 interface byte consists of two parts, as follows:<br>
+–The upper nibble (b8–b5) is called the ‘frame waiting time integer’ (FWI) and determines the frame waiting time (FWT). The meaning and calculation of the frame waiting time are described in the next section.<br>
+–The lower nibble (b4–b1) is called the ‘start-up frame guard time integer’ (SFGI) and is used to calculate the start-up frame guard time (SFGT). The SFGT is the time needed by the card after transmission of the ATS before it is ready to receive the next frame. The value 15 is RFU. The value 0 means that the card does not need any particular SFGT. With a value ranging from 1 through 14, the SFGT is calculated using the formula:<br>
+SFGT = (256 × 16/ fC) × 2<sup>SFGI</sup><br>
+The default value of SFGI is 0, and itsmaximumvalue (SFGTMAX) is approximately 4949 ms.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_123.jpg" alt="Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card" width="398" height="61"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Figure 3.126 Format of the TB1 interface byte</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">TC1 interface byte The TC1 interface byte indicates special protocol options. It consists of<br>
+the following parts:<br>
+–The six most significant bits (b8–b3) are set to’0′. All other values are RFU.<br>
+–Bits b2 and b1 indicate which optional fields in the prologe field are supported by the card (see the next section). The terminal is not obliged to actually transmit all fields that are supported, so it may omit one or more fields. However, fields that are not supported by the card may not be transmitted by the terminal to the card under any circumstances. The default value for bit b2 is 1, and the default value for b1 is 0. These values mean that CID is supported and NAD is not supported.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Table 3.33 Coding of the TC1 interface byte</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_124.jpg" alt="Mifare DESFire 8K Card,NXP MF3ICD81 Cards,Mifare DESFire EV1 8K Contactless Cards,Mifare DESFire EV1 8K Blank White Cards" width="568" height="89"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Historical bytes The historical bytes (T1 through Tk) are optional. Their contents are defined in ISO/IEC 7816-4 (see also Section 6.2, ‘Answer to Reset (ATR)’). The maximum possible number of historical bytes can be determined from the maximum length of the ATS. </span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Protocol and parameter selection<br>
+If the card indicates in the ATS that it supports modifiable parameters, the terminal can change the parameters for the subsequent protocol by using the PPS (protocol and parameter selection) command. If the card does not support any modifiable parameters, it is not required to support the PPS command (see Figure 3.122). In this case, the protocol will continue with unaltered parameters. If we assume that the card has indicated in the ATS that it supports modifiable parameters, the terminal can now evaluate whether it wants to utilize the modification options indicated by the card. If so, it transmits a PPS Request command having the structure shown in Figure 3.127.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire EV1 8K Smart Card,Mifare DESFire EV1 8K Proximity Cards,Mifare DESFire EV1 8K ISO Printing cards,HF 13.56MHz DESFire 8K Proximity Cards," src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_125.jpg" alt="Mifare DESFire EV1 8K Smart Card,Mifare DESFire EV1 8K Proximity Cards,Mifare DESFire EV1 8K ISO Printing cards,HF 13.56MHz DESFire 8K Proximity Cards," width="561" height="105"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Figure 3.127 Format of the PPS Request (protocol and parameter selection request) command</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Start byte: The start byte (PPSS) consists of two parts:<br>
+–The upper nibble (b8–b5) is set to’D'to identify the PPS. All other values are RFU.<br>
+–The lower nibble (b4–b1), which is called the ‘card identifier’ (CID), defines the logical number of the addressed card.<br>
+Parameter 1 Parameter 1 indicates which of the possible values of DS and DR in the TA1 interface byte have been selected. This determines the transmission rates for subsequent data transmissions.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="DESFire 8K Cards,Mifare DESFire EV1 8K ISO Printing Cards,Mifare DESFire EV1 8K Contactless Cards,NXP Mifare DESFire D81 ISO Card" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_126.jpg" alt="DESFire 8K Cards,Mifare DESFire EV1 8K ISO Printing Cards,Mifare DESFire EV1 8K Contactless Cards,NXP Mifare DESFire D81 ISO Card" width="524" height="235"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Protocol and parameter selection response<br>
+The card confirms correct reception of the protocol and parameter selection request by means of a protocol and parameter selection response, which consists of only the PPSS start byte and the two checksum bytes (CRC 1 and CRC 2). After this, the terminal and the card use only the selected parameters for data transmission.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Activation frame waiting time<br>
+In order to avoid unnecessarily long waiting times in case of transmissions errors, ISO/IEC 14 433-4 specifies the maximum time between when a Type-A card receives the end of a frame and when it sends a response. This time is called the ‘activation frame waiting time’, and it is set to 65,536/ fC (≈4833 μs). If a card does not respond within this interval, the terminal knows that communications with the card are impaired.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Error detection and correction<br>
+In a system using contactless cards, it must be expected that errors will occur more often during data transmission than is usual with contact-type cards. For example, with contact-type cards it is relatively uncommon for a card to be removed from a terminal while it is communicating with the terminal. With contactless cards, interruptions to communications can occur more often, since the cards are free to move within the working range of the terminal during use and can unintentionally leave the working range. It is thus important to have methods available that allow such interruptions to be recognized as quickly as possible and allow communications to be resumed in a state that is as well defined as possible. In order to avoid having every type of error completely interrupt communications and force re-initiation of the entire process, ISO/IEC 14 433-4 defines rules for error detection and correction during the protocol activation phase for Type-A cards. Rather than describe these rules in detail, we refer you to the appropriate section of the standard, where they are presented in an illustrative manner.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Half-duplex protocol in accordance with ISO/IEC 14 433-4<br>
+The transmission protocol defined in Part 4 of ISO/IEC 14 433-4 takes into account the special requirements imposed by the use of contactless cards. For instance, it allows a terminal to communicate with several cards in parallel. Like the T=1 protocol for contact-type cards, this protocol supports a clean separation of layers in accordance with the OSI reference model. Separation of layers means that data belonging to a higher level layer are transmitted completely transparently with respect to lower lever layers. This protocol is based on the frames defined for both types of cards (Type A and Type B) in Part 3 of the standard. Four layers are distinguished:<br>
+–the physical layer (byte transmission in accordance with 14 433-3)<br>
+–the data link layer (for exchanging data blocks in accordance with 14 433-3)<br>
+–the session layer (coupled to the data link layer in order to minimize overhead)<br>
+–the application layer (where the commands are processed).</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">This block-oriented protocol starts after the activation sequence has been completed. The terminal is entitled to make the first transmission. This means that after the activation sequence, the card must wait until it receives a block from the terminal. The card responds to each block that it receives by transmitting a response block within a defined frame waiting time. After the response block has been sent, the terminal again holds transmit authorization and the card switches back to reception mode. Communications continue in this manner, with transmit authorization alternately held by the terminal and the card. The protocol allows several cards to be concurrently activated by a terminal. It can switch back and forth among several cards without having to spend time deactivating a card and activating another card each time it switches cards. As already mentioned, the probability of errors in data transmissions is higher in systems using contactless cards than in comparable systems using contact-type cards. It is thus especially important for communications between the terminal and the card to take place in the shortest possible time. The data transmission rate, which has a default value of 106 kbit/s, is elatively high compared with the default value of 9.6 kbit/s for the T=0 and T=1 transmission protocols.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Block structure<br>
+Each transmission block consists of a leading prolog field, an optional information field and a trailing epilog field. The information field contains data for the application layer.<br>
+There are three different types of blocks:<br>
+–Information blocks, which are used for the transparent exchange of data belonging to the application layer.<br>
+–Reception confirmation blocks (R blocks), which do not contain information fields and serve to indicate positive or negative confirmation of reception.<br>
+–System blocks (S blocks), which are used to exchange control data for the protocol. Two types of S blocks are defined: WTX, which is an S block for extending the frame waiting<br>
+time and has a single-byte information field, and DESELECT, which is an S block with no information field that is used to place the card in the Halt state.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire EV1 8K Offset Printing Cards,Mifare DESFire EV1 8K Contactless Cards,Clamshell MIFARE DESFire EV1 8K Card," src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_127.jpg" alt="Mifare DESFire EV1 8K Offset Printing Cards,Mifare DESFire EV1 8K Contactless Cards,Clamshell MIFARE DESFire EV1 8K Card," width="451" height="183"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Figure 3.128 Block structure</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Prologue field The prologue field consists of the protocol control byte (PCB), an optional card identifier (CID) and an optional node address (NAD). The coding of the protocol control byte is shown in Table 3.36.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Prologue field The prologue field consists of the protocol control byte (PCB), an optional card identifier (CID) and an optional node address (NAD). The coding of the protocol control byte is shown in Table 3.36.<br>
+Table 3.36 Coding of a the protocol control byte (PCB)</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire EV1 8K Printed Cards,Mifare DESFire 8K Printing Card,RFID Mifare DESFire EV1 8K Printing Cards" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_128.jpg" alt="Mifare DESFire EV1 8K Printed Cards,Mifare DESFire 8K Printing Card,RFID Mifare DESFire EV1 8K Printing Cards" width="574" height="217"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Card identifier (CID) The card identifier field is used to identify a particular card, and it also contains information about the power supplied to the card. The most significant two bits (b8 and b7) indicate the power level provided to the card by the terminal. Bits b6 and b5 are set to 0, with 1 being reserved for future use. Bits b4–b1 code the card identifier.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire 8K Offset Printing Card,Mifare DESFire EV1 8K Printing Cards,HF 13.56MHz DESFire 8K Proximity Cards," src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_129.jpg" alt="Mifare DESFire 8K Offset Printing Card,Mifare DESFire EV1 8K Printing Cards,HF 13.56MHz DESFire 8K Proximity Cards,"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Figure 3.129 Format of the card identifier field</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">The coding of CID is defined in the PPS command for Type-A cards and in the ATTRIB command for Type-B cards. The following rules apply to evaluating the CID field:<br>
+–A card that does not support CID ignores all blocks containing a CID.<br>
+–A card that supports CID responds to blocks containing its CID by sending back its CID. It ignores blocks that contain other CIDs, and it responds to any block containing a CID of 0 by returning a block with no CID.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">These rules allow the terminal to communicate concurrently with several active cards without having to deactivate cards that are not being addressed.<br>
+Table 3.37 Coding of the power level indication</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire 8K Pre-printed Cards,NXP Mifare DESFire EV1 8K Smart Card,ISO MIFARE DESFire EV1 8K Card" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_130.jpg" alt="Mifare DESFire 8K Pre-printed Cards,NXP Mifare DESFire EV1 8K Smart Card,ISO MIFARE DESFire EV1 8K Card" width="424" height="122"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Node address (NAD): The third byte of the prologue field is called the ‘node address’. The node address is used to establish and address certain types of logical connections between the card and the terminal. Node addresses are used in the same manner as for contact-type cards. They are defined in ISO/IEC 7816-3 and described in Chapter 6.<br>
+Information field (INF): In I blocks, the information field acts as a container for data for the application layer. The content of this field is transferred fully transparently. In S blocks, the information field is used to control extending the frame waiting time.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Frame waiting time (FWT)<br>
+In order to achieve a defined termination of communications with a non-responding card in the shortest possible time, a ‘frame waiting time’ (FWT) is defined. It corresponds to the block waiting time of the T = 1 protocol for contact-type cards. The frame waiting time is the maximum interval between the end of a frame transmitted by the terminal and the start of the response frame from the card. If this interval expires without a response from the card, the terminal assumes that there is a malfunction in the card and reacquires transmit authorization in order to initiate error-detection mechanisms. As previously described, the ATS for Type-A cards contains the value of the frame waiting time integer (FWI) in the TB1 interface byte. The frame waiting time can be calculated from the FWI using the following formula:<br>
+FWT = (256 × 16 ÷ fC) × 2FWI<br>
+For Type-B cards, the FWI is defined in theATQB (Answer to Request, Type B). The minimum value of FWT, which is obtained when the value of FWI is 0, is approximately 302 μs. The<br>
+maximum value of FWT (FWTMAX), which is obtained when the value of FWI is 14, is approximately 4949 ms. The normal command processing time of the card must be taken into<br>
+account when selecting the frame waiting time. If the value of the frame waiting time is set too large, it will take longer for the terminal to detect that a card is not responding. In practice, cards can respond relatively quickly to most commands, but a few commands, such as commands involving the computation of a cryptographic algorithm, require significantly more time to execute. In order to avoid having to use a long frame waiting time for all commands just to accommodate such cases, there is a mechanism for extending the waiting time. This allows the card to request an extension of the frame waiting time for an individual command.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Extending the frame waiting time<br>
+To request an extension of the FWT, the card transmits a special S block called ‘S(STX) request’. It receives a corresponding ‘S(WTX) response’ from the terminal to confirm the request. The terminal is not allowed to deny such a request. The length of the extension to the frame waiting time is sent to the terminal using one byte in the information field of the S(WTX) S block. The new, temporary frame waiting time for processing the current command is obtained by multiplying this value by the framewaiting time.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;"><img title="Mifare DESFire 8K Printing Card,Mifare DESFire EV1 8K Printing Cards,Mifare DESFire EV1 8K Clamshell Proximity Card," src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_131.jpg" alt="Mifare DESFire 8K Printing Card,Mifare DESFire EV1 8K Printing Cards,Mifare DESFire EV1 8K Clamshell Proximity Card," width="474" height="219"></span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">The temporary frame waiting time (FWT<sub>TEMP</sub>) is measured starting with the end of the S(WTX) response sent by the terminal. It is calculated using the following formula:<br>
+FWT<sub>TEMP</sub> = FWT × WTXM<br>
+If the formula yields a result greater than FWT<sub>MAX</sub> (≈4949 ms), the value of FWT<sub>MAX</sub> must be used instead of the calculated value of FWT<sub>TEMP</sub>.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Block chaining<br>
+The chaining function allows either one of the communicating parties to transmit data blocks that are too big to fit within a single frame by partitioning the data into several I frames sent in succession. Each of these chained I blocks has a length that is less than or equal to the frame length specified by FSC or FSD, as appropriate. When block chaining is used, the sender sets the chaining bit in the protocol control byte (PCD) of the first block of the chain. This indicates to the recipient that the block chaining function is being used and that the subsequent block contains chained data. If the recipient receives the first block of the chain correctly, it indicates correct reception and its readiness to receive the next block by returning an R block with the same block number as the block it just received. The next block can then be sent. This back-and-forth exchange of I blocks and R blocks continues until the sender transmits an I block in which the chaining bit is not set. On receiving this block, the recipient knows that all of the application-layer data have been received, so it can process this data block and send the associated response.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Deactivating a card<br>
+When data transmission between the terminal and the card is completely finished, the terminal places the card in the Halt state by sending it a DESELECT command, which is transmitted using an S block. The card responds to this command with an S(DESELECT) response block and enters the Halt state.</span></span></p>
+<p><span><span style="font-family: Times New Roman; font-size: medium;">Error handling<br>
+The block transmission protocol has error-detection mechanisms that are similar to those of the T = 1 protocol and allow resynchronization at various levels in case of transmission errors. The exact rules for the protocol processes can be found in Part 4 of ISO/IEC 14 433. Extensive examples of error-free protocol processes and error handling can also be found in the Annex to the standard.</span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span><img title="NXP Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/Mifare_DESFire_EV1_2K_4K_8K_MF3ICD21_MF3ICD40_MF3ICD41_MF3ICD81_114.jpg" alt="NXP Mifare DESFire D81 ISO Card,Mifare DESFire EV1 8K Contactless Cards ,Mifare DESFire 8K Printing Card ,Mifare DESFire 8K Offset Printing Card"></span></span></span></span></p>
+<p><span><span style="font-family: times new roman,times;"><span style="font-size: medium;"><span>Figure 3.121 Example of an anticollision sequence with three Type-B cards (Part 2 of 2)</span></span></span></span></p>
+</div><!--post-content-->
+<div class="post-meta">
+Under: <a href="http://www.gorferay.com/technical-knowledge/" title="Technical Knowledge" rel="category tag">Technical Knowledge</a>    &nbsp;  
+</div><!--post-meta-->
+
+
+
+
+</div><!--main-container-->
+<div id="sidebar">
+
+
+<div class="sidebar-row green">
+<h3>Great Quality Products</h3>
+<ul>
+	<li class="cat-item cat-item-7"><a href="http://www.gorferay.com/blank-white-printable-cards/" title="Blank White Printable Cards">Blank White Printable Cards</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.gorferay.com/full-color-printing-cards/" title="Full Color Printing Cards">Full Color Printing Cards</a>
+</li>
+	<li class="cat-item cat-item-378"><a href="http://www.gorferay.com/plastic-cards/" title="Plastic Cards">Plastic Cards</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="http://www.gorferay.com/rfid-proximity-clamshell-card/" title="RFID Proximity Clamshell Card">RFID Proximity Clamshell Card</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://www.gorferay.com/rfid-key-fobs/" title="RFID Key Fobs">RFID Key Fobs</a>
+</li>
+	<li class="cat-item cat-item-12"><a href="http://www.gorferay.com/rfid-wristbands/" title="RFID Wristbands">RFID Wristbands</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="http://www.gorferay.com/rfid-tags/" title="RFID Tags">RFID Tags</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="http://www.gorferay.com/rfid-lables/" title="RFID Lables">RFID Lables</a>
+</li>
+	<li class="cat-item cat-item-68"><a href="http://www.gorferay.com/compatible-dallas-ibutton-cards/" title="Compatible DALLAS iButton Cards">Compatible DALLAS iButton Cards</a>
+</li>
+	<li class="cat-item cat-item-15"><a href="http://www.gorferay.com/mifare-1k-card/" title="Mifare 1K Card">Mifare 1K Card</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="http://www.gorferay.com/mifare-4k-card/" title="Mifare 4K Card">Mifare 4K Card</a>
+</li>
+	<li class="cat-item cat-item-17"><a href="http://www.gorferay.com/compatible-mifare-1k-card/" title="Compatible Mifare 1K Card">Compatible Mifare 1K Card</a>
+</li>
+	<li class="cat-item cat-item-18"><a href="http://www.gorferay.com/mifare-mini-s20-card/" title="Mifare Mini S20 Card">Mifare Mini S20 Card</a>
+</li>
+	<li class="cat-item cat-item-19"><a href="http://www.gorferay.com/mifare-desfire-ev1-2k-card/" title="Mifare DESFire EV1 2K Card">Mifare DESFire EV1 2K Card</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="http://www.gorferay.com/mifare-desfire-ev1-4k-card/" title="Mifare DESFire EV1 4K Card">Mifare DESFire EV1 4K Card</a>
+</li>
+	<li class="cat-item cat-item-21"><a href="http://www.gorferay.com/mifare-desfire-ev1-8k-card/" title="Mifare DESFire EV1 8K Card">Mifare DESFire EV1 8K Card</a>
+</li>
+	<li class="cat-item cat-item-22"><a href="http://www.gorferay.com/mifare-plus-2k-card/" title="Mifare Plus 2K Card">Mifare Plus 2K Card</a>
+</li>
+	<li class="cat-item cat-item-23"><a href="http://www.gorferay.com/mifare-plus-4k-card/" title="Mifare Plus 4K Card">Mifare Plus 4K Card</a>
+</li>
+	<li class="cat-item cat-item-24"><a href="http://www.gorferay.com/hitag-1-card/" title="Hitag 1 Card">Hitag 1 Card</a>
+</li>
+	<li class="cat-item cat-item-25"><a href="http://www.gorferay.com/hitag-2-card/" title="Hitag 2 Card">Hitag 2 Card</a>
+</li>
+	<li class="cat-item cat-item-26"><a href="http://www.gorferay.com/hitag-s-256-card/" title="Hitag S 256 Card">Hitag S 256 Card</a>
+</li>
+	<li class="cat-item cat-item-27"><a href="http://www.gorferay.com/hitag-s-2048-card/" title="Hitag S 2048 Card">Hitag S 2048 Card</a>
+</li>
+	<li class="cat-item cat-item-28"><a href="http://www.gorferay.com/mifare-ultralight-card/" title="Mifare Ultralight Card">Mifare Ultralight Card</a>
+</li>
+	<li class="cat-item cat-item-29"><a href="http://www.gorferay.com/mifare-ultralight-c-card/" title="Mifare Ultralight C Card">Mifare Ultralight C Card</a>
+</li>
+	<li class="cat-item cat-item-30"><a href="http://www.gorferay.com/i-code-sli-card/" title="I-CODE SLI Card">I-CODE SLI Card</a>
+</li>
+	<li class="cat-item cat-item-31"><a href="http://www.gorferay.com/u-code-hsl-card/" title="U-CODE HSL Card">U-CODE HSL Card</a>
+</li>
+	<li class="cat-item cat-item-32"><a href="http://www.gorferay.com/temic-t5567-proximity-card/" title="Temic T5567 Proximity Card">Temic T5567 Proximity Card</a>
+</li>
+	<li class="cat-item cat-item-33"><a href="http://www.gorferay.com/em4100-card/" title="EM4100 Card">EM4100 Card</a>
+</li>
+	<li class="cat-item cat-item-34"><a href="http://www.gorferay.com/em4200-card/" title="EM4200 Card">EM4200 Card</a>
+</li>
+	<li class="cat-item cat-item-35"><a href="http://www.gorferay.com/em4205-em4305-card/" title="EM4205 EM4305 Card">EM4205 EM4305 Card</a>
+</li>
+	<li class="cat-item cat-item-36"><a href="http://www.gorferay.com/em4450-em4550-card/" title="EM4450 EM4550 Card">EM4450 EM4550 Card</a>
+</li>
+	<li class="cat-item cat-item-37"><a href="http://www.gorferay.com/legic-prime-mim256-card/" title="LEGIC Prime MIM256 Card">LEGIC Prime MIM256 Card</a>
+</li>
+	<li class="cat-item cat-item-38"><a href="http://www.gorferay.com/legic-prime-mim1024-card/" title="LEGIC Prime MIM1024 Card">LEGIC Prime MIM1024 Card</a>
+</li>
+	<li class="cat-item cat-item-39"><a href="http://www.gorferay.com/legic-advant-atc128-mv-card/" title="LEGIC advant ATC128-MV Card">LEGIC advant ATC128-MV Card</a>
+</li>
+	<li class="cat-item cat-item-40"><a href="http://www.gorferay.com/legic-advant-atc256-mv-card/" title="LEGIC advant ATC256-MV Card">LEGIC advant ATC256-MV Card</a>
+</li>
+	<li class="cat-item cat-item-41"><a href="http://www.gorferay.com/legic-advant-atc1024-mv-card/" title="LEGIC advant ATC1024-MV Card">LEGIC advant ATC1024-MV Card</a>
+</li>
+	<li class="cat-item cat-item-42"><a href="http://www.gorferay.com/legic-advant-atc512-mp-card/" title="LEGIC advant ATC512-MP Card">LEGIC advant ATC512-MP Card</a>
+</li>
+	<li class="cat-item cat-item-43"><a href="http://www.gorferay.com/legic-advant-atc2048-mp-card/" title="LEGIC advant ATC2048-MP Card">LEGIC advant ATC2048-MP Card</a>
+</li>
+	<li class="cat-item cat-item-44"><a href="http://www.gorferay.com/legic-advant-atc4096-mp-card/" title="LEGIC advant ATC4096-MP Card">LEGIC advant ATC4096-MP Card</a>
+</li>
+	<li class="cat-item cat-item-46"><a href="http://www.gorferay.com/inside-picopass-32ks-card/" title="INSIDE PicoPass 32KS Card">INSIDE PicoPass 32KS Card</a>
+</li>
+	<li class="cat-item cat-item-47"><a href="http://www.gorferay.com/lri2k-card/" title="LRI2K Card">LRI2K Card</a>
+</li>
+	<li class="cat-item cat-item-48"><a href="http://www.gorferay.com/lris2k-card/" title="LRIS2K Card">LRIS2K Card</a>
+</li>
+	<li class="cat-item cat-item-49"><a href="http://www.gorferay.com/sri512-card/" title="SRI512 Card">SRI512 Card</a>
+</li>
+	<li class="cat-item cat-item-50"><a href="http://www.gorferay.com/srix4k-card/" title="SRIX4K Card">SRIX4K Card</a>
+</li>
+	<li class="cat-item cat-item-51"><a href="http://www.gorferay.com/ti-tag-it-hf-1-plus-card/" title="TI Tag-it HF-1 Plus Card">TI Tag-it HF-1 Plus Card</a>
+</li>
+	<li class="cat-item cat-item-52"><a href="http://www.gorferay.com/ti-tag-it-hf-1-standard-card/" title="TI Tag-it HF-1 Standard Card">TI Tag-it HF-1 Standard Card</a>
+</li>
+	<li class="cat-item cat-item-53"><a href="http://www.gorferay.com/sle5542-card/" title="SLE5542 Card">SLE5542 Card</a>
+</li>
+	<li class="cat-item cat-item-54"><a href="http://www.gorferay.com/sle5528-card/" title="SLE5528 Card">SLE5528 Card</a>
+</li>
+	<li class="cat-item cat-item-55"><a href="http://www.gorferay.com/compatible-sle4442-card/" title="Compatible SLE4442 Card">Compatible SLE4442 Card</a>
+</li>
+	<li class="cat-item cat-item-56"><a href="http://www.gorferay.com/compatible-sle4428-card/" title="Compatible SLE4428 Card">Compatible SLE4428 Card</a>
+</li>
+	<li class="cat-item cat-item-57"><a href="http://www.gorferay.com/at24c02-04-08-16-32-64-card/" title="AT24C02/04/08/16/32/64 Card">AT24C02 04 08 16 32 64 Card</a>
+</li>
+	<li class="cat-item cat-item-58"><a href="http://www.gorferay.com/at45db041-card/" title="AT45DB041 Card">AT45DB041 Card</a>
+</li>
+	<li class="cat-item cat-item-59"><a href="http://www.gorferay.com/at88sc0204c-card/" title="AT88SC0204C Card">AT88SC0204C Card</a>
+</li>
+	<li class="cat-item cat-item-60"><a href="http://www.gorferay.com/at88sc102-card/" title="AT88SC102 Card">AT88SC102 Card</a>
+</li>
+	<li class="cat-item cat-item-61"><a href="http://www.gorferay.com/at88sc153-card/" title="AT88SC153 Card">AT88SC153 Card</a>
+</li>
+	<li class="cat-item cat-item-62"><a href="http://www.gorferay.com/at88sc1604-card/" title="AT88SC1604 Card">AT88SC1604 Card</a>
+</li>
+	<li class="cat-item cat-item-63"><a href="http://www.gorferay.com/at88sc1608-card/" title="AT88SC1608 Card">AT88SC1608 Card</a>
+</li>
+	<li class="cat-item cat-item-67"><a href="http://www.gorferay.com/is24c02-04-08-16-32-64-card/" title="IS24C02 04 08 16 32 64 Card">IS24C02 04 08 16 32 64 Card</a>
+</li>
+	<li class="cat-item cat-item-64"><a href="http://www.gorferay.com/is23sc1604-card/" title="IS23SC1604 Card">IS23SC1604 Card</a>
+</li>
+	<li class="cat-item cat-item-65"><a href="http://www.gorferay.com/is23sc4439-card/" title="IS23SC4439 Card">IS23SC4439 Card</a>
+</li>
+	<li class="cat-item cat-item-66"><a href="http://www.gorferay.com/is23sc4456-card/" title="IS23SC4456 Card">IS23SC4456 Card</a>
+</li>
+	<li class="cat-item cat-item-69"><a href="http://www.gorferay.com/hybrid-smart-cards/" title="Hybrid Smart Cards">Hybrid Smart Cards</a>
+</li>
+	<li class="cat-item cat-item-70"><a href="http://www.gorferay.com/nxp-semiconductors/" title="NXP Semiconductors">NXP Semiconductors</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="http://www.gorferay.com/legic-identsystems/" title="LEGIC Identsystems">LEGIC Identsystems</a>
+</li>
+	<li class="cat-item cat-item-283"><a href="http://www.gorferay.com/infineon-technologies/" title="Infineon Technologies">Infineon Technologies</a>
+</li>
+	<li class="cat-item cat-item-308"><a href="http://www.gorferay.com/atmel-corporation/" title="Atmel Corporation">Atmel Corporation</a>
+</li>
+	<li class="cat-item cat-item-305"><a href="http://www.gorferay.com/st-microelectronics/" title="ST Microelectronics">ST Microelectronics</a>
+</li>
+	<li class="cat-item cat-item-310"><a href="http://www.gorferay.com/microchip-technology/" title="Microchip Technology">Microchip Technology</a>
+</li>
+	<li class="cat-item cat-item-206"><a href="http://www.gorferay.com/technical-knowledge/" title="Technical Knowledge">Technical Knowledge</a>
+</li>
+</ul>
+</div><!--sidebar-row-->
+
+
+
+</div><!--sidebar--><div id="r_sidebar">
+
+
+<div class="sidebar-row blue">
+<h3>Competitive Price</h3>
+<p><span style="font-size: medium"><strong>E-mail: </strong></span><a href="mailto:sales@gorferay.com"><span style="color: white"><strong>Contact Us</strong></span></a><span style="font-size: medium"><strong>&nbsp;</strong></span></p><strong>
+</strong></div><!--blue--><strong>
+
+<a href="http://www.gorferay.com/products/"><img src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/RFID_products.jpg"></a>
+
+
+
+</strong></div><!--r_sidebar--></div><!--main--><strong>
+﻿<div id="footer">
+<ul id="navi">
+<li class="page_item page-item-2481"><a href="http://www.gorferay.com/" title="About us">About us</a></li>
+<li class="page_item page-item-12"><a href="http://www.gorferay.com/products/" title="Products">Products</a></li>
+<li class="page_item page-item-8"><a href="http://www.gorferay.com/contact-us/" title="Contact us">Contact us</a></li>
+</ul>
+<div id="credits"><a href="http://www.gorferay.com/sitemap.xml">site map</a></div>
+<div id="credits">Copyright © <a href="http://www.gorferay.com/">Gorferay Card Service Co.,Ltd</a></div>
+
+
+</div><!--footer-->
+
+
+<script language="javascript" type="text/javascript" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/17853415.js"></script><a href="http://www.51.la/?17853415" target="_blank" title="51.La 网站流量统计系统"><img alt="51.La 网站流量统计系统" src="./Data transmission protocol (ISO _ IEC 14 433-4)_files/icon_0.gif" style="border:none"></a>
+
+<noscript>&lt;a href="http://www.51.la/?17853415" target="_blank"&gt;&lt;img alt="&amp;#x6211;&amp;#x8981;&amp;#x5566;&amp;#x514D;&amp;#x8D39;&amp;#x7EDF;&amp;#x8BA1;" src="http://img.users.51.la/17853415.asp" style="border:none" /&gt;&lt;/a&gt;</noscript>
+ 
+<div id="for-wp-footer">
+
+                <div id="lang_sel_footer">
+                    <ul>
+                    	<li><a href="http://www.gorferay.com/data-transmission-protocol-iso-iec-14-433-4/" class="lang_sel_sel"><span class="icl_lang_sel_current">English</span></a></li>
+                    	<li><a href="http://www.gorferay.com/de/"><span class="icl_lang_sel_native">Deutsch</span> <span class="icl_lang_sel_translated"><span class="icl_lang_sel_native">(</span>German<span class="icl_lang_sel_native">)</span></span></a></li>
+                    </ul>
+                </div></div><!--for wp_footer-->
+
+
+
+</strong></body></html>
