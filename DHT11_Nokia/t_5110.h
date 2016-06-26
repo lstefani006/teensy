@@ -9,9 +9,6 @@
 #endif
 
 
-#define LCDWIDTH 84
-#define LCDHEIGHT 48
-
 #define PCD8544_POWERDOWN 0x04
 #define PCD8544_ENTRYMODE 0x02
 #define PCD8544_EXTENDEDINSTRUCTION 0x01
@@ -40,7 +37,6 @@
 namespace t 
 {
 	extern const uint8_t ASCII[][5];
-	extern uint32_t G_t;
 
 	template <typename  T, int8_t _pinRST, int8_t _pinDC, bool timerUpdate> class Lcd : public Print
 	{
@@ -71,7 +67,7 @@ namespace t
 		int8_t _cx;
 		int8_t _cy;
 
-		void xy(int8_t x, int8_t y) {
+		inline void xy(int8_t x, int8_t y) {
 			writeCommand(0x80 | x);  // Column.
 			writeCommand(0x40 | y / 8);  // Row.
 		}
@@ -154,7 +150,6 @@ namespace t
 			if (_invalid == 0) 
 				return;
 
-			uint32_t s = micros();
 			typename T::SPITransaction tr(_spi, _spiSettings);
 			for (int8_t y = 0; y < LCD_Y / 8; ++y)
 			{
@@ -166,9 +161,6 @@ namespace t
 				}
 			}
 			_invalid = 0;
-			uint32_t e = micros();
-
-			G_t = e-s;
 		}
 
 	public:
