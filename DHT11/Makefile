@@ -14,7 +14,7 @@ SRC=\
 
 ifdef TEENSY
 else
-	SRC+= timer.cpp 
+#	SRC+= timer.cpp 
 endif
 
 ifdef TEENSY

@@ -416,8 +416,8 @@ MFRC522::StatusCode MFRC522::PICC_REQA_or_WUPA(
  * Transmits SELECT/ANTICOLLISION commands to select a single PICC.
  * Before calling this function the PICCs must be placed in the READY(*) state by calling PICC_RequestA() or PICC_WakeupA().
  * On success:
- * 		- The chosen PICC is in state ACTIVE(*) and all other PICCs have returned to state IDLE/HALT. (Figure 7 of the ISO/IEC 14443-3 draft.)
- * 		- The UID size and value of the chosen PICC is returned in *uid along with the SAK.
+ * 	- The chosen PICC is in state ACTIVE(*) and all other PICCs have returned to state IDLE/HALT. (Figure 7 of the ISO/IEC 14443-3 draft.)
+ * 	- The UID size and value of the chosen PICC is returned in *uid along with the SAK.
  * 
  * A PICC UID consists of 4, 7 or 10 bytes.
  * Only 4 bytes can be specified in a SELECT command, so for the longer UIDs two or three iterations are used:
@@ -992,15 +992,15 @@ MFRC522::PICC_Type MFRC522::PICC_GetType(
 	
 	switch (sak) 
 	{
-		case 0x09:	return PICC_TYPE_MIFARE_MINI;	break;
-		case 0x08:	return PICC_TYPE_MIFARE_1K;		break;
-		case 0x18:	return PICC_TYPE_MIFARE_4K;		break;
-		case 0x00:	return PICC_TYPE_MIFARE_UL;		break;
-		case 0x10:
-		case 0x11:	return PICC_TYPE_MIFARE_PLUS;	break;
-		case 0x20:	return PICC_TYPE_MIFARE_DESFIRE;break;
-		case 0x01:	return PICC_TYPE_TNP3XXX;		break;
-		default:	break;
+	case 0x00:	return PICC_TYPE_MIFARE_UL;		break;
+	case 0x09:	return PICC_TYPE_MIFARE_MINI;	break;
+	case 0x08:	return PICC_TYPE_MIFARE_1K;		break;
+	case 0x18:	return PICC_TYPE_MIFARE_4K;		break;
+	case 0x10:
+	case 0x11:	return PICC_TYPE_MIFARE_PLUS;	break;
+	case 0x20:	return PICC_TYPE_MIFARE_DESFIRE;break;
+	case 0x01:	return PICC_TYPE_TNP3XXX;		break;
+	default:	break;
 	}
 	
 	if (sak & 0x20) return PICC_TYPE_ISO_14443_4;

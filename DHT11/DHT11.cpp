@@ -9,6 +9,8 @@
 */
 
 #include <idDHTLib.h>
+
+/*
 #include "timer.hpp"
 
 void timer2_tick()
@@ -22,6 +24,7 @@ void timer2_tick()
 		digitalWrite(LED_BUILTIN, !a);
 	}
 }
+*/
 
 constexpr int idDHTLibPin = 2; //Digital pin for comunications
 constexpr int idDHTLibIntNumber = 0; //interrupt number (must be the one that use the previus defined pin (see table above)
@@ -35,12 +38,14 @@ idDHTLib DHTLib(idDHTLibPin,idDHTLibIntNumber,dhtLib_wrapper);
 
 void setup()
 {
-	Serial.begin(115200);
+	Serial.begin(38400);
 
 	pinMode(LED_BUILTIN, OUTPUT);
+	/*
 #ifdef __AVR__
 	timer2.setup_overflow(1000ul);
 #endif
+	*/
 
 	Serial.println("idDHTLib Example program");
 	Serial.print("LIB version: ");
@@ -48,17 +53,23 @@ void setup()
 	Serial.println("---------------");
 	delay(3000); // The sensor need like 2 sec to initialize, if you have some code before this that make a delay, you can eliminate this delay
 }
+
+
 // This wrapper is in charge of calling 
 // mus be defined like this for the lib work
-void dhtLib_wrapper() {
-	DHTLib.dht11Callback();
-}
+void dhtLib_wrapper() { DHTLib.dht11Callback(); }
+
 void loop()
 {
 	Serial.print("\nRetrieving information from sensor: ");
 	Serial.print("Read sensor: ");
 
-	int result = DHTLib.acquireAndWait();
+	// int result = DHTLib.acquireAndWait();
+
+	DHTLib.acquire();
+	while(DHTLib.acquiring());
+
+	auto result =  DHTLib.getStatus();
 	switch (result)
 	{
 	case IDDHTLIB_OK: 
@@ -101,4 +112,3 @@ void loop()
 
 	delay(2000);
 }
-

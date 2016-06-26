@@ -1,4 +1,4 @@
-W=3
+W=4
 
 ifeq ($(shell test $(W) -ge 1; echo $$?),0)
 	WCOMMON=
