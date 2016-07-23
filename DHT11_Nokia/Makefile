@@ -1,3 +1,4 @@
+W=3
 ifdef TEENSY
 	CXXFLAGS=-W2 -Os -I../TeensyLib -V -I.
 	VPATH=../TeensyLib

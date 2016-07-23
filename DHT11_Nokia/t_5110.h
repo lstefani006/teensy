@@ -36,11 +36,11 @@
 
 namespace t 
 {
-	extern const uint8_t ASCII[][5];
+	extern const uint8_t ASCII[][5] /*PROGMEM*/;
 
 	template <typename  T, int8_t _pinRST, int8_t _pinDC, bool timerUpdate> class Lcd : public Print
 	{
-		enum LcdCommand { LCD_CMD = 0, LCD_DATA = 1 };
+		enum class LcdCommand : uint8_t { LCD_CMD = 0, LCD_DATA = 1 };
 
 		T &_spi;
 		typename T::Settings _spiSettings;
@@ -50,19 +50,19 @@ namespace t
 			digitalWrite(_pinDC, (int8_t)dc);
 			_spi.write(data);
 		}
-		void writeCommand(uint8_t data) { write(LCD_CMD, data); }
-		void writeData(uint8_t data) { write(LCD_DATA, data); }
+		void writeCommand(uint8_t data) { write(LcdCommand::LCD_CMD, data); }
+		void writeData(uint8_t data) { write(LcdCommand::LCD_DATA, data); }
 
 		// Size of the LCD
 	public:
 		constexpr static int8_t LCD_X = 84;
 		constexpr static int8_t LCD_Y = 48;
 	private:
-		constexpr static int16_t LCD_SZ = LCD_X * LCD_Y / 8;
+		constexpr static int16_t LCD_SZ = int16_t(LCD_X) * int16_t(LCD_Y) / 8;
+		constexpr static int8_t _wch = 6;
+		constexpr static int8_t _hch = 8;
 
-		int8_t _wch;
-		int8_t _hch;
-		uint8_t _buff[LCD_SZ];
+		uint8_t _buff[LCD_SZ];  // 84*48/8 = 504 byte !!!
 		uint8_t _invalid;
 		int8_t _cx;
 		int8_t _cy;
@@ -71,12 +71,6 @@ namespace t
 			writeCommand(0x80 | x);  // Column.
 			writeCommand(0x40 | y / 8);  // Row.
 		}
-	protected:
-		size_t write(uint8_t ch) {
-			if (ch == '\r') return 1;
-			print(ch);
-			return 1;
-		}
 	public:
 
 		// PDC8544 max clock 4Mhz ==> SPI_CLOCK_DIV4
@@ -84,8 +78,6 @@ namespace t
 			_spi(spi), 
 			_spiSettings(1*1000*1000, MSBFIRST, SPI_MODE0) 
 		{
-			_wch = 6;
-			_hch = 8;
 			_cx = 0;
 			_cy = 0;
 			_invalid = 0;
@@ -120,14 +112,14 @@ namespace t
 
 #if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
 			if (timerUpdate) {
-				Timer3.initialize(1000 * 20);
 				sThis = this;
+				Timer3.initialize(1000 * 20);
 				Timer3.attachInterrupt(s_update);
 			}
 #else
 			if (timerUpdate) {
-				Timer1.initialize(1000 * 20);
 				sThis = this;
+				Timer1.initialize(1000 * 20);
 				Timer1.attachInterrupt(s_update);
 			}
 #endif
@@ -139,9 +131,8 @@ namespace t
 
 		static Lcd *sThis;
 		static void s_update() {
-			if (sThis) {
+			if (sThis)
 				sThis->updateTimer();
-			}
 		}
 
 	private:
@@ -157,7 +148,7 @@ namespace t
 				{
 					xy(0, y * 8);
 					for (int8_t x = 0; x < LCD_X; x++)
-						writeData(_buff[y * LCD_X + x]);
+						writeData(_buff[int16_t(y) * LCD_X + x]);
 				}
 			}
 			_invalid = 0;
@@ -171,7 +162,7 @@ namespace t
 		void clear()
 		{
 			noInterrupts();
-			for (int8_t i = 0; i < LCD_SZ; i++)
+			for (int16_t i = 0; i < LCD_SZ; i++)
 				_buff[i] = 0x00;
 			_cx = -_wch;
 			_cy = 0;
@@ -187,7 +178,7 @@ namespace t
 			x = LCD_X - 1 - x;
 			y = LCD_Y - 1 - y;
 
-			const uint8_t *p = &_buff[y / 8 * LCD_X + x];
+			const uint8_t *p = &_buff[int16_t(y) / 8 * LCD_X + x];
 			return *p & (1u << (y&7)) ? true : false;
 		}
 
@@ -199,7 +190,7 @@ namespace t
 			x = LCD_X - 1 - x;
 			y = LCD_Y - 1 - y;
 
-			uint8_t *p = &_buff[y / 8 * LCD_X + x];
+			uint8_t *p = &_buff[int16_t(y) / 8 * LCD_X + x];
 
 			if (v)
 				*p = *p | (1u << (y&7));
@@ -266,13 +257,16 @@ namespace t
 			}
 		}
 
-		void print(uint8_t character)
+	public:
+		size_t write(uint8_t character) override 
 		{
+			if (character == '\r') 
+				return 1;
 			if (character == '\n')
 			{
 				_cx = -_wch;
 				_cy += _hch;
-				return;
+				return 1;
 			}
 
 			_cx += _wch;
@@ -300,7 +294,10 @@ namespace t
 				if (x == _wch - 1)
 					a = 0;
 				else
+				{
 					a = ASCII[character - 0x20][x];
+					//a = pgm_read_byte(ASCII + (5 * (int16_t(character) - 0x20) + x));
+				}
 
 				for (int8_t y = 0; y < _hch; ++y)
 				{
@@ -308,6 +305,7 @@ namespace t
 					putPixel(_cx + x, _cy + y, v);
 				}
 			}
+			return 1;
 		}
 
 		void scrollUp() 
@@ -327,11 +325,23 @@ namespace t
 			}
 		}
 
+		/*
 		void print(const char *characters)
 		{
 			while (*characters)
 				print(*characters++);
 		}
+		void print(const __FlashStringHelper *characters) { print_P((PGM_P)characters); }
+		void print_P(PGM_P str)
+		{
+			uint8_t c;
+			while(c = pgm_read_byte(str))
+			{
+				print(c);
+				str++;
+			}
+		}
+		*/
 
 
 		void gotoXY(int8_t x, int8_t y)

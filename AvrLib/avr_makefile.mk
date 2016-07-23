@@ -1,4 +1,4 @@
-W=4
+W?=4
 
 ifeq ($(shell test $(W) -ge 1; echo $$?),0)
 	WCOMMON=
@@ -58,7 +58,7 @@ CCOMMON= \
 	-Os \
 	-ffunction-sections -fdata-sections \
 	-mmcu=atmega328p -DF_CPU=8000000L \
-	-DARDUINO=10607 -DARDUINO_AVR_PRO -DARDUINO_ARCH_AVR \
+	-DARDUINO=10608 -DARDUINO_AVR_PRO -DARDUINO_ARCH_AVR \
 	-I$(ARDUINO)/hardware/arduino/avr/cores/arduino \
 	-I$(ARDUINO)/hardware/arduino/avr/variants/eightanaloginputs
 

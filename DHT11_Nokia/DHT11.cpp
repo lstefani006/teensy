@@ -34,17 +34,17 @@ void setup()
 {
 	t::SetPrint(&lcd);
 	spi.begin();
+
 	lcd.begin();
 	lcd.clear();
 	lcd.gotoXY(0, 0);
-
 	lcd.setContrast(35);
 
-	lcd.print("START");
-	delay(3000);
+	lcd.print(F("START"));
+	delay(2000);
+
 	lcd.clear();
 	lcd.gotoXY(0, 0);
-	delay(3000); // The sensor need like 2 sec to initialize, if you have some code before this that make a delay, you can eliminate this delay
 }
 
 
@@ -52,63 +52,86 @@ void setup()
 // mus be defined like this for the lib work
 void dhtLib_wrapper() { DHTLib.dht11Callback(); }
 
+long  g_tt = 0;
+float g_cc = 0;
+float g_hh = 0;
+float g_dd = 0;
+
+void pp(float m, float a)
+{
+	/***/if (m > a) lcd.println("+");
+	else if (m < a) lcd.println("-");
+	else lcd.println();
+}
+
 void loop()
 {
+	DHTLib.acquire();
+	while (DHTLib.acquiring()) delay(10);
+
 	lcd.clear();
 	lcd.gotoXY(0, 0);
-	//lcd.print("\nRetrieving information from sensor: ");
-	lcd.print("RX....");
-	lcd.gotoXY(0, 0);
 
-	// int result = DHTLib.acquireAndWait();
-
-	DHTLib.acquire();
-	while(DHTLib.acquiring()) delay(10);
-
-	auto result =  DHTLib.getStatus();
-	switch (result)
+	switch (DHTLib.getStatus())
 	{
 	case IDDHTLIB_OK: 
 		{
-			lcd.print("C'   : ");
-			lcd.println(DHTLib.getCelsius(), 2);
+			auto tcc = DHTLib.getCelsius();
+			auto thh = DHTLib.getHumidity();
+			auto tdd = DHTLib.getDewPoint();
 
-			lcd.print("H%   : ");
-			lcd.println(DHTLib.getHumidity(), 2);
+			if (g_tt == 0) 
+			{
+				g_cc = tcc;
+				g_hh = thh;
+				g_dd = tdd;
+			}
 
-			lcd.print("DP  C: ");
-			auto dp = DHTLib.getDewPoint();
-			lcd.println(dp);
+			lcd.print(/*F*/("C' : ")); lcd.print(int16_t(tcc + 0.5)); pp(tcc, g_cc);
+			lcd.print(F("H% : ")); lcd.print(int16_t(thh + 0.5)); pp(thh, g_hh);
+			lcd.print(F("DP : ")); lcd.print(tdd, 2); pp(tdd, g_dd);
 
 			lcd.println();
 
-			/***/if (dp <= 10) lcd.println("1 Molto secco");
-			else if (dp <= 12) lcd.println("2 Molto confort");
-			else if (dp <= 16) lcd.println("3 Confort");
-			else if (dp <= 18) lcd.println("4 Poco umido");
-			else if (dp <= 21) lcd.println("5 Umido");
-			else if (dp <= 24) lcd.println("6 Molto umido");
-			else               lcd.println("7 Afa");
-			lcd.println("Scala 1..7");
+			g_tt++;
+			if (g_tt >= 30 * 60)
+			{
+				g_cc = tcc;
+				g_hh = thh;
+				g_dd = tdd;
+
+				g_tt = 0;
+			}
+
+			auto dp = tdd;
+			/***/if (dp <= 10) lcd.println(F("1 Molto secco"));
+			else if (dp <= 12) lcd.println(F("2 Secco"));
+			else if (dp <= 16) lcd.println(F("3 Confort"));
+			else if (dp <= 18) lcd.println(F("4 Poco umido"));
+			else if (dp <= 21) lcd.println(F("5 Umido"));
+			else if (dp <= 24) lcd.println(F("6 Molto umido"));
+			else               lcd.println(F("7 Afa"));
+			lcd.println(F("Scala 1..7"));
 		}
 		break;
+
 	case IDDHTLIB_ERROR_CHECKSUM: 
-		lcd.println("Error\n\r\tChecksum error"); 
+		lcd.println(F("Error\n\r\tChecksum error")); 
 		break;
 	case IDDHTLIB_ERROR_TIMEOUT: 
-		lcd.println("Error\n\r\tTime out error"); 
+		lcd.println(F("Error\n\r\tTime out error")); 
 		break;
 	case IDDHTLIB_ERROR_ACQUIRING: 
-		lcd.println("Error\n\r\tAcquiring"); 
+		lcd.println(F("Error\n\r\tAcquiring")); 
 		break;
 	case IDDHTLIB_ERROR_DELTA: 
-		lcd.println("Error\n\r\tDelta time to small"); 
+		lcd.println(F("Error\n\r\tDelta time to small")); 
 		break;
 	case IDDHTLIB_ERROR_NOTSTARTED: 
-		lcd.println("Error\n\r\tNot started"); 
+		lcd.println(F("Error\n\r\tNot started")); 
 		break;
 	default: 
-		lcd.println("Unknown error"); 
+		lcd.println(F("Unknown error")); 
 		break;
 	}
 
