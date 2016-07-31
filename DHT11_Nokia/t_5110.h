@@ -36,7 +36,7 @@
 
 namespace t 
 {
-	extern const uint8_t ASCII[][5] /*PROGMEM*/;
+	extern const uint8_t ASCII[][5] PROGMEM;
 
 	template <typename  T, int8_t _pinRST, int8_t _pinDC, bool timerUpdate> class Lcd : public Print
 	{
@@ -114,29 +114,28 @@ namespace t
 			if (timerUpdate) {
 				sThis = this;
 				Timer3.initialize(1000 * 20);
-				Timer3.attachInterrupt(s_update);
+				Timer3.attachInterrupt(s_updateTimer);
 			}
 #else
 			if (timerUpdate) {
 				sThis = this;
 				Timer1.initialize(1000 * 20);
-				Timer1.attachInterrupt(s_update);
+				Timer1.attachInterrupt(s_updateTimer);
 			}
 #endif
 
 			clear();
-			if (!timerUpdate)
-				updateTimer();
+			update();
 		}
 
 		static Lcd *sThis;
-		static void s_update() {
+		static void s_updateTimer() {
 			if (sThis)
-				sThis->updateTimer();
+				sThis->updateScreen();
 		}
 
 	private:
-		void updateTimer()
+		void updateScreen()
 		{
 			if (_invalid == 0) 
 				return;
@@ -157,17 +156,22 @@ namespace t
 	public:
 		void update()
 		{
-			if (timerUpdate == false) updateTimer();
+			if (timerUpdate == false)
+				updateScreen();
+			else
+			{
+				// si aspetta il timer....
+			}
 		}
 		void clear()
 		{
-			noInterrupts();
+			//if (timerUpdate) noInterrupts();
 			for (int16_t i = 0; i < LCD_SZ; i++)
 				_buff[i] = 0x00;
 			_cx = -_wch;
 			_cy = 0;
 			_invalid = 0x3f;  // 6 righe
-			interrupts();
+			//if (timerUpdate) interrupts();
 		}
 
 		bool getPixel(int8_t x, int8_t y) const
@@ -295,8 +299,8 @@ namespace t
 					a = 0;
 				else
 				{
-					a = ASCII[character - 0x20][x];
-					//a = pgm_read_byte(ASCII + (5 * (int16_t(character) - 0x20) + x));
+					//a = ASCII[character - 0x20][x];
+					a = pgm_read_byte(((const char PROGMEM *)ASCII) + (5 * (int16_t(character) - 0x20)) + x);
 				}
 
 				for (int8_t y = 0; y < _hch; ++y)

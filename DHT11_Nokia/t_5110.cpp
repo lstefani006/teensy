@@ -1,6 +1,6 @@
 ﻿#include "t_5110.h"
 
-const byte t::ASCII[][5] /*PROGMEM*/ =
+const byte t::ASCII[][5] PROGMEM =
 {
 	{0x00, 0x00, 0x00, 0x00, 0x00} // 20
 	,{0x00, 0x00, 0x5f, 0x00, 0x00} // 21 !
