@@ -45,9 +45,3 @@ tags :
 	ctags *.c *.cpp *.h *.hpp \
 		$(TEENSY)/*.cpp $(TEENSY)/*.c \
 		$(TEENSY)/*.hpp $(TEENSY)/*.h
-
-
-
-
-
-

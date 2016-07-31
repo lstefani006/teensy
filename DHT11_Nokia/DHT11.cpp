@@ -58,7 +58,7 @@ void setup()
 	lcd.print("NUM="); lcd.println(g_dallas.getDeviceCount());
 	lcd.print("PARASTIC="); lcd.println(g_dallas.isParasitePowerMode());
 	if (g_dallas.getAddress(g_addr, 0) == false) lcd.println(F("getADDR ERRORE"));
-	g_dallas.setResolution(g_addr, 9);
+	g_dallas.setResolution(g_addr, 12);
 	lcd.print("RES=");
 	lcd.println(g_dallas.getResolution(g_addr));
 	lcd.update();
@@ -119,27 +119,11 @@ void wd()
 enum class dallasError : uint8_t { ok, deviceNotPresent, timeout };
 dallasError readDallasTemp(float &ret)
 {
-	/*
-	bool b = g_dallas.requestTemperaturesByAddress(g_ds);
-	if (b == false) return dallasError::deviceNotPresent;
-
-	DallasTemperature::ScratchPad sc;
-	auto t = millis();
-	for (;;) 
-	{
-		delay(10);
-		auto d = millis() - t;
-		if (g_dallas.isConnected(g_ds, sc))
-			break;
-
-		if (d > 1000) return dallasError::timeout;
-	}
-	ret = g_dallas.calculateTemperature(g_ds, sc);
-	return dallasError::ok;
-	*/
-	g_dallas.requestTemperatures(); // Send the command to get temperatures
+	bool b = g_dallas.requestTemperaturesByAddress(g_addr); // Send the command to get temperatures
+	if(!b) return dallasError::deviceNotPresent;
 
 	ret = g_dallas.getTempC(g_addr);
+	if (ret == DEVICE_DISCONNECTED) return dallasError::deviceNotPresent;
 	return dallasError::ok;
 }
 #endif
@@ -159,10 +143,10 @@ void loop()
 	switch (de)
 	{
 	case dallasError::deviceNotPresent:
-		lcd.print(F("Dallas device fail"));
+		lcd.print(F("Dallas\n\rdevice fail"));
 		break;
 	case dallasError::timeout:
-		lcd.print(F("Dallas imeout"));
+		lcd.print(F("Dallas\n\rtimeout"));
 		break;
 	}
 #endif
@@ -239,6 +223,7 @@ void loop()
 
 	DHTLib.acquire();
 	while (DHTLib.acquiring()) delay(10);
-	t = millis() - t;
-	delay(2000 - t);
+	auto tn = millis();
+	if (t + 2000 > tn)
+		delay(2000 - (tn - t));
 }
