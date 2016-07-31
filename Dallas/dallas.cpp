@@ -4,13 +4,15 @@
 
 //////////////////////////////////////////////////////////////////
 
+/*
 #define PIN_CE    10
 #define PIN_SDIN  11
 #define PIN_SCLK  13
 #define PIN_RESET  9
 #define PIN_DC    14
+*/
 
-static OneWire ds(22);
+static OneWire ds(7);
 static DallasTemperature sensors(&ds);
 
 static DeviceAddress ds0;
@@ -21,7 +23,6 @@ void setup()
 	t::SetPrint(&Serial);
 
 	sensors.begin();
-
 	sensors.getAddress(ds0, 0);
 	sensors.setWaitForConversion(false);
 }

@@ -1,10 +1,6 @@
 ﻿#include "t_5110.h"
 
-namespace t {
-uint32_t G_t;
-}
-
-const byte t::ASCII[][5] =
+const byte t::ASCII[][5] PROGMEM =
 {
 	{0x00, 0x00, 0x00, 0x00, 0x00} // 20
 	,{0x00, 0x00, 0x5f, 0x00, 0x00} // 21 !

@@ -1,4 +1,4 @@
-W=3
+W=4
 ifdef TEENSY
 	CXXFLAGS=-W2 -Os -I../TeensyLib -V -I.
 	VPATH=../TeensyLib
@@ -27,6 +27,14 @@ ifndef TEENSY
 	SRC += t_io.cpp
 endif
 
+#####################################################
+CXXFLAGS+= -DONEWIRE_CRC8_TABLE=0 -DDALLAS=1
+CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/OneWire
+VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/OneWire
+SRC+=OneWire.cpp
+SRC+=DallasTemperature.cpp
+
+
 ifdef TEENSY
 include ../TeensyLib/teensy_makefile.mk
 else
@@ -37,3 +45,9 @@ tags :
 	ctags *.c *.cpp *.h *.hpp \
 		$(TEENSY)/*.cpp $(TEENSY)/*.c \
 		$(TEENSY)/*.hpp $(TEENSY)/*.h
+
+
+
+
+
+

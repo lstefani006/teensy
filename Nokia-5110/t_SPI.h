@@ -6,64 +6,6 @@
 
 namespace t
 {
-	template<uint8_t cs, uint8_t clk, uint8_t mosi, uint8_t miso> class swSPI
-	{
-		uint8_t bitOrder;
-		uint8_t trLevel;
-
-	public:
-		class Settings {
-		public:
-			Settings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode) : bitOrder(bitOrder) {}
-			uint8_t bitOrder;
-		};
-
-		swSPI() { trLevel = 0; bitOrder = MSBFIRST; }
-
-		bool begin() 
-		{
-			if (cs != 0xff) pinMode(cs, OUTPUT);
-			pinMode(clk,  OUTPUT);
-			pinMode(mosi, OUTPUT);
-			if (miso != 0xff) pinMode(miso, INPUT);
-			return true;
-		}
-		void write(byte data)  
-		{
-			if (trLevel == 0 && cs != 0xff) digitalWrite(cs, LOW);
-			shiftOut(mosi, clk, bitOrder, data);
-			if (trLevel == 0 && cs != 0xff) digitalWrite(cs, HIGH);
-		}
-		byte read() 
-		{
-			if (trLevel == 0 && cs != 0xff) digitalWrite(cs, LOW);
-			byte r = shiftIn(miso, clk, bitOrder);
-			if (trLevel == 0 && cs != 0xff) digitalWrite(cs, HIGH);
-			return r;
-		}
-
-		class SPITransaction {
-		public:
-			SPITransaction(swSPI &spi, Settings &s) : spi(spi) { spi.beginTransaction(s); }
-			~SPITransaction() { spi.endTransaction(); }
-		private:
-			swSPI &spi;
-		};
-	private:
-		void beginTransaction(Settings &s) {
-			if (trLevel == 0) {
-				bitOrder = s.bitOrder;
-				if (cs != 0xff) digitalWrite(cs, LOW);
-			}
-			trLevel += 1;
-		}
-		void endTransaction() {
-			trLevel -= 1;
-			if (trLevel == 0)
-				if (cs != 0xff) digitalWrite(cs, HIGH);
-		}
-	};
-
 	template<uint8_t cs, uint8_t clk, uint8_t mosi, uint8_t miso> class hwSPI
 	{
 		uint8_t trLevel;
