@@ -329,25 +329,6 @@ namespace t
 			}
 		}
 
-		/*
-		void print(const char *characters)
-		{
-			while (*characters)
-				print(*characters++);
-		}
-		void print(const __FlashStringHelper *characters) { print_P((PGM_P)characters); }
-		void print_P(PGM_P str)
-		{
-			uint8_t c;
-			while(c = pgm_read_byte(str))
-			{
-				print(c);
-				str++;
-			}
-		}
-		*/
-
-
 		void gotoXY(int8_t x, int8_t y)
 		{
 			if (x < 0 || x >= LCD_X) return;

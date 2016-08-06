@@ -41,7 +41,7 @@ do
 done
 
 if [ $w -ge 0 ] ; then
-	W=""
+	W="-Wreturn-type"
 fi
 if [ $w -ge 1 ] ; then
 	W+="-Wall "

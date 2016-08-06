@@ -81,16 +81,17 @@ float g_cc[g_sz];
 float g_hh[g_sz];
 float g_dd[g_sz];
 float g_ds[g_sz];
-int8_t g_top = 0;
+int8_t g_top = 0; // g_top = 0 => il piu' recente
 
-void pp(float m, float a[], int asz)
+void pp(float m, float a[], int8_t asz)
 {
 	lcd.print(' ');
 	for (int8_t i = 0; i < asz; ++i)
 	{
+		auto v = (i == 0) ? m : a[i-1];
 		char c;
-		/***/if (m > a[i]) c = '/';
-		else if (m < a[i]) c = '\\';
+		/***/if (v > a[i]) c = '/';
+		else if (v < a[i]) c = '\\';
 		else c = '-';
 		lcd.print(c);
 	}
@@ -123,7 +124,7 @@ dallasError readDallasTemp(float &ret)
 	if(!b) return dallasError::deviceNotPresent;
 
 	ret = g_dallas.getTempC(g_addr);
-	if (ret == DEVICE_DISCONNECTED) return dallasError::deviceNotPresent;
+	if (ret == DEVICE_DISCONNECTED_C) return dallasError::deviceNotPresent;
 	return dallasError::ok;
 }
 #endif
@@ -203,15 +204,15 @@ void loop()
 		{
 			for (int8_t t = 1; t < g_top; ++t)
 			{
-				g_cc[t-1] = g_cc[t];
-				g_hh[t-1] = g_hh[t];
-				g_dd[t-1] = g_dd[t];
-				g_ds[t-1] = g_ds[t];
+				g_cc[t] = g_cc[t-1];
+				g_hh[t] = g_hh[t-1];
+				g_dd[t] = g_dd[t-1];
+				g_ds[t] = g_ds[t-1];
 			};
-			g_cc[g_top] = tcc;
-			g_hh[g_top] = thh;
-			g_dd[g_top] = tdd;
-			g_ds[g_top] = tds;
+			g_cc[0] = tcc;
+			g_hh[0] = thh;
+			g_dd[0] = tdd;
+			g_ds[0] = tds;
 
 			g_top+=1;
 			if (g_top == g_sz) g_top = g_sz - 1;
