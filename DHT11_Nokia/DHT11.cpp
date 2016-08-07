@@ -76,7 +76,7 @@ void dhtLib_wrapper() { DHTLib.dht11Callback(); }
 
 
 long  g_tt = 0;
-constexpr int8_t g_sz = 6;
+constexpr int8_t g_sz = 8;
 float g_cc[g_sz];
 float g_hh[g_sz];
 float g_dd[g_sz];
@@ -182,11 +182,17 @@ void loop()
 		auto tdd = DHTLib.getDewPoint();
 
 #ifdef DALLAS
-		lcd.print(F("eC ")); lcd.print(tds, 1);pp(tcc, g_ds, g_top);
+		lcd.print(F("CE ")); lcd.print(tds, 1);pp(tcc, g_ds, g_top);
 #endif
-		lcd.print(F("C' ")); lcd.print(tcc, 1); pp(tcc, g_cc, g_top);
-		lcd.print(F("H% ")); lcd.print(thh, 1); pp(thh, g_hh, g_top);
+		lcd.print(F("CI ")); lcd.print(tcc, 1); pp(tcc, g_cc, g_top);
+		lcd.print(F("H  ")); lcd.print(thh, 1); pp(thh, g_hh, g_top);
+
+		if (tdd < 10) {
+		lcd.print(F("DP  ")); lcd.print(tdd, 1); pp(tdd, g_dd, g_top);
+		}
+		else {
 		lcd.print(F("DP ")); lcd.print(tdd, 1); pp(tdd, g_dd, g_top);
+		}
 
 		//lcd.println();
 

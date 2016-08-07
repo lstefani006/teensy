@@ -8,6 +8,8 @@
 #	include <TimerOne.h>
 #endif
 
+#include "fonts/fonts.h"
+
 
 #define PCD8544_POWERDOWN 0x04
 #define PCD8544_ENTRYMODE 0x02
@@ -59,8 +61,9 @@ namespace t
 		constexpr static int8_t LCD_Y = 48;
 	private:
 		constexpr static int16_t LCD_SZ = int16_t(LCD_X) * int16_t(LCD_Y) / 8;
-		constexpr static int8_t _wch = 6;
-		constexpr static int8_t _hch = 8;
+		//constexpr static int8_t _wch = 6;
+		//constexpr static int8_t _hch = 8;
+		const uint8_t *_font;
 
 		uint8_t _buff[LCD_SZ];  // 84*48/8 = 504 byte !!!
 		uint8_t _invalid;
@@ -81,6 +84,7 @@ namespace t
 			_cx = 0;
 			_cy = 0;
 			_invalid = 0;
+			_font = font_05x08;
 		}
 		void setContrast(uint8_t val) 
 		{
@@ -168,7 +172,7 @@ namespace t
 			//if (timerUpdate) noInterrupts();
 			for (int16_t i = 0; i < LCD_SZ; i++)
 				_buff[i] = 0x00;
-			_cx = -_wch;
+			_cx = -wch(_font);
 			_cy = 0;
 			_invalid = 0x3f;  // 6 righe
 			//if (timerUpdate) interrupts();
@@ -264,62 +268,77 @@ namespace t
 	public:
 		size_t write(uint8_t character) override 
 		{
+			uint8_t ch_w = wch(_font);
+			uint8_t ch_h = hch(_font) - 1;
+
 			if (character == '\r') 
 				return 1;
 			if (character == '\n')
 			{
-				_cx = -_wch;
-				_cy += _hch;
+				_cx = -ch_w;
+				_cy += ch_h;
 				return 1;
 			}
 
-			_cx += _wch;
-			if (_cx + _wch > LCD_X) 
+			_cx += ch_w;
+			if (_cx + ch_w > LCD_X) 
 			{
 				for (int8_t x = _cx; x < LCD_X ; x++)
-					for (int8_t y = _cy; y < _cy + _hch; ++y)
+					for (int8_t y = _cy; y < _cy + ch_h; ++y)
 						putPixel(x, y, false);
 
 				_cx = 0;
-				_cy += _hch;
+				_cy += ch_h;
 			}
 
 			if (character < 0x20 || character > 0x7f) character = '?';
 
-			if (_cy + _hch > LCD_Y)
+			if (_cy + ch_h > LCD_Y)
 			{
-				_cy -= _hch;
+				_cy -= ch_h;
 				scrollUp();
 			}
 
-			for (int8_t x = 0; x < _wch; x++)
-			{
-				uint8_t a;
-				if (x == _wch - 1)
-					a = 0;
-				else
+			for (uint8_t y = 0; y < ch_h; ++y)
+				for (uint8_t x = 0; x < ch_w; ++x)
 				{
-					//a = ASCII[character - 0x20][x];
-					a = pgm_read_byte(((const char PROGMEM *)ASCII) + (5 * (int16_t(character) - 0x20)) + x);
-				}
-
-				for (int8_t y = 0; y < _hch; ++y)
-				{
-					bool v = (a & (1 << y)) ? true : false;
+					bool v = pxch(_font, character, x, y);
 					putPixel(_cx + x, _cy + y, v);
 				}
+
+
+			/*
+			   for (int8_t x = 0; x < ch_w; x++)
+			   {
+			   uint8_t a;
+			   if (x == ch_w - 1)
+			   a = 0;
+			   else
+			   {
+			//a = ASCII[character - 0x20][x];
+			a = pgm_read_byte(((const char PROGMEM *)ASCII) + (5 * (int16_t(character) - 0x20)) + x);
 			}
+
+			for (int8_t y = 0; y < ch_h; ++y)
+			{
+			bool v = (a & (1 << y)) ? true : false;
+			putPixel(_cx + x, _cy + y, v);
+			}
+			}
+			*/
 			return 1;
 		}
 
 		void scrollUp() 
 		{
-			for (int8_t y = _hch; y < LCD_Y; y++)
+			uint8_t ch_h = hch(_font) - 1;
+
+			for (int8_t y = ch_h; y < LCD_Y; y++)
 			{
 				for (int8_t x = 0; x < LCD_X; x++)
 				{
 					bool v = getPixel(x, y);
-					putPixel(x, y - _hch, v);
+					putPixel(x, y - ch_h, v);
 				}
 			}
 			for (int8_t y = _cy; y < LCD_Y; y++)
@@ -331,9 +350,10 @@ namespace t
 
 		void gotoXY(int8_t x, int8_t y)
 		{
+			uint8_t ch_w = wch(_font);
 			if (x < 0 || x >= LCD_X) return;
 			if (y < 0 || y >= LCD_Y) return;
-			_cx = x - _wch;
+			_cx = x - ch_w;
 			_cy = y;
 		}
 	};

@@ -1,4 +1,4 @@
-W=4
+W=3
 ifdef TEENSY
 	CXXFLAGS=-W2 -Os -I../TeensyLib -V -I.
 	VPATH=../TeensyLib
@@ -9,6 +9,7 @@ endif
 
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
+VPATH+=./fonts
 
 CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
@@ -19,7 +20,9 @@ SRC=             \
 	idDHTLib.cpp \
 	t_5110.cpp   \
 	SPI.cpp      \
-	TimerOne.cpp 
+	TimerOne.cpp \
+	fonts.cpp
+
 
 #	PCD8544.cpp  
 	#
