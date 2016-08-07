@@ -5,14 +5,19 @@ CXXFLAGS+= -Os
 VPATH+=./crypto
 
 ifdef TEENSY
-VPATH   +=../TeensyLib
-CXXFLAGS+= -DUSE_NO_RTOS
-CXXFLAGS+= -W3 -Os
-CXXFLAGS+=-I../TeensyLib -V
+	VPATH   +=../TeensyLib
+	CXXFLAGS+= -DUSE_NO_RTOS
+	CXXFLAGS+= -W3 -Os
+	CXXFLAGS+=-I../TeensyLib -V
+else ifdef ESP8266
+else
+	VPATH   +=../AvrLib
+	SRC+=t_io.cpp
+	CXXFLAGS+=-I../AvrLib
 endif
 
 TARGET=522.hex
-SRC=\
+SRC+=\
 	MFRC522.cpp \
 	main.cpp \
 	SPI.cpp \

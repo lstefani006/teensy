@@ -1,18 +1,15 @@
 ifdef TEENSY
 	CXXFLAGS=-W3 -Os -I../TeensyLib -V
 	VPATH=../TeensyLib
+	CXXFLAGS+= -I$(TEENSYLIB)
 else
-	CXXFLAGS=-I../AvrLib
+	CXXFLAGS=-I../AvrLib -Os
 	VPATH=../AvrLib
 endif
 
-CXXFLAGS+= -I. -DONEWIRE_CRC8_TABLE=0
-CXXFLAGS+= -I$(TEENSYLIB)
-CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree
+CXXFLAGS+=  -DONEWIRE_CRC8_TABLE=0
 CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/OneWire
-CXXFLAGS+= -Os
 
-VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/OneWire
 
 SRC=dallas.cpp

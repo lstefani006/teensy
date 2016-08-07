@@ -140,7 +140,7 @@ void dumpUL()
 	{
 		printf("LOCK BITS\n");
 		printf("Lock Bit - se settato la pagina e' a sola lettura\n");
-		uint8_t m = 0b1000'0000;
+		uint8_t m = 0b10000000;
 		for (int i = 7; i >= 3; i--)
 		{
 			if (i == 3)
@@ -151,7 +151,7 @@ void dumpUL()
 			printf("\n");
 			m>>=1;
 		}
-		m = 0b1000'0000;
+		m = 0b10000000;
 		for (int i = 7; i >= 0; i--)
 		{
 			printf("L%01x    ", i+8);

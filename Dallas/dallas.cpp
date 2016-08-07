@@ -1,16 +1,6 @@
-﻿#include "OneWire.h"
+﻿#include <OneWire.h>
 #include "DallasTemperature.h"
 #include "t_io.h"
-
-//////////////////////////////////////////////////////////////////
-
-/*
-#define PIN_CE    10
-#define PIN_SDIN  11
-#define PIN_SCLK  13
-#define PIN_RESET  9
-#define PIN_DC    14
-*/
 
 static OneWire ds(7);
 static DallasTemperature sensors(&ds);
@@ -26,6 +16,7 @@ void setup()
 	sensors.getAddress(ds0, 0);
 	sensors.setWaitForConversion(false);
 }
+
 void loop(void)
 {
 	Serial.print("Requesting temperatures...");

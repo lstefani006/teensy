@@ -5,17 +5,17 @@ ifdef TEENSY
 else
 	CXXFLAGS=-I../AvrLib -I.
 	VPATH=../AvrLib
+	SRC += t_io.cpp
 endif
 
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
-VPATH+=./fonts
 
 CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
 
 TARGET=DHT11.hex
-SRC=             \
+SRC+=             \
 	DHT11.cpp    \
 	idDHTLib.cpp \
 	t_5110.cpp   \
@@ -23,12 +23,6 @@ SRC=             \
 	TimerOne.cpp \
 	fonts.cpp
 
-
-#	PCD8544.cpp  
-	#
-ifndef TEENSY
-	SRC += t_io.cpp
-endif
 
 #####################################################
 CXXFLAGS+= -DONEWIRE_CRC8_TABLE=0 -DDALLAS=1

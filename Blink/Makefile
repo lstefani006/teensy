@@ -1,22 +1,18 @@
 ifdef TEENSY
 	CXXFLAGS=-W2 -Os -I../TeensyLib -V
 	VPATH=../TeensyLib
-else  
-ifdef ESP8266
+else  ifdef ESP8266
 	CXXFLAGS=-I../EspLib
 	VPATH=../EspLib
 else
 	CXXFLAGS=-I../AvrLib
 	VPATH=../AvrLib
-endif
+	SRC += t_io.cpp
 endif
 
 TARGET=Blink.hex
-SRC=\
+SRC+=\
 	Blink.cpp
-ifndef TEENSY
-	SRC += t_io.cpp
-endif
 
 
 ifdef TEENSY
