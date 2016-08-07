@@ -50,6 +50,7 @@ inline bool pxch(const uint8_t *font, char ch, uint8_t x, uint8_t y)
 	}
 	else
 	{
+		// sicuramente errato... venti FontNavigator
 		if (x < 8)
 		{
 			v = pgm_read_byte(&font[2 * (ci*h + y) + 0]);
@@ -64,6 +65,42 @@ inline bool pxch(const uint8_t *font, char ch, uint8_t x, uint8_t y)
 	}
 	return (v & b) ? true : false;
 }
+
+class FontNavigator
+{
+public:
+	FontNavigator(const uint8_t *font, char ch) : _p(font) {
+		_ch_w = wch(_p);
+		_ch_h = hch(_p);
+		_p += 2;
+
+		uint16_t  ci = uint16_t(ch - ' ') * _ch_h;
+		_p += ci;
+		if (_ch_w > 8)
+			_p += ci;
+		else
+			_ch_w += 8; // simulo un font a 16bit
+	}
+
+	bool get(uint8_t x)
+	{
+		uint16_t b = 0b10000000 << 8;
+		b >>= 16-_ch_w+x;
+		return (_v & b) ? true : false;
+	}
+	void inc_y()
+	{
+		_v = pgm_read_byte(_p++) << 8;
+		if (_ch_w-8 > 8)
+			_v |= pgm_read_byte(_p++);
+	}
+private:
+	const uint8_t *_p;
+	uint8_t _ch_w;
+	uint8_t _ch_h;
+	uint16_t _v;
+};
+
 #endif
 
 #endif //fonts_h

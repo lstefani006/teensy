@@ -1,13 +1,13 @@
 W?=4
 
 ifeq ($(shell test $(W) -ge 1; echo $$?),0)
-	WCOMMON=-Wreturn-type
-	WC+=$(WCOMMON)
-	WCXX+=$(WCOMMON)
+	WCOMMON_1=-Wreturn-type
+	WC+=$(WCOMMON_1)
+	WCXX+=$(WCOMMON_1)
 endif
 
 ifeq ($(shell test $(W) -ge 2; echo $$?),0)
-	WCOMMON= -Wall \
+	WCOMMON_2= -Wall \
 			 -Wdouble-promotion \
 			 -Wformat \
 			 -Winit-self \
@@ -32,24 +32,24 @@ ifeq ($(shell test $(W) -ge 2; echo $$?),0)
 			 -Wmissing-include-dirs \
 			 -Wno-unused-parameter \
 			 -Wuninitialized 
-	WC+= $(WCOMMON) \
+	WC+= $(WCOMMON_2) \
 		 -Wstrict-prototypes 
-	WCXX+= $(WCOMMON) \
+	WCXX+= $(WCOMMON_2) \
 		 -Wuseless-cast \
 		 -Wzero-as-null-pointer-constant
 endif
 
 ifeq ($(shell test $(W) -ge 3; echo $$?),0)
-	WCOMMON= -Wextra \
+	WCOMMON_3= -Wextra \
 			 -Wempty-body
-	WC+=$(WCOMMON)
-	WCXX+=$(WCOMMON)
+	WC+=$(WCOMMON_3)
+	WCXX+=$(WCOMMON_3)
 endif
 
 ifeq ($(shell test $(W) -ge 4; echo $$?),0)
-	WCOMMON= -Wpedantic
-	WC+=$(WCOMMON)
-	WCXX+=$(WCOMMON)
+	WCOMMON_4= -Wpedantic
+	WC+=$(WCOMMON_4)
+	WCXX+=$(WCOMMON_4)
 endif
 
 ##################################################

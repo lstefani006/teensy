@@ -149,6 +149,8 @@ void loop()
 	case dallasError::timeout:
 		lcd.print(F("Dallas\n\rtimeout"));
 		break;
+	case dallasError::ok:
+		break;
 	}
 #endif
 

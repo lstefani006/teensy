@@ -8,7 +8,7 @@
 #	include <TimerOne.h>
 #endif
 
-#include "fonts/fonts.h"
+#include "fonts.hpp"
 
 
 #define PCD8544_POWERDOWN 0x04
@@ -299,12 +299,28 @@ namespace t
 				scrollUp();
 			}
 
-			for (uint8_t y = 0; y < ch_h; ++y)
-				for (uint8_t x = 0; x < ch_w; ++x)
+			if (false)
+			{
+				for (uint8_t y = 0; y < ch_h; ++y)
+					for (uint8_t x = 0; x < ch_w; ++x)
+					{
+						bool v = pxch(_font, character, x, y);
+						putPixel(_cx + x, _cy + y, v);
+					}
+			}
+			else
+			{
+				FontNavigator nv(_font, character);
+				for (uint8_t y = 0; y < ch_h; ++y)
 				{
-					bool v = pxch(_font, character, x, y);
-					putPixel(_cx + x, _cy + y, v);
+					nv.inc_y();
+					for (uint8_t x = 0; x < ch_w; ++x)
+					{
+						bool v = nv.get(x);
+						putPixel(_cx + x, _cy + y, v);
+					}
 				}
+			}
 
 
 			/*
@@ -326,7 +342,7 @@ namespace t
 			}
 			}
 			*/
-			return 1;
+			//return 1;
 		}
 
 		void scrollUp() 
