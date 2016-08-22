@@ -54,7 +54,7 @@ namespace t
 
 		class SPITransaction {
 		public:
-			SPITransaction(hwSPI &spi, Settings &s) : spi(spi) { spi.beginTransaction(s); }
+			SPITransaction(hwSPI &spi_, Settings &s) : spi(spi_) { spi.beginTransaction(s); }
 			~SPITransaction() { spi.endTransaction(); }
 		private:
 			hwSPI &spi;

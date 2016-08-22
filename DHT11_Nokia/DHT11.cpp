@@ -1,15 +1,13 @@
-/*
-   Board	          int.0	  int.1	  int.2	  int.3	  int.4	  int.5
-   Uno, Ethernet	  2	  3
-   Mega2560	          2	  3	  21	  20	  19	  18
-   Leonardo	          3	  2	  0	       1
-   Due	          (any pin, more info http://arduino.cc/en/Reference/AttachInterrupt)
-
-   This example, as difference to the other, make use of the new method acquireAndWait()
-*/
 #include <idDHTLib.h>
 #include <t_5110.h>
 #include <t_io.h>
+#include "Graph.hpp"
+
+int freeRam () {
+	extern int __heap_start, *__brkval; 
+	int v; 
+	return (int) &v - (__brkval == nullptr ? (int) &__heap_start : (int) __brkval); 
+}
 
 #ifdef DALLAS
 #include <OneWire.h>
@@ -24,6 +22,11 @@ void dhtLib_wrapper(); // must be declared before the lib initialization
 
 // Lib instantiate
 idDHTLib DHTLib(idDHTLibPin, idDHTLibIntNumber, dhtLib_wrapper);
+
+// This wrapper is in charge of calling 
+// mus be defined like this for the lib work
+void dhtLib_wrapper() { DHTLib.dht11Callback(); }
+
 
 #define PIN_CE    10
 #define PIN_SCLK  13
@@ -42,6 +45,9 @@ DeviceAddress g_addr;
 
 void setup()
 {
+	Serial.begin(38400);
+	Serial.println("Inizio");
+
 	t::SetPrint(&lcd);
 	spi.begin();
 
@@ -51,13 +57,15 @@ void setup()
 	lcd.setContrast(35);
 
 	lcd.clear();
-	lcd.println(F("... test..."));
+	lcd.print(F("FREE MEM = "));
+	lcd.println(freeRam());
+
 #ifdef DALLAS
 	g_dallas.begin();
 	delay(100);
 	lcd.print("NUM="); lcd.println(g_dallas.getDeviceCount());
 	lcd.print("PARASTIC="); lcd.println(g_dallas.isParasitePowerMode());
-	if (g_dallas.getAddress(g_addr, 0) == false) lcd.println(F("getADDR ERRORE"));
+	if (g_dallas.getAddress(g_addr, 0) == false) lcd.println(F("getAddress ERRORE"));
 	g_dallas.setResolution(g_addr, 12);
 	lcd.print("RES=");
 	lcd.println(g_dallas.getResolution(g_addr));
@@ -70,40 +78,18 @@ void setup()
 }
 
 
-// This wrapper is in charge of calling 
-// mus be defined like this for the lib work
-void dhtLib_wrapper() { DHTLib.dht11Callback(); }
-
-
 long  g_tt = 0;
-constexpr int8_t g_sz = 8;
-float g_cc[g_sz];
+constexpr int8_t g_sz = 18;
+float g_ci[g_sz];
 float g_hh[g_sz];
-float g_dd[g_sz];
-float g_ds[g_sz];
+float g_dp[g_sz];
+float g_ce[g_sz];
 int8_t g_top = 0; // g_top = 0 => il piu' recente
 
-void pp(float m, float a[], int8_t asz)
-{
-	lcd.print(' ');
-	for (int8_t i = 0; i < asz; ++i)
-	{
-		auto v = (i == 0) ? m : a[i-1];
-		char c;
-		/***/if (v > a[i]) c = '/';
-		else if (v < a[i]) c = '\\';
-		else c = '-';
-		lcd.print(c);
-	}
-	for (int8_t i = asz; i < g_sz; ++i)
-		lcd.print('.');
-	lcd.println();
-}
-void wd()
+static void wd()
 {
 	static uint8_t g_wd = 0;
 
-	lcd.gotoXY(lcd.LCD_X-6, lcd.LCD_Y-8);
 	char p=0;
 	switch (g_wd)
 	{
@@ -112,8 +98,15 @@ void wd()
 	case 2: p = '|'; break;
 	case 3: p = '/'; break;
 	}
-	lcd.println(p);
+	lcd.print(p);
 	g_wd = (g_wd + 1) % 4;
+}
+
+static void pf(const __FlashStringHelper *p, float f)
+{
+	lcd.print(p);
+	if (f < 10 && f > 0) lcd.print(' ');
+	lcd.println(f, 1);
 }
 
 #ifdef DALLAS
@@ -129,9 +122,38 @@ dallasError readDallasTemp(float &ret)
 }
 #endif
 
+
+class TempSource : public GraphSource
+{
+	int8_t _i;
+	const float &_tce;
+public:
+	TempSource(const float &tce) : _i(-1), _tce(tce) {}
+
+	bool Next() { _i += 1; return _i <= g_top; }
+	void Get(Point &p)
+	{
+		p.x = g_sz - _i;
+		p.y = (_i == 0) ? _tce : g_ce[_i-1];
+	}
+	void Reset() { _i = -1; }
+
+	void DrawLine(const Line &r)
+	{
+		int x0 = int(r.a.x);
+		int y0 = int(r.a.y);
+
+		int x1 = int(r.b.x);
+		int y1 = int(r.b.y);
+
+		lcd.line(x0, y0, x1, y1);
+	}
+};
+
 void loop()
 {
-	g_tt += 2;
+	int t_period = 5;
+	g_tt += t_period;
 	auto t = millis();
 
 	lcd.clear();
@@ -139,8 +161,8 @@ void loop()
 
 
 #ifdef DALLAS
-	float tds;
-	dallasError de = readDallasTemp(tds);
+	float tce;
+	dallasError de = readDallasTemp(tce);
 	switch (de)
 	{
 	case dallasError::deviceNotPresent:
@@ -172,6 +194,8 @@ void loop()
 	case IDDHTLIB_ERROR_NOTSTARTED: 
 		lcd.println(F("Error\n\r\tNot started")); 
 		break;
+	case IDDHTLIB_OK: 
+		break;
 	default: 
 		lcd.println(F("Unknown error")); 
 		break;
@@ -179,60 +203,143 @@ void loop()
 
 	if (de == dallasError::ok && dhtError == IDDHTLIB_OK)
 	{
-		auto tcc = DHTLib.getCelsius();
+		auto tci = DHTLib.getCelsius();
 		auto thh = DHTLib.getHumidity();
-		auto tdd = DHTLib.getDewPoint();
+		auto mdp = DHTLib.getDewPoint();
 
-#ifdef DALLAS
-		lcd.print(F("CE ")); lcd.print(tds, 1);pp(tcc, g_ds, g_top);
-#endif
-		lcd.print(F("CI ")); lcd.print(tcc, 1); pp(tcc, g_cc, g_top);
-		lcd.print(F("H  ")); lcd.print(thh, 1); pp(thh, g_hh, g_top);
+		pf(F("CE "), tce); 
+		pf(F("CI "), tci); 
+		pf(F("H  "), thh); 
+		pf(F("DP "), mdp); 
 
-		if (tdd < 10) {
-		lcd.print(F("DP  ")); lcd.print(tdd, 1); pp(tdd, g_dd, g_top);
-		}
-		else {
-		lcd.print(F("DP ")); lcd.print(tdd, 1); pp(tdd, g_dd, g_top);
-		}
-
-		//lcd.println();
-
-		/***/if (tdd <= 10) lcd.println(F("1 Molto secco"));
-		else if (tdd <= 12) lcd.println(F("2 Secco"));
-		else if (tdd <= 16) lcd.println(F("3 Confort"));
-		else if (tdd <= 18) lcd.println(F("4 Poco umido"));
-		else if (tdd <= 21) lcd.println(F("5 Umido"));
-		else if (tdd <= 24) lcd.println(F("6 Molto umido"));
-		else                lcd.println(F("7 Afa"));
-		lcd.println(F("Scala 1..7"));
-
-		// ogni due ore storicizzo ==> 12ore di storia
-		if (g_tt % (2 * 60 * 60) == 0)
+		if (true)
 		{
-			for (int8_t t = 1; t < g_top; ++t)
-			{
-				g_cc[t] = g_cc[t-1];
-				g_hh[t] = g_hh[t-1];
-				g_dd[t] = g_dd[t-1];
-				g_ds[t] = g_ds[t-1];
-			};
-			g_cc[0] = tcc;
-			g_hh[0] = thh;
-			g_dd[0] = tdd;
-			g_ds[0] = tds;
+			int aa = lcd.getX();
+			int bb = lcd.getY();
+			lcd.gotoXY(aa, bb + 6);
 
-			g_top+=1;
-			if (g_top == g_sz) g_top = g_sz - 1;
+			/***/if (mdp <= 10) lcd.println(F("1 Molto secco"));
+			else if (mdp <= 12) lcd.println(F("2 Secco"));
+			else if (mdp <= 16) lcd.println(F("3 Confort"));
+			else if (mdp <= 18) lcd.println(F("4 Poco umido"));
+			else if (mdp <= 21) lcd.println(F("5 Umido"));
+			else if (mdp <= 24) lcd.println(F("6 Molto umido"));
+			else                lcd.println(F("7 Afa"));
+
+			lcd.print(F("Scala 1..7  "));
+			wd();
+		}
+
+		// ogni ora storicizzo ==> 18 ore di storia
+		if (g_tt % (1 * 60 * 60) == 0)
+		//if (g_tt % 10 == 0)
+		{
+			for (int8_t i = min(g_top, g_sz-1); i >= 1; --i)
+			{
+				g_ci[i] = g_ci[i-1];
+				g_hh[i] = g_hh[i-1];
+				g_dp[i] = g_dp[i-1];
+				g_ce[i] = g_ce[i-1];
+			};
+			g_ci[0] = tci;
+			g_hh[0] = thh;
+			g_dp[0] = mdp;
+			g_ce[0] = tce;
+
+			if (g_top < g_sz)
+				g_top += 1;
+		}
+
+		if (true)
+		{
+			// estremi inclusi
+			int8_t x0 = 5*(3+4)+2+1;
+			int8_t x1 = lcd.LCD_X-1;
+			int8_t y = 7*4+4-1;
+
+			// questo voule +1 (estremi esclusi)
+			lcd.box(x0, 0, x1+1, y+1);
+
+			Rect screen;
+			screen.a.x = x0;
+			screen.a.y = 0;
+			screen.b.x = x1;
+			screen.b.y = y;
+
+			Rect view;
+			view.a.x = 0;
+			view.b.x = g_sz;
+			view.a.y = -5;
+			view.b.y = +30;
+
+			TempSource gs(tce);
+
+			float mint = 5;
+			float maxt = 35;
+
+			while (gs.Next())
+			{
+				Point pt;
+				gs.Get(pt);
+				for (;;) 
+				{
+					if (pt.y < maxt)
+						break;
+					maxt += 5;
+				}
+				for (;;) 
+				{
+					if (pt.y > mint)
+						break;
+					mint -= 5;
+				}
+			}
+			gs.Reset();
+
+			view.a.y = mint;
+			view.b.y = maxt;
+
+			Graph gr(&view, &screen);
+
+
+			// righello asse y ==> temperature
+			for (int8_t tc = 0; tc <= 30; tc += 10)
+			{
+				Point t;
+				t.x = 0;
+				t.y = tc;
+
+				if (gr.Clip(t) == false)
+					continue;
+
+				gr.Translate(t);
+
+				lcd.h_line(x0, x1, int(t.y), tc == 0? 2:4); 
+			}
+			
+			// righello per le ore
+			for (int8_t i = 0; i < g_sz; i += 2)
+			{
+				Point t;
+				t.x = i;
+				t.y = 0;
+
+				gr.Translate(t);
+
+				int8_t dd = (i % 6 == 0) ? 4 : 2;
+				lcd.v_line(int(t.x), y, y-dd);
+			}
+
+			// qui si plotta
+			gr.Plot(gs);
 		}
 	}
 
-	wd();
 	lcd.update();
 
 	DHTLib.acquire();
 	while (DHTLib.acquiring()) delay(10);
 	auto tn = millis();
-	if (t + 2000 > tn)
-		delay(2000 - (tn - t));
+	if (t + t_period * 1000 > tn)
+		delay(t_period * 1000 - (tn - t));
 }

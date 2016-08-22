@@ -184,12 +184,12 @@ bool DallasTemperature::readPowerSupply(const uint8_t* deviceAddress){
 // if new resolution is out of range, it is constrained.
 void DallasTemperature::setResolution(uint8_t newResolution){
 
-    bitResolution = constrain(newResolution, 9, 12);
+    this->bitResolution = constrain(newResolution, 9, 12);
     DeviceAddress deviceAddress;
     for (int i=0; i<devices; i++)
     {
         getAddress(deviceAddress, i);
-        setResolution(deviceAddress, bitResolution);
+        setResolution(deviceAddress, this->bitResolution);
     }
 
 }
@@ -314,7 +314,7 @@ void DallasTemperature::requestTemperatures(){
 
     // ASYNC mode?
     if (!waitForConversion) return;
-    blockTillConversionComplete(bitResolution, NULL);
+    blockTillConversionComplete(bitResolution, nullptr);
 
 }
 
@@ -323,33 +323,31 @@ void DallasTemperature::requestTemperatures(){
 // returns TRUE  otherwise
 bool DallasTemperature::requestTemperaturesByAddress(const uint8_t* deviceAddress){
 
-    uint8_t bitResolution = getResolution(deviceAddress);
-    if (bitResolution == 0){
-     return false; //Device disconnected
-    }
+	uint8_t bs = getResolution(deviceAddress);
+	if (bs == 0)
+		return false; //Device disconnected
 
-    if (_wire->reset() == 0){
-        return false;
-    }
+	if (_wire->reset() == 0)
+		return false;
 
-    _wire->select(deviceAddress);
-    _wire->write(STARTCONVO, parasite);
+	_wire->select(deviceAddress);
+	_wire->write(STARTCONVO, parasite);
 
 
-    // ASYNC mode?
-    if (!waitForConversion) return true;
+	// ASYNC mode?
+	if (!waitForConversion) return true;
 
-    blockTillConversionComplete(bitResolution, deviceAddress);
+	blockTillConversionComplete(bs, deviceAddress);
 
-    return true;
+	return true;
 
 }
 
 
 // Continue to check if the IC has responded with a temperature
-void DallasTemperature::blockTillConversionComplete(uint8_t bitResolution, const uint8_t* deviceAddress){
+void DallasTemperature::blockTillConversionComplete(uint8_t bs, const uint8_t* deviceAddress){
     
-    int delms = millisToWaitForConversion(bitResolution);
+    int delms = millisToWaitForConversion(bs);
     if (deviceAddress != NULL && checkForConversion && !parasite){
         unsigned long now = millis();
         while(!isConversionAvailable(deviceAddress) && (millis() - delms < now));
@@ -360,19 +358,15 @@ void DallasTemperature::blockTillConversionComplete(uint8_t bitResolution, const
 }
 
 // returns number of milliseconds to wait till conversion is complete (based on IC datasheet)
-int16_t DallasTemperature::millisToWaitForConversion(uint8_t bitResolution){
+int16_t DallasTemperature::millisToWaitForConversion(uint8_t bs){
 
-    switch (bitResolution){
-    case 9:
-        return 94;
-    case 10:
-        return 188;
-    case 11:
-        return 375;
-    default:
-        return 750;
+    switch (bs)
+	{
+    case 9: return 94;
+    case 10: return 188;
+    case 11: return 375;
+    default: return 750;
     }
-
 }
 
 
@@ -537,12 +531,12 @@ void DallasTemperature::setUserDataByIndex(uint8_t deviceIndex, int16_t data)
 
 // Convert float Celsius to Fahrenheit
 float DallasTemperature::toFahrenheit(float celsius){
-    return (celsius * 1.8) + 32;
+    return (celsius * 1.8f) + 32;
 }
 
 // Convert float Fahrenheit to Celsius
 float DallasTemperature::toCelsius(float fahrenheit){
-    return (fahrenheit - 32) * 0.555555556;
+    return (fahrenheit - 32) * 0.555555556f;
 }
 
 // convert from raw to Celsius
@@ -551,7 +545,7 @@ float DallasTemperature::rawToCelsius(int16_t raw){
     if (raw <= DEVICE_DISCONNECTED_RAW)
     return DEVICE_DISCONNECTED_C;
     // C = RAW/128
-    return (float)raw * 0.0078125;
+    return (float)raw * 0.0078125f;
 
 }
 
@@ -562,7 +556,7 @@ float DallasTemperature::rawToFahrenheit(int16_t raw){
     return DEVICE_DISCONNECTED_F;
     // C = RAW/128
     // F = (C*1.8)+32 = (RAW/128*1.8)+32 = (RAW*0.0140625)+32
-    return ((float)raw * 0.0140625) + 32;
+    return ((float)raw * 0.0140625f) + 32;
 
 }
 

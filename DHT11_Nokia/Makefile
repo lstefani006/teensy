@@ -21,7 +21,9 @@ SRC+=             \
 	t_5110.cpp   \
 	SPI.cpp      \
 	TimerOne.cpp \
-	fonts.cpp
+	fonts.cpp    \
+	Graph.cpp    \
+	AffineMatrix.cpp
 
 
 #####################################################

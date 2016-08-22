@@ -20,7 +20,6 @@ ifeq ($(shell test $(W) -ge 2; echo $$?),0)
 			 -Wshadow \
 			 -Wcast-qual \
 			 -Wwrite-strings \
-			 -Wconversion \
 			 -Wlogical-op \
 			 -Waggregate-return \
 			 -Wwrite-strings \
@@ -47,7 +46,8 @@ ifeq ($(shell test $(W) -ge 3; echo $$?),0)
 endif
 
 ifeq ($(shell test $(W) -ge 4; echo $$?),0)
-	WCOMMON_4= -Wpedantic
+	WCOMMON_4= -Wpedantic \
+			 -Wconversion
 	WC+=$(WCOMMON_4)
 	WCXX+=$(WCOMMON_4)
 endif

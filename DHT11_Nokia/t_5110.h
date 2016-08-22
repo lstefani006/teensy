@@ -77,14 +77,14 @@ namespace t
 	public:
 
 		// PDC8544 max clock 4Mhz ==> SPI_CLOCK_DIV4
-		Lcd(T &spi) : 
-			_spi(spi), 
+		Lcd(T &spi_) : 
+			_spi(spi_), 
 			_spiSettings(1*1000*1000, MSBFIRST, SPI_MODE0) 
 		{
-			_cx = 0;
-			_cy = 0;
 			_invalid = 0;
-			_font = font_05x08;
+			_font = font_05x07;
+			_cy = 0;
+			_cx = -wch(_font);
 		}
 		void setContrast(uint8_t val) 
 		{
@@ -158,6 +158,14 @@ namespace t
 		}
 
 	public:
+
+		void setFont(const uint8_t *font)
+		{
+			_font = font;
+			_cx = -wch(_font);
+			_cy = 0;
+			gotoXY(0,0);
+		}
 		void update()
 		{
 			if (timerUpdate == false)
@@ -207,11 +215,11 @@ namespace t
 
 			_invalid = _invalid | (1 << (y / 8));
 		}
-		void line(int x0, int y0, int x1, int y1)
+		void line(int8_t x0, int8_t y0, int8_t x1, int8_t y1)
 		{
-			int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-			int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-			int err = (dx>dy ? dx : -dy)/2, e2;
+			int8_t dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+			int8_t dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+			int8_t err = (dx>dy ? dx : -dy)/2, e2;
 
 			for(;;)
 			{
@@ -221,6 +229,59 @@ namespace t
 				if (e2 >-dx) { err -= dy; x0 += sx; }
 				if (e2 < dy) { err += dx; y0 += sy; }
 			}
+		}
+		void h_line(int8_t x0, int8_t x1, int8_t y)
+		{
+			int8_t sx = (x0 < x1) ? 1 : -1;
+			for (;;) 
+			{
+				putPixel(x0, y, true);
+				if (x0==x1) break;
+				x0 += sx;
+			}
+		}
+		void h_line(int8_t x0, int8_t x1, int8_t y, int8_t d)
+		{
+			int8_t sx = (x0 < x1) ? 1 : -1;
+			for (;;) 
+			{
+				putPixel(x0, y, (x0 % d == 0) ? true : false);
+				if (x0==x1) break;
+				x0 += sx;
+			}
+		}
+		void v_line(int8_t x, int8_t y0, int8_t y1)
+		{
+			int8_t sy = (y0 < y1) ? 1 : -1;
+			for (;;) 
+			{
+				putPixel(x, y0, true);
+				if (y0==y1) break;
+				y0 += sy;
+			}
+		}
+		void v_line(int8_t x, int8_t y0, int8_t y1, int8_t d)
+		{
+			int8_t sy = (y0 < y1) ? 1 : -1;
+			int8_t t = 0;
+			for (;;) 
+			{
+				putPixel(x, y0, t == 0);
+				if (y0==y1) break;
+				y0 += sy;
+				t += 1; if (t == d) t = 0;
+			}
+		}
+		void box(int8_t x0, int8_t y0, int8_t x1, int8_t y1)
+		{
+			x1 -= 1;
+			y1 -= 1;
+
+			line(x0, y0, x1, y0);
+			line(x0, y1, x1, y1);
+
+			line(x0, y0, x0, y1);
+			line(x1, y0, x1, y1);
 		}
 		void circle(int xm, int ym, int r)
 		{
@@ -269,7 +330,7 @@ namespace t
 		size_t write(uint8_t character) override 
 		{
 			uint8_t ch_w = wch(_font);
-			uint8_t ch_h = hch(_font) - 1;
+			uint8_t ch_h = hch(_font);
 
 			if (character == '\r') 
 				return 1;
@@ -299,7 +360,7 @@ namespace t
 				scrollUp();
 			}
 
-			if (false)
+			if (true)
 			{
 				for (uint8_t y = 0; y < ch_h; ++y)
 					for (uint8_t x = 0; x < ch_w; ++x)
@@ -322,27 +383,7 @@ namespace t
 				}
 			}
 
-
-			/*
-			   for (int8_t x = 0; x < ch_w; x++)
-			   {
-			   uint8_t a;
-			   if (x == ch_w - 1)
-			   a = 0;
-			   else
-			   {
-			//a = ASCII[character - 0x20][x];
-			a = pgm_read_byte(((const char PROGMEM *)ASCII) + (5 * (int16_t(character) - 0x20)) + x);
-			}
-
-			for (int8_t y = 0; y < ch_h; ++y)
-			{
-			bool v = (a & (1 << y)) ? true : false;
-			putPixel(_cx + x, _cy + y, v);
-			}
-			}
-			*/
-			//return 1;
+			return 1;
 		}
 
 		void scrollUp() 
@@ -366,12 +407,20 @@ namespace t
 
 		void gotoXY(int8_t x, int8_t y)
 		{
-			uint8_t ch_w = wch(_font);
 			if (x < 0 || x >= LCD_X) return;
 			if (y < 0 || y >= LCD_Y) return;
+
+			uint8_t ch_w = wch(_font);
 			_cx = x - ch_w;
 			_cy = y;
 		}
+
+		int8_t getX() const { 
+			uint8_t ch_w = wch(_font);
+			return _cx + ch_w; 
+		}
+		int8_t getY() const { return _cy; }
+
 	};
 	template <typename  T, int8_t pinRST, int8_t pinDC, bool timerUpdate>
 		Lcd<T, pinRST, pinDC, timerUpdate> * Lcd<T, pinRST, pinDC, timerUpdate>::sThis = nullptr;

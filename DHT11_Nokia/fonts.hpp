@@ -12,6 +12,7 @@
 #define FONT_START (0x20) //first character
 
 extern const uint8_t font_04x06[] PROGMEM;
+extern const uint8_t font_05x07[] PROGMEM;
 extern const uint8_t font_05x08[] PROGMEM;
 extern const uint8_t font_05x12[] PROGMEM;
 extern const uint8_t font_06x08[] PROGMEM;
@@ -30,6 +31,17 @@ extern const uint8_t font_16x26[] PROGMEM;
 inline uint8_t wch(const uint8_t *font) { return pgm_read_byte(font + 0); }
 inline uint8_t hch(const uint8_t *font) { return pgm_read_byte(font + 1); }
 
+inline uint8_t pch(const uint8_t *font, char ch, int8_t y)
+{
+	uint8_t w = pgm_read_byte(font + 0);
+	uint8_t h = pgm_read_byte(font + 1);
+	font += 2;
+
+	uint16_t  ci = ch - ' ';
+	auto v = pgm_read_byte(&font[ci*h + y]);
+	return v;
+
+}
 inline bool pxch(const uint8_t *font, char ch, uint8_t x, uint8_t y)
 {
 	uint8_t w = pgm_read_byte(font + 0);
@@ -45,8 +57,8 @@ inline bool pxch(const uint8_t *font, char ch, uint8_t x, uint8_t y)
 	if (nb == 1)
 	{
 		v = pgm_read_byte(&font[ci*h + y]);
-		b >>= 8-w;
-		b >>= x;
+		b = uint8_t(b >> (8u-w));
+		b = uint8_t(b >> x);
 	}
 	else
 	{
@@ -54,13 +66,13 @@ inline bool pxch(const uint8_t *font, char ch, uint8_t x, uint8_t y)
 		if (x < 8)
 		{
 			v = pgm_read_byte(&font[2 * (ci*h + y) + 0]);
-			b >>= 8-w;
-			b >>= x;
+			b = uint8_t(b >> (8-w));
+			b = uint8_t(b >> x);
 		}
 		else
 		{
 			v = pgm_read_byte(&font[2 * (ci*h + y) + 1]);
-			b >>= x-8;
+			b = uint8_t(b >> (x-8));
 		}
 	}
 	return (v & b) ? true : false;
@@ -79,7 +91,7 @@ public:
 		if (_ch_w > 8)
 			_p += ci;
 		else
-			_ch_w += 8; // simulo un font a 16bit
+			_ch_w = uint8_t(_ch_w + 8); // simulo un font a 16bit
 	}
 
 	bool get(uint8_t x)
