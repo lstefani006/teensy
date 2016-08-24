@@ -230,6 +230,22 @@ namespace t
 				if (e2 < dy) { err += dx; y0 += sy; }
 			}
 		}
+		void line(int8_t x0, int8_t y0, int8_t x1, int8_t y1, int8_t d)
+		{
+			int8_t dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+			int8_t dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+			int8_t err = (dx>dy ? dx : -dy)/2, e2;
+
+			int8_t nn = 0;
+			for(;;)
+			{
+				putPixel(x0, y0, nn++ % d == 0);
+				if (x0==x1 && y0==y1) break;
+				e2 = err;
+				if (e2 >-dx) { err -= dy; x0 += sx; }
+				if (e2 < dy) { err += dx; y0 += sy; }
+			}
+		}
 		void h_line(int8_t x0, int8_t x1, int8_t y)
 		{
 			int8_t sx = (x0 < x1) ? 1 : -1;

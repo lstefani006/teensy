@@ -1,4 +1,4 @@
-W=3
+W=2
 ifdef TEENSY
 	CXXFLAGS=-W2 -Os -I../TeensyLib -V -I.
 	VPATH=../TeensyLib
@@ -23,7 +23,8 @@ SRC+=             \
 	TimerOne.cpp \
 	fonts.cpp    \
 	Graph.cpp    \
-	AffineMatrix.cpp
+	AffineMatrix.cpp \
+	uprintf.cpp
 
 
 #####################################################

@@ -2,6 +2,7 @@
 #include <t_5110.h>
 #include <t_io.h>
 #include "Graph.hpp"
+#include "uprintf.hpp"
 
 int freeRam () {
 	extern int __heap_start, *__brkval; 
@@ -43,10 +44,18 @@ DallasTemperature g_dallas(&g_ow);
 DeviceAddress g_addr;
 #endif
 
+bool pf(char ch)
+{
+	Serial.print(ch);
+	return true;
+}
+
 void setup()
 {
 	Serial.begin(38400);
 	Serial.println("Inizio");
+
+	uprintf(pf, "Ciao");
 
 	t::SetPrint(&lcd);
 	spi.begin();
@@ -79,7 +88,7 @@ void setup()
 
 
 long  g_tt = 0;
-constexpr int8_t g_sz = 18;
+constexpr int8_t g_sz = 24;
 float g_ci[g_sz];
 float g_hh[g_sz];
 float g_dp[g_sz];
@@ -105,6 +114,9 @@ static void wd()
 static void pf(const __FlashStringHelper *p, float f)
 {
 	lcd.print(p);
+	int8_t x = lcd.getX();
+	int8_t y = lcd.getY();
+	lcd.gotoXY(x + 2, y);
 	if (f < 10 && f > 0) lcd.print(' ');
 	lcd.println(f, 1);
 }
@@ -127,14 +139,16 @@ class TempSource : public GraphSource
 {
 	int8_t _i;
 	const float &_tce;
+	float *_t;
+	int _d;
 public:
-	TempSource(const float &tce) : _i(-1), _tce(tce) {}
+	TempSource(const float &tce, float *t, int d) : _i(-1), _tce(tce), _t(t), _d(d) {}
 
 	bool Next() { _i += 1; return _i <= g_top; }
 	void Get(Point &p)
 	{
 		p.x = g_sz - _i;
-		p.y = (_i == 0) ? _tce : g_ce[_i-1];
+		p.y = (_i == 0) ? _tce : _t[_i-1];
 	}
 	void Reset() { _i = -1; }
 
@@ -146,9 +160,12 @@ public:
 		int x1 = int(r.b.x);
 		int y1 = int(r.b.y);
 
-		lcd.line(x0, y0, x1, y1);
+		lcd.line(x0, y0, x1, y1, _d);
 	}
 };
+
+
+
 
 void loop()
 {
@@ -207,10 +224,10 @@ void loop()
 		auto thh = DHTLib.getHumidity();
 		auto mdp = DHTLib.getDewPoint();
 
-		pf(F("CE "), tce); 
-		pf(F("CI "), tci); 
-		pf(F("H  "), thh); 
-		pf(F("DP "), mdp); 
+		pf(F("CE"), tce); 
+		pf(F("CI"), tci); 
+		pf(F("H "), thh); 
+		pf(F("DP"), mdp); 
 
 		if (true)
 		{
@@ -230,9 +247,9 @@ void loop()
 			wd();
 		}
 
-		// ogni ora storicizzo ==> 18 ore di storia
+		// ogni ora storicizzo ==> 24 ore di storia
 		if (g_tt % (1 * 60 * 60) == 0)
-		//if (g_tt % 10 == 0)
+		//if (true)
 		{
 			for (int8_t i = min(g_top, g_sz-1); i >= 1; --i)
 			{
@@ -253,85 +270,98 @@ void loop()
 		if (true)
 		{
 			// estremi inclusi
-			int8_t x0 = 5*(3+4)+2+1;
+			int8_t x0 = 5*(3+4)+2+1 - 2 - 2;
 			int8_t x1 = lcd.LCD_X-1;
 			int8_t y = 7*4+4-1;
 
 			// questo voule +1 (estremi esclusi)
 			lcd.box(x0, 0, x1+1, y+1);
 
-			Rect screen;
-			screen.a.x = x0;
-			screen.a.y = 0;
-			screen.b.x = x1;
-			screen.b.y = y;
 
-			Rect view;
-			view.a.x = 0;
-			view.b.x = g_sz;
-			view.a.y = -5;
-			view.b.y = +30;
-
-			TempSource gs(tce);
-
-			float mint = 5;
-			float maxt = 35;
-
-			while (gs.Next())
+			static Graph *gr = nullptr;
+			if (!gr)
 			{
-				Point pt;
-				gs.Get(pt);
-				for (;;) 
-				{
-					if (pt.y < maxt)
-						break;
-					maxt += 5;
-				}
-				for (;;) 
-				{
-					if (pt.y > mint)
-						break;
-					mint -= 5;
-				}
+				static Rect view;
+				view.a.x = 0;
+				view.b.x = g_sz;
+				view.a.y = -5;
+				view.b.y = +35;
+
+				static Rect screen;
+				screen.a.x = x0;
+				screen.a.y = 0;
+				screen.b.x = x1;
+				screen.b.y = y;
+
+
+				/*
+				   float mint = 5;
+				   float maxt = 35;
+
+				   while (gse.Next())
+				   {
+				   Point pt;
+				   gse.Get(pt);
+				   for (;;) 
+				   {
+				   if (pt.y < maxt)
+				   break;
+				   maxt += 5;
+				   }
+				   for (;;) 
+				   {
+				   if (pt.y > mint)
+				   break;
+				   mint -= 5;
+				   }
+				   }
+				   gse.Reset();
+
+				   view.a.y = mint;
+				   view.b.y = maxt;
+				   */
+
+				static Graph grs;
+				gr = &grs;
+				gr->SetViewScreen(&view, &screen);
 			}
-			gs.Reset();
 
-			view.a.y = mint;
-			view.b.y = maxt;
-
-			Graph gr(&view, &screen);
+			TempSource gse(tce, g_ce, 1);
+			TempSource gsi(tci, g_ci, 2);
 
 
 			// righello asse y ==> temperature
-			for (int8_t tc = 0; tc <= 30; tc += 10)
+			for (int8_t tc = -10; tc <= 50; tc += 10)
 			{
 				Point t;
 				t.x = 0;
 				t.y = tc;
 
-				if (gr.Clip(t) == false)
+				if (gr->Clip(t) == false)
 					continue;
 
-				gr.Translate(t);
+				gr->Translate(t);
 
-				lcd.h_line(x0, x1, int(t.y), tc == 0? 2:4); 
+				lcd.h_line(x0, x1, int(t.y), tc == 0? 4:8); 
 			}
-			
+
 			// righello per le ore
-			for (int8_t i = 0; i < g_sz; i += 2)
+			int8_t step = 3;
+			for (int8_t i = 0; i < g_sz; i += step)
 			{
 				Point t;
 				t.x = i;
 				t.y = 0;
 
-				gr.Translate(t);
+				gr->Translate(t);
 
-				int8_t dd = (i % 6 == 0) ? 4 : 2;
+				int8_t dd = (i % 6 == 0) ? 2 : 1;
 				lcd.v_line(int(t.x), y, y-dd);
 			}
 
 			// qui si plotta
-			gr.Plot(gs);
+			gr->Plot(gse);
+			gr->Plot(gsi);
 		}
 	}
 
@@ -343,3 +373,4 @@ void loop()
 	if (t + t_period * 1000 > tn)
 		delay(t_period * 1000 - (tn - t));
 }
+
