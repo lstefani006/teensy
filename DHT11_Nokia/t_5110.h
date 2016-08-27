@@ -61,12 +61,11 @@ namespace t
 		constexpr static int8_t LCD_Y = 48;
 	private:
 		constexpr static int16_t LCD_SZ = int16_t(LCD_X) * int16_t(LCD_Y) / 8;
-		//constexpr static int8_t _wch = 6;
-		//constexpr static int8_t _hch = 8;
 		const uint8_t *_font;
 
 		uint8_t _buff[LCD_SZ];  // 84*48/8 = 504 byte !!!
 		uint8_t _invalid;
+		bool    _inverse;
 		int8_t _cx;
 		int8_t _cy;
 
@@ -85,6 +84,7 @@ namespace t
 			_font = font_05x07;
 			_cy = 0;
 			_cx = -wch(_font);
+			_inverse = false;
 		}
 		void setContrast(uint8_t val) 
 		{
@@ -95,6 +95,9 @@ namespace t
 			writeCommand(PCD8544_FUNCTIONSET);
 
 		}
+
+		void setInverse(bool v) { _inverse = v; }
+		bool inverse() const { return _inverse; }
 
 		void begin()
 		{
@@ -376,7 +379,7 @@ namespace t
 				scrollUp();
 			}
 
-			if (true)
+			if (false)
 			{
 				for (uint8_t y = 0; y < ch_h; ++y)
 					for (uint8_t x = 0; x < ch_w; ++x)
@@ -394,6 +397,7 @@ namespace t
 					for (uint8_t x = 0; x < ch_w; ++x)
 					{
 						bool v = nv.get(x);
+						if (_inverse) v = !v;
 						putPixel(_cx + x, _cy + y, v);
 					}
 				}

@@ -30,41 +30,41 @@ idDHTLib::idDHTLib(int pin, int intNumber,void (*callback_wrapper)()) {
 }
 
 void idDHTLib::init(int pin, int intNumber, void (*callback_wrapper) ()) {
-	this->intNumber = intNumber;
-	this->pin = pin;
+	this->_intNumber = intNumber;
+	this->_pin = pin;
 	this->isrCallback_wrapper = callback_wrapper;
-	hum = 0;
-	temp = 0;
+	this->_hum = 0;
+	this->_temp = 0;
 	pinMode(pin, OUTPUT);
 	digitalWrite(pin, HIGH);
-	state = STOPPED;
-	status = IDDHTLIB_ERROR_NOTSTARTED;
+	this->_state = STOPPED;
+	this->_status = IDDHTLIB_ERROR_NOTSTARTED;
 }
 
 int idDHTLib::acquire() {
-	if (state == STOPPED || state == ACQUIRED) {
+	if (this->_state == STOPPED || this->_state == ACQUIRED) {
 
 		//set the state machine for interruptions analisis of the signal
-		state = RESPONSE;
+		this->_state = RESPONSE;
 
 		// EMPTY BUFFER and vars
-		for (int i=0; i < 5; i++) bits[i] = 0;
-		cnt = 7;
-		idx = 0;
-		hum = 0;
-		temp = 0;
+		for (int i=0; i < 5; i++) this->_bits[i] = 0;
+		this->_cnt = 7;
+		this->_idx = 0;
+		this->_hum = 0;
+		this->_temp = 0;
 
 		// REQUEST SAMPLE
-		pinMode(pin, OUTPUT);
-		digitalWrite(pin, LOW);
+		pinMode(this->_pin, OUTPUT);
+		digitalWrite(this->_pin, LOW);
 		delay(18);
-		digitalWrite(pin, HIGH);
+		digitalWrite(this->_pin, HIGH);
 		delayMicroseconds(25);
-		pinMode(pin, INPUT);
+		pinMode(this->_pin, INPUT);
 
 		// Analize the data in an interrupt
 		us = micros();
-		attachInterrupt(intNumber,isrCallback_wrapper,FALLING);
+		attachInterrupt(this->_intNumber,isrCallback_wrapper,FALLING);
 
 		return IDDHTLIB_ACQUIRING;
 	} else
@@ -87,66 +87,71 @@ void idDHTLib::isrCallback(bool dht22) {
 	int delta = (newUs-us);
 	us = newUs;
 	if (delta>6000) {
-		status = IDDHTLIB_ERROR_TIMEOUT;
-		state = STOPPED;
-		detachInterrupt(intNumber);
+		this->_status = IDDHTLIB_ERROR_TIMEOUT;
+		this->_state = STOPPED;
+		detachInterrupt(this->_intNumber);
 		return;
 	}
-	switch(state) {
+	switch(this->_state) {
+	case STOPPED:
+	case ACQUIRING:
+	case ACQUIRED:
+		// non erano gestite....
+		break;
 	case RESPONSE:
 		if(delta<25){
 			us -= delta;
 			break; //do nothing, it started the response signal
 		} if(125<delta && delta<190) {
-			state = DATA;
+			this->_state = DATA;
 		} else {
-			detachInterrupt(intNumber);
-			status = IDDHTLIB_ERROR_TIMEOUT;
-			state = STOPPED;
+			detachInterrupt(this->_intNumber);
+			this->_status = IDDHTLIB_ERROR_TIMEOUT;
+			this->_state = STOPPED;
 		}
 		break;
 	case DATA:
 		if(60<delta && delta<145) { //valid in timing
-			bits[idx] <<= 1; //shift the data
+			this->_bits[this->_idx] <<= 1; //shift the data
 			if(delta>100) //is a one
-				bits[idx] |= 1;
-			if (cnt == 0) {  // when we have fulfilled the byte, go to the next
-				cnt = 7;    // restart at MSB
-				if(++idx == 5) { // go to next byte; when we have got 5 bytes, stop.
-					detachInterrupt(intNumber);
+				this->_bits[this->_idx] |= 1;
+			if (this->_cnt == 0) {  // when we have fulfilled the byte, go to the next
+				this->_cnt = 7;    // restart at MSB
+				if(++this->_idx == 5) { // go to next byte; when we have got 5 bytes, stop.
+					detachInterrupt(this->_intNumber);
 					// WRITE TO RIGHT VARS 
 					uint8_t sum;
 					if (dht22) {
-						hum = word(bits[0], bits[1]) * 0.1;
-						temp = (bits[2] & 0x80 ?
-								-word(bits[2] & 0x7F, bits[3]) :
-								word(bits[2], bits[3]))
+						this->_hum = word(this->_bits[0], this->_bits[1]) * 0.1;
+						this->_temp = (this->_bits[2] & 0x80 ?
+								-word(this->_bits[2] & 0x7F, this->_bits[3]) :
+								word(this->_bits[2], this->_bits[3]))
 							* 0.1;
-						sum = bits[0] + bits[1] + bits[2] + bits[3];
+						sum = this->_bits[0] + this->_bits[1] + this->_bits[2] + this->_bits[3];
 					} else {
-						hum    = bits[0]; 
+						this->_hum    = this->_bits[0]; 
 						// as bits[1] and bits[3] are always zero they are omitted in formulas.
-						temp = bits[2];
-						sum = bits[0] + bits[2];
+						this->_temp = this->_bits[2];
+						sum = this->_bits[0] + this->_bits[2];
 					}  
-					if (bits[4] != (sum&0xFF)) {
-						status = IDDHTLIB_ERROR_CHECKSUM;
-						state = STOPPED;
+					if (this->_bits[4] != (sum&0xFF)) {
+						this->_status = IDDHTLIB_ERROR_CHECKSUM;
+						this->_state = STOPPED;
 					} else {
-						status = IDDHTLIB_OK;
-						state = ACQUIRED;
+						this->_status = IDDHTLIB_OK;
+						this->_state = ACQUIRED;
 					}
 					break;
 				}
-			} else cnt--;
+			} else this->_cnt--;
 		} else if(delta<10) {
-			detachInterrupt(intNumber);
-			status = IDDHTLIB_ERROR_DELTA;
-			state = STOPPED;
+			detachInterrupt(this->_intNumber);
+			this->_status = IDDHTLIB_ERROR_DELTA;
+			this->_state = STOPPED;
 		} else {
-			detachInterrupt(intNumber);
-			status = IDDHTLIB_ERROR_TIMEOUT;
-			state = STOPPED;
+			detachInterrupt(this->_intNumber);
+			this->_status = IDDHTLIB_ERROR_TIMEOUT;
+			this->_state = STOPPED;
 		}
 		break;
 	default:
@@ -154,31 +159,31 @@ void idDHTLib::isrCallback(bool dht22) {
 	}
 }
 bool idDHTLib::acquiring() {
-	if (state != ACQUIRED && state != STOPPED)
+	if (this->_state != ACQUIRED && this->_state != STOPPED)
 		return true;
 	return false;
 }
 int idDHTLib::getStatus() {
-	return status;
+	return this->_status;
 }
 float idDHTLib::getCelsius() {
 	IDDHTLIB_CHECK_STATE;
-	return temp;
+	return this->_temp;
 }
 
 float idDHTLib::getHumidity() {
 	IDDHTLIB_CHECK_STATE;
-	return hum;
+	return this->_hum;
 }
 
 float idDHTLib::getFahrenheit() {
 	IDDHTLIB_CHECK_STATE;
-	return temp * 1.8 + 32;
+	return this->_temp * 1.8f + 32;
 }
 
 float idDHTLib::getKelvin() {
 	IDDHTLIB_CHECK_STATE;
-	return temp + 273.15;
+	return this->_temp + 273.15f;
 }
 
 // delta max = 0.6544 wrt dewPoint()
@@ -186,9 +191,9 @@ float idDHTLib::getKelvin() {
 // reference: http://en.wikipedia.org/wiki/Dew_point
 float idDHTLib::getDewPoint() {
 	IDDHTLIB_CHECK_STATE;
-	float a = 17.271;
-	float b = 237.7;
-	float temp_ = (a * (float) temp) / (b + (float) temp) + log( (float) hum/100);
+	float a = 17.271f;
+	float b = 237.7f;
+	float temp_ = (a * (float) this->_temp) / (b + (float) this->_temp) + (float)log( (float) this->_hum/100);
 	float Td = (b * temp_) / (a - temp_);
 	return Td;
 
@@ -197,14 +202,14 @@ float idDHTLib::getDewPoint() {
 // reference: http://wahiduddin.net/calc/density_algorithms.htm 
 float idDHTLib::getDewPointSlow() {
 	IDDHTLIB_CHECK_STATE;
-	float A0= 373.15/(273.15 + (float) temp);
-	float SUM = -7.90298 * (A0-1);
-	SUM += 5.02808 * log10(A0);
-	SUM += -1.3816e-7 * (pow(10, (11.344*(1-1/A0)))-1) ;
-	SUM += 8.1328e-3 * (pow(10,(-3.49149*(A0-1)))-1) ;
-	SUM += log10(1013.246);
-	float VP = pow(10, SUM-3) * (float) hum;
-	float T = log(VP/0.61078);   // temp var
-	return (241.88 * T) / (17.558-T);
+	float fA0= 373.15f/(273.15f + (float) this->_temp);
+	float SUM = -7.90298f * (fA0-1);
+	SUM += 5.02808f * (float)log10(fA0);
+	SUM += -1.3816e-7f * float(pow(10, (11.344f*(1-1/fA0)))-1) ;
+	SUM += 8.1328e-3f * float(pow(10,(-3.49149f*(fA0-1)))-1) ;
+	SUM += (float)log10(1013.246f);
+	float VP = (float)pow(10, SUM-3) * (float) this->_hum;
+	float T = (float)log(VP/0.61078f);   // temp var
+	return (241.88f * T) / (17.558f-T);
 }
 // EOF

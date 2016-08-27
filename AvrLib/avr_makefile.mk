@@ -21,7 +21,6 @@ ifeq ($(shell test $(W) -ge 2; echo $$?),0)
 			 -Wcast-qual \
 			 -Wwrite-strings \
 			 -Wlogical-op \
-			 -Waggregate-return \
 			 -Wwrite-strings \
 			 -Wcast-align \
 			 -Wcast-qual \
@@ -46,49 +45,51 @@ ifeq ($(shell test $(W) -ge 3; echo $$?),0)
 endif
 
 ifeq ($(shell test $(W) -ge 4; echo $$?),0)
-	WCOMMON_4= -Wpedantic \
-			 -Wconversion
+	# -Wpedantic emette warnings per violazioni ISC C++... ma non aiuta molto
+	WCOMMON_4= \
+			   -Waggregate-return \
+			   -Wconversion
 	WC+=$(WCOMMON_4)
 	WCXX+=$(WCOMMON_4)
 endif
 
 ##################################################
 CCOMMON= \
-	-MMD \
-	-Os \
-	-ffunction-sections -fdata-sections \
-	-mmcu=atmega328p -DF_CPU=8000000L \
-	-DARDUINO=10608 -DARDUINO_AVR_PRO -DARDUINO_ARCH_AVR \
-	-I$(ARDUINO)/hardware/arduino/avr/cores/arduino \
-	-I$(ARDUINO)/hardware/arduino/avr/variants/eightanaloginputs
+		 -MMD \
+		 -Os \
+		 -ffunction-sections -fdata-sections \
+		 -mmcu=atmega328p -DF_CPU=8000000L \
+		 -DARDUINO=10608 -DARDUINO_AVR_PRO -DARDUINO_ARCH_AVR \
+		 -I$(ARDUINO)/hardware/arduino/avr/cores/arduino \
+		 -I$(ARDUINO)/hardware/arduino/avr/variants/eightanaloginputs
 
 CFLAGS+=$(CCOMMON) $(WC)
 CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++11 -fno-threadsafe-statics \
-	-fno-exceptions
+		  -fno-exceptions
 
 .obj/%.o : %.cpp | .obj
 	@echo $<
-	avr-g++ -c $(CXXFLAGS) $< -o $@
+	@avr-g++ -c $(CXXFLAGS) $< -o $@
 
 .obj/%.o : %.c | .obj
 	@echo $<
-	avr-gcc -c $(CFLAGS) $< -o $@
+	@avr-gcc -c $(CFLAGS) $< -o $@
 
 .lib/%.o : %.cpp | .lib
 	@echo $<
-	avr-g++ -c $(CXXFLAGS) $< -o $@
+	@avr-g++ -c $(CXXFLAGS) $< -o $@
 
 .lib/%.o : %.c | .lib
 	@echo $<
-	avr-gcc -c $(CFLAGS) $< -o $@
+	@avr-gcc -c $(CFLAGS) $< -o $@
 
 %.s : %.cpp
 	@echo $<
-	avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
+	@avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
 
 %.s : %.c
 	@echo $<
-	avr-gcc -S -c $(CFLAGS) $< -o $@
+	@avr-gcc -S -c $(CFLAGS) $< -o $@
 
 VPATH+=$(ARDUINO)/hardware/arduino/avr/cores/arduino
 
@@ -113,23 +114,23 @@ TARGET:=$(TARGET:.hex=)
 all : $(TARGET).hex
 
 $(TARGET).hex : libArduinoPro.a $(OBJ)
-	avr-g++ -o$(TARGET).elf -Wl,--gc-sections -mmcu=atmega328p $(OBJ) libArduinoPro.a 
-	avr-strip -g $(TARGET).elf
-	avr-objdump -S -D $(TARGET).elf > $(TARGET).dis
-	avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(TARGET).elf $(TARGET).eep
-	avr-objcopy -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex
-	avr-size $(TARGET).elf
-	avr-size --mcu=atmega328 --format=avr $(TARGET).elf
+	@avr-g++ -o$(TARGET).elf -Wl,--gc-sections -mmcu=atmega328p $(OBJ) libArduinoPro.a 
+	@avr-strip -g $(TARGET).elf
+	@avr-objdump -S -D $(TARGET).elf > $(TARGET).dis
+	@avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(TARGET).elf $(TARGET).eep
+	@avr-objcopy -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex
+	@avr-size $(TARGET).elf
+	@avr-size --mcu=atmega328 --format=avr $(TARGET).elf
 
 libArduinoPro.a : $(LIB_OBJ)
-	rm -f $@
-	avr-ar -cvq $@ $^
+	@rm -f $@
+	@avr-ar -cvq $@ $^
 
 .lib:
-	mkdir .lib
+	@mkdir .lib
 
 .obj:
-	mkdir .obj
+	@mkdir .obj
 
 clean:
 	-rm -f libArduinoPro.a
@@ -141,9 +142,9 @@ clean:
 	-rm -f $(TARGET).dis
 
 upload : $(TARGET).hex
-	ArduinoSerialMonitor.exe -stop
-	avrdude -C$(ARDUINO)/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino \
+	@ArduinoSerialMonitor.exe -stop
+	@avrdude -C$(ARDUINO)/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino \
 		-P/dev/ttyUSB0 -b57600 -D -Uflash:w:$(TARGET).hex
-	ArduinoSerialMonitor.exe -run
+	@ArduinoSerialMonitor.exe -run
 
 -include $(OBJ:.o=.d)

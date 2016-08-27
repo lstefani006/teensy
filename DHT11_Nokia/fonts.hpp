@@ -7,6 +7,7 @@
 #define PROGMEM
 #endif
 
+
 //if defined char range 0x20-0x7F otherwise 0x20-0xFF
 #define FONT_END7F
 #define FONT_START (0x20) //first character
@@ -33,7 +34,7 @@ inline uint8_t hch(const uint8_t *font) { return pgm_read_byte(font + 1); }
 
 inline uint8_t pch(const uint8_t *font, char ch, int8_t y)
 {
-	uint8_t w = pgm_read_byte(font + 0);
+	//uint8_t w = pgm_read_byte(font + 0);
 	uint8_t h = pgm_read_byte(font + 1);
 	font += 2;
 

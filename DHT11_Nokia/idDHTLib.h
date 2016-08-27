@@ -46,9 +46,9 @@
 #define IDDHTLIB_ERROR_DELTA		-4
 #define IDDHTLIB_ERROR_NOTSTARTED	-5
 
-#define IDDHTLIB_CHECK_STATE		if(state == STOPPED)			\
-						return status;			\
-					else if(state != ACQUIRED)		\
+#define IDDHTLIB_CHECK_STATE		if(this->_state == STOPPED)			\
+						return this->_status;			\
+					else if(this->_state != ACQUIRED)		\
 						return IDDHTLIB_ERROR_ACQUIRING;
 									
 class idDHTLib
@@ -74,16 +74,16 @@ private:
 	void (*isrCallback_wrapper)(void);
 	
 	enum states{RESPONSE=0,DATA=1,ACQUIRED=2,STOPPED=3,ACQUIRING=4};
-	volatile states state;
-	volatile int status;
-	volatile byte bits[5];
-	volatile byte cnt;
-	volatile byte idx;
+	volatile states _state;
+	volatile int _status;
+	volatile byte _bits[5];
+	volatile byte _cnt;
+	volatile byte _idx;
 	volatile int us;
-	int intNumber;
-	int pin;
-	volatile float hum;
-	volatile float temp;
+	int _intNumber;
+	int _pin;
+	volatile float _hum;
+	volatile float _temp;
 	void isrCallback(bool dht22);
 };
 #endif // idDHTLib_H__

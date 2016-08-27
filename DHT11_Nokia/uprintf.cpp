@@ -100,19 +100,25 @@ static inline bool align(pfp pf, char ch, int n)
 static inline bool pf_dummy(char) { return true; }
 
 
-int uprintf(pfp pf, const char *fmt, ...)
+int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 {
 	char b[20];
 	va_list args;
-	va_start(args, fmt);
+	va_copy(args, vargs);
 
 	int ret = 0;
 
 	if (!pf) pf = pf_dummy;
 
-	while (*fmt)
+
+	for (;;)
 	{
-		if (*fmt == '%')
+#define rfmt(ss) (fmtFlash ? pgm_read_byte(ss) : *ss)
+		char fmt = rfmt(ffmt++);
+		if (!fmt)
+			break;
+
+		if (fmt == '%')
 		{
 			bool opz_l = false;
 			int  opz_wl = 0;
@@ -128,36 +134,45 @@ int uprintf(pfp pf, const char *fmt, ...)
 			// lenght     ==> l
 			// specificer ==> s d x f
 
-			++fmt;
+			fmt = rfmt(ffmt++);
 
-			while (*fmt == '-' || *fmt == '0')
-				if (*fmt++ == '-')
+			while (fmt == '-' || fmt == '0')
+			{
+				if (fmt == '-')
 					opz_align_left = true;
 				else
 					opz_align_char = '0';
+				fmt = rfmt(ffmt++);
+			}
 
 
-			while (*fmt >= '0' && *fmt <= '9')
-				opz_wr = opz_wr * 10 + (*fmt++ - '0');
+			while (fmt >= '0' && fmt <= '9')
+			{
+				opz_wr = opz_wr * 10 + (fmt - '0');
+				fmt = rfmt(ffmt++);
+			}
 			if (opz_align_left) { opz_wl = opz_wr; opz_wr = 0; }
 
-			if (*fmt=='.')
+			if (fmt=='.')
 			{
 				opz_prec = 0;
-				fmt++;
-				while (*fmt >= '0' && *fmt <= '9')
-					opz_prec = opz_prec * 10 + (*fmt++ - '0');
+				fmt = rfmt(ffmt++);
+				while (fmt >= '0' && fmt <= '9')
+				{
+					opz_prec = opz_prec * 10 + (fmt - '0');
+					fmt = rfmt(ffmt++);
+				}
 			}
-			if (*fmt == 'l')
+			if (fmt == 'l')
 			{
 				opz_l = true;
-				fmt++;
+				fmt = rfmt(ffmt++);
 			}
 
 			int n=0;
 			const char *s = nullptr;
 			const char *f = nullptr;
-			switch (*fmt)
+			switch (fmt)
 			{
 			case 0:
 				return -1;
@@ -165,7 +180,7 @@ int uprintf(pfp pf, const char *fmt, ...)
 			case 'd':
 			case 'x':
 				{
-					int8_t base = (*fmt == 'x')? 16 : 10;
+					int8_t base = (fmt == 'x')? 16 : 10;
 					long v;
 					if (!opz_l)
 						v = va_arg(args, int);
@@ -223,15 +238,34 @@ int uprintf(pfp pf, const char *fmt, ...)
 		}
 		else
 		{
-			if (!pf(*fmt)) return -1;
+			if (!pf(fmt)) return -1;
 			ret += 1;
 		}
-		++fmt;
 	}
 
 	va_end(args);
 	return ret;
 }
+
+int uprintf(pfp pf, const char *fmt, ...)
+{
+	va_list args;
+	va_start (args, fmt);
+	int rc =uvprintf(pf, false, fmt, args);
+	va_end (args);
+	return rc;
+}
+
+#ifdef ARDUINO
+int uprintf(pfp pf, const __FlashStringHelper *fmt, ...)
+{
+	va_list args;
+	va_start (args, fmt);
+	int rc =uvprintf(pf, true, (const char *)fmt, args);
+	va_end (args);
+	return rc;
+}
+#endif
 
 #ifndef ARDUINO
 
@@ -247,12 +281,12 @@ main()
 {
 	int r;
 	
-	printf("%d\n", sizeof(int));
-	printf("%d\n", sizeof(long));
+	//printf("%d\n", sizeof(int));
+	//printf("%d\n", sizeof(long));
 
 	r = uprintf(pf2, "leo\n");
 	printf("%d\n", r);
-	r = uprintf(pf2, "leo #%10d#\n", -1234);
+	r = uprintf(pf2, "leo #%6d#\n", -1234);
 	printf("%d\n", r);
 	r = uprintf(pf2, "leo #%-10d#\n", 1234);
 	printf("%d\n", r);

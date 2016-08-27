@@ -1,4 +1,5 @@
 W=2
+
 ifdef TEENSY
 	CXXFLAGS=-W2 -Os -I../TeensyLib -V -I.
 	VPATH=../TeensyLib
@@ -33,6 +34,11 @@ CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/OneWire
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/OneWire
 SRC+=OneWire.cpp
 SRC+=DallasTemperature.cpp
+
+#####################################################
+CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/EEPROM
+VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/EEPROM
+SRC+=EEPROM.cpp
 
 
 ifdef TEENSY
