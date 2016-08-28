@@ -250,23 +250,53 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 int uprintf(pfp pf, const char *fmt, ...)
 {
 	va_list args;
-	va_start (args, fmt);
-	int rc =uvprintf(pf, false, fmt, args);
+	va_start(args, fmt);
+	int rc = uvprintf(pf, false, fmt, args);
 	va_end (args);
 	return rc;
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////
 
 #ifdef ARDUINO
 int uprintf(pfp pf, const __FlashStringHelper *fmt, ...)
 {
 	va_list args;
-	va_start (args, fmt);
-	int rc =uvprintf(pf, true, (const char *)fmt, args);
+	va_start(args, fmt);
+	int rc = uvprintf(pf, true, (const char *)fmt, args);
+	va_end (args);
+	return rc;
+}
+#endif
+/////////////////////////////////////////////////////////////////////////////////
+bool (*uprintf_cb)(char) = nullptr;
+
+int uprintf(const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	auto rc = uvprintf(uprintf_cb, false, fmt, args);
+	va_end (args);
+	return rc;
+}
+
+#ifdef ARDUINO
+int uprintf(const __FlashStringHelper *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	auto rc = uvprintf(uprintf_cb, true, (const char *)fmt, args);
 	va_end (args);
 	return rc;
 }
 #endif
 
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 #ifndef ARDUINO
 
 #include <stdio.h>

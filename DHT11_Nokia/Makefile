@@ -40,6 +40,10 @@ CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/EEPROM
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/EEPROM
 SRC+=EEPROM.cpp
 
+#####################################################
+CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/Time
+VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/Time
+SRC+=Time.cpp
 
 ifdef TEENSY
 include ../TeensyLib/teensy_makefile.mk

@@ -1,10 +1,11 @@
-#include <idDHTLib.h>
+#include "idDHTLib.h"
 #include <t_5110.h>
 #include <t_io.h>
 #include "Graph.hpp"
 #include "uprintf.hpp"
 
 #include <EEPROM.h>
+#include <Time.h>
 
 
 #ifdef DALLAS
@@ -31,9 +32,8 @@ constexpr int PIN_SCLK  = 13;
 constexpr int PIN_SDIN  = 11;
 constexpr int PIN_RESET =  9;
 constexpr int PIN_DC    = 14;
-t::hwSPI<PIN_CE, PIN_SCLK, PIN_SDIN, -1> spi;
+t::hwSPI<PIN_CE, PIN_SCLK, PIN_SDIN, /*-1*/SPI_MODE0> spi;
 t::Lcd<typeof(spi), PIN_RESET, PIN_DC, false> lcd(spi);
-
 
 #ifdef DALLAS
 OneWire g_ow(6);
@@ -61,14 +61,24 @@ dallasError readDallasTemp(float &ret)
 }
 #endif
 
+static void processSyncMessage() 
+{
+	const unsigned long DEFAULT_TIME = 1357041600; // Jan 1 2013
+	if(Serial.find((char *)"T")) {
+		unsigned long pctime = Serial.parseInt();
+		if( pctime >= DEFAULT_TIME)
+			setTime(pctime);
+	}
+}
+
+
 void setup()
 {
-	if (false)
-	{
-		Serial.begin(38400);
-		Serial.println("Inizio");
-		uprintf([](char ch) { Serial.print(ch); return true; }, "Ciao");
-	}
+	Serial.begin(38400);
+	Serial.println("Inizio");
+	uprintf_cb = [](char ch) { Serial.print(ch); return true; };
+	uprintf("Ciao");
+
 
 	t::SetPrint(&lcd);
 	spi.begin();
@@ -86,6 +96,10 @@ void setup()
 
 	lcd.print(F("FREE MEM="));
 	lcd.println(freeRam());
+
+	// Time
+	setSyncProvider([]() -> time_t { Serial.write("7"); Serial.flush(); return 0; });
+	setSyncInterval(60);
 
 #ifdef DALLAS
 	g_dallas.begin();
@@ -119,6 +133,7 @@ struct CodaItem
 	int16_t dp;
 	int16_t te;
 };
+
 
 class Coda
 {
@@ -270,12 +285,11 @@ public:
 	}
 };
 
-
-
-
-
 void loop()
 {
+	if (Serial.available()) 
+		processSyncMessage();
+
 	const unsigned long tPeriod = 5;
 	const unsigned long tStart = millis();
 
@@ -355,22 +369,72 @@ void loop()
 
 			if (true)
 			{
-				static bool inv=false;
-				lcd.setInverse(inv);
-				int aa = lcd.getX();
-				lcd.gotoXY(aa, lcd.LCD_Y - 7);
+				auto ff = [](char ch) { lcd.print(ch); return true; };
+				switch (timeStatus())
+				{
+				case timeNotSet:
+					lcd.setInverse(true);
+					uprintf(ff, "????");
+					lcd.setInverse(false);
+					break;
 
-				/***/if (dp <= 10) lcd.println(F("1 Molto secco"));
-				else if (dp <= 12) lcd.println(F("2 Secco"));
-				else if (dp <= 16) lcd.println(F("3 Confort"));
-				else if (dp <= 18) lcd.println(F("4 Poco umido"));
-				else if (dp <= 21) lcd.println(F("5 Umido"));
-				else if (dp <= 24) lcd.println(F("6 Molto umido"));
-				else               lcd.println(F("7 Afa"));
-				lcd.setInverse(false);
-				inv = !inv;
+				case timeNeedsSync:
+					lcd.setInverse(true);
+				case timeSet:
+					uprintf(ff, "%02d:%02d\n", hour(), minute());
+					lcd.setInverse(false);
+					break;
+				}
+
+				int aa = lcd.getX();
+				lcd.gotoXY(0, lcd.LCD_Y - 7);
+
+				static bool ora = false;
+				ora = !ora;
+				if (ora)
+				{
+					switch (timeStatus())
+					{
+					case timeNotSet:
+						lcd.setInverse(true);
+						uprintf(ff, "????");
+						lcd.setInverse(false);
+						break;
+
+					case timeNeedsSync:
+						lcd.setInverse(true);
+					case timeSet:
+						{
+							const char *wd="???";
+							switch (weekday())
+							{
+							case 1: wd = "DOM"; break;
+							case 2: wd = "LUN"; break;
+							case 3: wd = "MAR"; break;
+							case 4: wd = "MER"; break;
+							case 5: wd = "GIO"; break;
+							case 6: wd = "VEN"; break;
+							case 7: wd = "SAB"; break;
+							}
+							uprintf(ff, "%s %02d/%02d/%d", wd, day(), month(), year());
+							lcd.setInverse(false);
+						}
+						break;
+					}
+				}
+				else
+				{
+					/***/if (dp <= 10) lcd.println(F("1 Molto secco"));
+					else if (dp <= 12) lcd.println(F("2 Secco"));
+					else if (dp <= 16) lcd.println(F("3 Confort"));
+					else if (dp <= 18) lcd.println(F("4 Poco umido"));
+					else if (dp <= 21) lcd.println(F("5 Umido"));
+					else if (dp <= 24) lcd.println(F("6 Molto umido"));
+					else               lcd.println(F("7 Afa"));
+				}
 			}
 		}
+
 		if (true)
 		{
 			// estremi inclusi
@@ -417,8 +481,7 @@ void loop()
 				screen.b.y = y;
 
 			}
-			s_grafico = (s_grafico + 1) % 4;
-
+			s_grafico = (s_grafico + 1) % 8;
 
 			TempSource gte(cc, CodaType::te, 1);
 
