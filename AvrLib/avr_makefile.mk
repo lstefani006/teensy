@@ -141,9 +141,11 @@ clean:
 	-rm -f $(TARGET).hex
 	-rm -f $(TARGET).dis
 
+#VERBOSE=-v
+VERBOSE=
 upload : $(TARGET).hex
 	@ArduinoSerialMonitor.exe -stop
-	@avrdude -C$(ARDUINO)/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino \
+	@avrdude -C$(ARDUINO)/hardware/tools/avr/etc/avrdude.conf $(VERBOSE) -patmega328p -carduino \
 		-P/dev/ttyUSB0 -b57600 -D -Uflash:w:$(TARGET).hex
 	@ArduinoSerialMonitor.exe -run
 

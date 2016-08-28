@@ -1,6 +1,5 @@
 #include "idDHTLib.h"
 #include <t_5110.h>
-#include <t_io.h>
 #include "Graph.hpp"
 #include "uprintf.hpp"
 
@@ -12,6 +11,16 @@
 #include <OneWire.h>
 #include "DallasTemperature.h"
 #endif
+#include "RTC_DS1302.h"
+
+///////////////////////////////////
+constexpr int8_t DS1302_SCLK_PIN = 3;
+constexpr int8_t DS1302_IO_PIN = 4;
+constexpr int8_t DS1302_CE_PIN = 5;
+DS1302 rtc(DS1302_SCLK_PIN, DS1302_IO_PIN, DS1302_CE_PIN);
+//////////////////////////////////
+
+
 
 constexpr int idDHTLibPin = 2;       //Digital pin for comunications
 constexpr int idDHTLibIntNumber = 0; //interrupt number (must be the one that use the previus defined pin (see table above)
@@ -63,47 +72,73 @@ dallasError readDallasTemp(float &ret)
 
 static void processSyncMessage() 
 {
-	const unsigned long DEFAULT_TIME = 1357041600; // Jan 1 2013
-	if(Serial.find((char *)"T")) {
+	// se c'è la seriale attaccata e il PC risponde.... felici di aggiornare sia il Time che l'rtc
+	if (Serial.find(const_cast<char*>("T"))) 
+	{
 		unsigned long pctime = Serial.parseInt();
+		const unsigned long DEFAULT_TIME = 1357041600; // Jan 1 2013
 		if( pctime >= DEFAULT_TIME)
+		{
 			setTime(pctime);
+			rtc.SetTime(pctime);
+		}
+	}
+	else
+	{
+		// aggiorno il Time con l'rtc
+		setTime(rtc);
 	}
 }
 
+static bool lcd_write(char ch)
+{
+	lcd.print(ch); 
+	return true;
+}
+static time_t syncProvider()
+{
+	rtc.GetTime(); 
+
+	// se poi c'è il PC attaccato.... aggiorno....
+	Serial.print(F("7")); 
+	Serial.flush(); 
+
+	// se per caso ho una data valida.....
+	if (rtc.Y() >= 2016 && rtc.Y() < 2050)
+		return rtc; 
+	else
+		return 0;
+}
 
 void setup()
 {
 	Serial.begin(38400);
-	Serial.println("Inizio");
-	uprintf_cb = [](char ch) { Serial.print(ch); return true; };
-	uprintf("Ciao");
-
-
-	t::SetPrint(&lcd);
+	rtc.begin();
 	spi.begin();
-
 	lcd.begin();
+
 	lcd.clear();
 	lcd.gotoXY(0, 0);
 	lcd.setContrast(35);
 
-	lcd.clear();
-	uprintf([](char ch) { lcd.print(ch); return true; }, "Ciao");
+	rtc.GetTime();
+	uprintf(lcd_write, F("%d/%d/%d\n"), rtc.Y(), rtc.M(), rtc.D());
+	uprintf(lcd_write, F("%d:%d:%d\n"), rtc.h24(), rtc.m(), rtc.s());
+	uprintf(lcd_write, F("FREE MEM=%d\n"), freeRam());
 	lcd.update();
-	delay(500);
-	lcd.clear();
+	delay(2000);
 
-	lcd.print(F("FREE MEM="));
-	lcd.println(freeRam());
-
-	// Time
-	setSyncProvider([]() -> time_t { Serial.write("7"); Serial.flush(); return 0; });
-	setSyncInterval(60);
+	if (true)
+	{
+		// Time
+		setSyncProvider(syncProvider);
+		setSyncInterval(60); // ogni 60 secondi leggo dal rtc
+	}
 
 #ifdef DALLAS
 	g_dallas.begin();
 	delay(100);
+	lcd.clear();
 	lcd.print(F("NUM=")); lcd.println(g_dallas.getDeviceCount());
 	lcd.print(F("PARASTIC=")); lcd.println(g_dallas.isParasitePowerMode());
 	if (g_dallas.getAddress(g_addr, 0) == false) lcd.println(F("getAddress ERRORE"));
@@ -142,9 +177,9 @@ public:
 	{
 		uint8_t magic;
 		EEPROM.get(addr_magic, magic);
-		if (magic != 0xa5)
+		if (magic != 0xa7)
 		{
-			magic = 0xa5;
+			magic = 0xa7;
 			EEPROM.put(addr_magic, magic);
 
 			PrimoVuoto(0);
@@ -369,24 +404,22 @@ void loop()
 
 			if (true)
 			{
-				auto ff = [](char ch) { lcd.print(ch); return true; };
 				switch (timeStatus())
 				{
 				case timeNotSet:
 					lcd.setInverse(true);
-					uprintf(ff, "????");
+					uprintf(lcd_write, "????");
 					lcd.setInverse(false);
 					break;
 
 				case timeNeedsSync:
 					lcd.setInverse(true);
 				case timeSet:
-					uprintf(ff, "%02d:%02d\n", hour(), minute());
+					uprintf(lcd_write, F("%02d:%02d\n"), hour(), minute());
 					lcd.setInverse(false);
 					break;
 				}
 
-				int aa = lcd.getX();
 				lcd.gotoXY(0, lcd.LCD_Y - 7);
 
 				static bool ora = false;
@@ -397,7 +430,7 @@ void loop()
 					{
 					case timeNotSet:
 						lcd.setInverse(true);
-						uprintf(ff, "????");
+						uprintf(lcd_write, F("????"));
 						lcd.setInverse(false);
 						break;
 
@@ -416,7 +449,7 @@ void loop()
 							case 6: wd = "VEN"; break;
 							case 7: wd = "SAB"; break;
 							}
-							uprintf(ff, "%s %02d/%02d/%d", wd, day(), month(), year());
+							uprintf(lcd_write, F("%s %02d/%02d/%d"), wd, day(), month(), year());
 							lcd.setInverse(false);
 						}
 						break;
@@ -561,4 +594,3 @@ void loop()
 	if (tStart + tPeriod * 1000 > tNow)
 		delay(tPeriod * 1000 - (tNow - tStart));
 }
-

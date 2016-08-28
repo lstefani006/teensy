@@ -10,10 +10,9 @@ void blink(int msec) {
 	delay(msec);           
 }
 
-int8_t DS1302_SCLK_PIN = 19;
-int8_t DS1302_IO_PIN = 18;
-int8_t DS1302_CE_PIN = 17;
-
+constexpr int8_t DS1302_SCLK_PIN = 3;
+constexpr int8_t DS1302_IO_PIN = 4;
+constexpr int8_t DS1302_CE_PIN = 5;
 DS1302 rtc(DS1302_SCLK_PIN, DS1302_IO_PIN, DS1302_CE_PIN);
 
 int main()

@@ -25,7 +25,8 @@ SRC+=             \
 	fonts.cpp    \
 	Graph.cpp    \
 	AffineMatrix.cpp \
-	uprintf.cpp
+	uprintf.cpp \
+	RTC_DS1302.cpp
 
 
 #####################################################
