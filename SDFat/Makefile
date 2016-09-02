@@ -1,6 +1,5 @@
 ﻿CXXFLAGS += -I SdFat-master/SdFat
 CXXFLAGS += -I $(ARDUINO)/libraries/SPI
-CXXFLAGS += -W1 -MMD -Os
 
 VPATH    += $(ARDUINO)/libraries/SPI
 VPATH    += SdFat-master/SdFat
@@ -28,4 +27,4 @@ SRC = \
 	  SdVolume.cpp \
 	  StdioStream.cpp
 
-include ../TeensyLib/Makefile.inc
+include ../AvrLib/avr_makefile.mk
