@@ -1,18 +1,16 @@
-CXXFLAGS = -I.
-CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+CXXFLAGS= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
 VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
-CXXFLAGS+= -Os
 VPATH+=./crypto
 
 ifdef TEENSY
-	VPATH   +=../TeensyLib
+	VPATH   +=../util
 	CXXFLAGS+= -DUSE_NO_RTOS
-	CXXFLAGS+=-I../TeensyLib
+	CXXFLAGS+=-I../util
 else ifdef ESP8266
 else
-	VPATH   +=../AvrLib
-	SRC+=t_io.cpp
-	CXXFLAGS+=-I../AvrLib
+	CXXFLAGS+= -DUSE_NO_RTOS
+	VPATH   +=../util
+	CXXFLAGS+=-I../util
 endif
 
 TARGET=522.hex

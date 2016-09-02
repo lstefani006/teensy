@@ -191,6 +191,14 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 				}
 				break;
 
+			case 'p':
+				{
+					int8_t base = (fmt == 'x')? 16 : 10;
+					unsigned long v = (unsigned long)va_arg(args, void *);
+					s = b;
+					n = numeric_to_a(v, base, b);
+				}
+				break;
 			case 'c':
 				{
 					int v = va_arg(args, int);
