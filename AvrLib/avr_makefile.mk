@@ -55,6 +55,7 @@ endif
 
 ##################################################
 CCOMMON= \
+		 -g \
 		 -MMD \
 		 -Os \
 		 -ffunction-sections -fdata-sections \
@@ -115,12 +116,12 @@ all : $(TARGET).hex
 
 $(TARGET).hex : libArduinoPro.a $(OBJ)
 	@avr-g++ -o$(TARGET).elf -Wl,--gc-sections -mmcu=atmega328p $(OBJ) libArduinoPro.a 
+	@avr-objdump -h -S $(TARGET).elf > $(TARGET).dis
 	@avr-strip -g $(TARGET).elf
-	@avr-objdump -S -D $(TARGET).elf > $(TARGET).dis
 	@avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(TARGET).elf $(TARGET).eep
 	@avr-objcopy -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex
 	@avr-size $(TARGET).elf
-	@avr-size --mcu=atmega328 --format=avr $(TARGET).elf
+	@avr-size --mcu=atmega328p --format=avr $(TARGET).elf
 
 libArduinoPro.a : $(LIB_OBJ)
 	@rm -f $@

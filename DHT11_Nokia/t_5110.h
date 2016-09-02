@@ -45,7 +45,6 @@ namespace t
 		enum class LcdCommand : uint8_t { LCD_CMD = 0, LCD_DATA = 1 };
 
 		T &_spi;
-		typename T::Settings _spiSettings;
 
 		void write(LcdCommand dc, uint8_t data)
 		{
@@ -57,8 +56,9 @@ namespace t
 
 		// Size of the LCD
 	public:
-		constexpr static int8_t LCD_X = 84;
-		constexpr static int8_t LCD_Y = 48;
+		typedef int8_t gint;
+		constexpr static gint LCD_X = 84;
+		constexpr static gint LCD_Y = 48;
 	private:
 		constexpr static int16_t LCD_SZ = int16_t(LCD_X) * int16_t(LCD_Y) / 8;
 		const uint8_t *_font;
@@ -66,19 +66,18 @@ namespace t
 		uint8_t _buff[LCD_SZ];  // 84*48/8 = 504 byte !!!
 		uint8_t _invalid;
 		bool    _inverse;
-		int8_t _cx;
-		int8_t _cy;
+		gint _cx;
+		gint _cy;
 
-		inline void xy(int8_t x, int8_t y) {
+		inline void xy(gint x, gint y) {
 			writeCommand(0x80 | x);  // Column.
 			writeCommand(0x40 | y / 8);  // Row.
 		}
 	public:
 
 		// PDC8544 max clock 4Mhz ==> SPI_CLOCK_DIV4
-		Lcd(T &spi_) : 
-			_spi(spi_), 
-			_spiSettings(1*1000*1000, MSBFIRST, SPI_MODE0) 
+		Lcd(T &spi) : 
+			_spi(spi)
 		{
 			_invalid = 0;
 			_font = font_05x07;
@@ -108,7 +107,8 @@ namespace t
 			delay(500);
 			digitalWrite(_pinRST, HIGH);
 
-			typename T::SPITransaction tr(_spi, _spiSettings);
+			typename T::Settings spiSettings(1*1000L*1000L, MSBFIRST, SPI_MODE0);
+			typename T::SPITransaction tr(_spi, spiSettings);
 			writeCommand(0x21);  // LCD Extended Commands.
 			writeCommand(0xBf);  // Set LCD Vop (Contrast). //B1
 			writeCommand(0x04);  // Set Temp coefficent. //0x04
@@ -147,13 +147,14 @@ namespace t
 			if (_invalid == 0) 
 				return;
 
-			typename T::SPITransaction tr(_spi, _spiSettings);
-			for (int8_t y = 0; y < LCD_Y / 8; ++y)
+			typename T::Settings spiSettings(1*1000L*1000L, MSBFIRST, SPI_MODE0);
+			typename T::SPITransaction tr(_spi, spiSettings);
+			for (gint y = 0; y < LCD_Y / 8; ++y)
 			{
 				if (_invalid & (1u << y))
 				{
 					xy(0, y * 8);
-					for (int8_t x = 0; x < LCD_X; x++)
+					for (gint x = 0; x < LCD_X; x++)
 						writeData(_buff[int16_t(y) * LCD_X + x]);
 				}
 			}
@@ -189,7 +190,8 @@ namespace t
 			//if (timerUpdate) interrupts();
 		}
 
-		bool getPixel(int8_t x, int8_t y) const
+
+		bool getPixel(gint x, gint y) const
 		{
 			if (x < 0 || x >= LCD_X) return false;
 			if (y < 0 || y >= LCD_Y) return false;
@@ -201,7 +203,7 @@ namespace t
 			return *p & (1u << (y&7)) ? true : false;
 		}
 
-		void putPixel(int8_t x, int8_t y, bool v = true)
+		void putPixel(gint x, gint y, bool v = true)
 		{
 			if (x < 0 || x >= LCD_X) return;
 			if (y < 0 || y >= LCD_Y) return;
@@ -218,11 +220,11 @@ namespace t
 
 			_invalid = _invalid | (1 << (y / 8));
 		}
-		void line(int8_t x0, int8_t y0, int8_t x1, int8_t y1)
+		void line(gint x0, gint y0, gint x1, gint y1)
 		{
-			int8_t dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-			int8_t dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-			int8_t err = (dx>dy ? dx : -dy)/2, e2;
+			gint dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+			gint dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+			gint err = (dx>dy ? dx : -dy)/2, e2;
 
 			for(;;)
 			{
@@ -233,13 +235,13 @@ namespace t
 				if (e2 < dy) { err += dx; y0 += sy; }
 			}
 		}
-		void line(int8_t x0, int8_t y0, int8_t x1, int8_t y1, int8_t d)
+		void line(gint x0, gint y0, gint x1, gint y1, gint d)
 		{
-			int8_t dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-			int8_t dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-			int8_t err = (dx>dy ? dx : -dy)/2, e2;
+			gint dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+			gint dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+			gint err = (dx>dy ? dx : -dy)/2, e2;
 
-			int8_t nn = 0;
+			gint nn = 0;
 			for(;;)
 			{
 				putPixel(x0, y0, nn++ % d == 0);
@@ -249,9 +251,9 @@ namespace t
 				if (e2 < dy) { err += dx; y0 += sy; }
 			}
 		}
-		void h_line(int8_t x0, int8_t x1, int8_t y)
+		void h_line(gint x0, gint x1, gint y)
 		{
-			int8_t sx = (x0 < x1) ? 1 : -1;
+			gint sx = (x0 < x1) ? 1 : -1;
 			for (;;) 
 			{
 				putPixel(x0, y, true);
@@ -259,9 +261,9 @@ namespace t
 				x0 += sx;
 			}
 		}
-		void h_line(int8_t x0, int8_t x1, int8_t y, int8_t d)
+		void h_line(gint x0, gint x1, gint y, gint d)
 		{
-			int8_t sx = (x0 < x1) ? 1 : -1;
+			gint sx = (x0 < x1) ? 1 : -1;
 			for (;;) 
 			{
 				putPixel(x0, y, (x0 % d == 0) ? true : false);
@@ -269,9 +271,9 @@ namespace t
 				x0 += sx;
 			}
 		}
-		void v_line(int8_t x, int8_t y0, int8_t y1)
+		void v_line(gint x, gint y0, gint y1)
 		{
-			int8_t sy = (y0 < y1) ? 1 : -1;
+			gint sy = (y0 < y1) ? 1 : -1;
 			for (;;) 
 			{
 				putPixel(x, y0, true);
@@ -279,10 +281,10 @@ namespace t
 				y0 += sy;
 			}
 		}
-		void v_line(int8_t x, int8_t y0, int8_t y1, int8_t d)
+		void v_line(gint x, gint y0, gint y1, gint d)
 		{
-			int8_t sy = (y0 < y1) ? 1 : -1;
-			int8_t t = 0;
+			gint sy = (y0 < y1) ? 1 : -1;
+			gint t = 0;
 			for (;;) 
 			{
 				putPixel(x, y0, t == 0);
@@ -291,7 +293,7 @@ namespace t
 				t += 1; if (t == d) t = 0;
 			}
 		}
-		void box(int8_t x0, int8_t y0, int8_t x1, int8_t y1)
+		void box(gint x0, gint y0, gint x1, gint y1)
 		{
 			x1 -= 1;
 			y1 -= 1;
@@ -302,9 +304,9 @@ namespace t
 			line(x0, y0, x0, y1);
 			line(x1, y0, x1, y1);
 		}
-		void circle(int xm, int ym, int r)
+		void circle(gint xm, gint ym, gint r)
 		{
-			int x = -r, y = 0, err = 2-2*r; /* II. Quadrant */ 
+			gint x = -r, y = 0, err = 2-2*r; /* II. Quadrant */ 
 			do {
 				putPixel(xm-x, ym+y); /*   I. Quadrant */
 				putPixel(xm-y, ym-x); /*  II. Quadrant */
@@ -316,11 +318,11 @@ namespace t
 			} while (x < 0);
 		}
 
-		void ellipse(int x0, int y0, int x1, int y1)
+		void ellipse(gint x0, gint y0, gint x1, gint y1)
 		{
-			int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
-			long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
-			long err = dx+dy+b1*a*a, e2; /* error of 1.step */
+			gint a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
+			int dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
+			int err = dx+dy+b1*a*a, e2; /* error of 1.step */
 
 			if (x0 > x1) { x0 = x1; x1 += a; } /* if called with swapped points */
 			if (y0 > y1) y0 = y1; /* .. exchange them */
@@ -363,8 +365,8 @@ namespace t
 			_cx += ch_w;
 			if (_cx + ch_w > LCD_X) 
 			{
-				for (int8_t x = _cx; x < LCD_X ; x++)
-					for (int8_t y = _cy; y < _cy + ch_h; ++y)
+				for (gint x = _cx; x < LCD_X ; x++)
+					for (gint y = _cy; y < _cy + ch_h; ++y)
 						putPixel(x, y, false);
 
 				_cx = 0;
@@ -410,22 +412,22 @@ namespace t
 		{
 			uint8_t ch_h = hch(_font) - 1;
 
-			for (int8_t y = ch_h; y < LCD_Y; y++)
+			for (gint y = ch_h; y < LCD_Y; y++)
 			{
-				for (int8_t x = 0; x < LCD_X; x++)
+				for (gint x = 0; x < LCD_X; x++)
 				{
 					bool v = getPixel(x, y);
 					putPixel(x, y - ch_h, v);
 				}
 			}
-			for (int8_t y = _cy; y < LCD_Y; y++)
+			for (gint y = _cy; y < LCD_Y; y++)
 			{
-				for (int8_t x = 0; x < LCD_X; x++)
+				for (gint x = 0; x < LCD_X; x++)
 					putPixel(x, y, false);
 			}
 		}
 
-		void gotoXY(int8_t x, int8_t y)
+		void gotoXY(gint x, gint y)
 		{
 			if (x < 0 || x >= LCD_X) return;
 			if (y < 0 || y >= LCD_Y) return;
@@ -435,11 +437,11 @@ namespace t
 			_cy = y;
 		}
 
-		int8_t getX() const { 
+		gint getX() const { 
 			uint8_t ch_w = wch(_font);
 			return _cx + ch_w; 
 		}
-		int8_t getY() const { return _cy; }
+		gint getY() const { return _cy; }
 
 	};
 	template <typename  T, int8_t pinRST, int8_t pinDC, bool timerUpdate>

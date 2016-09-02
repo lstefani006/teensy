@@ -1,33 +1,43 @@
-W=2
+W=1
 
 ifdef TEENSY
-	CXXFLAGS=-W2 -Os -I../TeensyLib -V -I.
-	VPATH=../TeensyLib
+	#CXXFLAGS=-I../TeensyLib -I.
+	CXXFLAGS=-I.
+	#VPATH=../TeensyLib
 else
-	CXXFLAGS=-I../AvrLib -I.
-	VPATH=../AvrLib
-	SRC += t_io.cpp
+	CXXFLAGS=-I.
+	#CXXFLAGS=-I../AvrLib -I.
+	#VPATH=../AvrLib
 endif
 
-VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
-VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
+ifdef TEENSY
+	VPATH     +=$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree
+	CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree
+else
+	VPATH     +=$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
+	CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
+endif
 
+VPATH     +=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
-CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
 
 TARGET=DHT11.hex
-SRC+=             \
-	DHT11.cpp    \
-	idDHTLib.cpp \
-	t_5110.cpp   \
-	SPI.cpp      \
-	TimerOne.cpp \
-	fonts.cpp    \
-	Graph.cpp    \
-	AffineMatrix.cpp \
-	uprintf.cpp \
-	RTC_DS1302.cpp
+SRC+= \
+	  t_5110.cpp   \
+	  SPI.cpp      \
+	  RTC_DS1302.cpp \
+	  idDHTLib.cpp \
+	  uprintf.cpp \
+	  fonts.cpp    \
+	  AffineMatrix.cpp \
+	  Graph.cpp    \
+	  DHT11.cpp   
 
+ifdef TEENSY
+	SRC+=TimerThree.cpp
+else
+	SRC+=TimerOne.cpp
+endif
 
 #####################################################
 CXXFLAGS+= -DONEWIRE_CRC8_TABLE=0 -DDALLAS=1
@@ -47,9 +57,9 @@ VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/Time
 SRC+=Time.cpp
 
 ifdef TEENSY
-include ../TeensyLib/teensy_makefile.mk
+	include ../TeensyLib/teensy_makefile.mk
 else
-include ../AvrLib/avr_makefile.mk
+	include ../AvrLib/avr_makefile.mk
 endif
 
 tags : 

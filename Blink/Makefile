@@ -1,5 +1,5 @@
 ifdef TEENSY
-	CXXFLAGS=-W2 -Os -I../TeensyLib -V
+	CXXFLAGS=-I../TeensyLib 
 	VPATH=../TeensyLib
 else  ifdef ESP8266
 	CXXFLAGS=-I../EspLib
@@ -7,7 +7,6 @@ else  ifdef ESP8266
 else
 	CXXFLAGS=-I../AvrLib
 	VPATH=../AvrLib
-	SRC += t_io.cpp
 endif
 
 TARGET=Blink.hex
@@ -22,8 +21,3 @@ else ifdef ESP8266
 else
 	include ../AvrLib/avr_makefile.mk
 endif
-
-tags : 
-	ctags *.c *.cpp *.h *.hpp \
-		$(TEENSY)/*.cpp $(TEENSY)/*.c \
-		$(TEENSY)/*.hpp $(TEENSY)/*.h

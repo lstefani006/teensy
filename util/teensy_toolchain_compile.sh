@@ -1,17 +1,14 @@
 #!/bin/bash
 
 set -e
-set +x
+set -x
 
-#export PATH=/usr/bin
-
-export V=5.2.0
-export B=2.25
-export N=2.2.0-1
+export V=6.2.0
+export B=2.27
+export N=2.4.0
 
 export MYTOOLS=$PWD/arm-none-eabi-$V
 TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
-#TARGET=""
 
 OPTIND=1
 x=0
@@ -62,9 +59,9 @@ fi
 
 if [ ! -e binutils-$B ] ; then
 	tar xvf binutils-$B.tar.gz
-	pushd binutils-$B
-	../gcc-$V/contrib/download_prerequisites
-	popd
+	#pushd binutils-$B
+	#../gcc-$V/contrib/download_prerequisites
+	#popd
 fi
 
 if [ ! -e newlib-$N ] ; then
@@ -91,7 +88,8 @@ if [ ! -e binutils.ok ] ; then
 		--with-no-thumb-interwork \
 		--disable-multilib \
 		--with-gnu-as \
-		--with-gnu-ls
+		--with-gnu-ls \
+		$TARGET
 	make all
 	make install
 	popd
@@ -108,7 +106,7 @@ if [ ! -e gcc-first.ok ] ; then
 		--enable-interwork \
 		--disable-multilib \
 		--disable-werror \
-		--enable-languages="c,c++" \
+		--enable-languages="c" \
 		--with-newlib \
 		--without-headers \
 		--disable-shared \
@@ -151,22 +149,20 @@ if [ ! -e gcc.ok ] ; then
 	#rm -rf gcc
 	#mkdir gcc
 	pushd gcc
-	#../../gcc-$V/configure \
-	#	--target=arm-none-eabi \
-	#	--prefix=$MYTOOLS \
-	#	--enable-interwork \
-	#	--disable-multilib \
-	#	--disable-werror \
-	#	--enable-languages="c,c++" \
-	#	--with-newlib \
-	#	--without-headers \
-	#	--disable-shared \
-	#	--with-gnu-as \
-	#	--with-gnu-ld \
-	#	-disable-nls \
-	#	$TARGET
-	#make -j4 CFLAGS="-mcpu=cortex-m4 -mthumb" CXXFLAGS="-mcpu=cortex-m4 -mthumb" LIBCXXFLAGS="-mcpu=cortex-m4 -mthumb" all
-	make -j4 
+	../../gcc-$V/configure \
+		--target=arm-none-eabi \
+		--prefix=$MYTOOLS \
+		--enable-interwork \
+		--disable-multilib \
+		--disable-werror \
+		--enable-languages="c,c++" \
+		--with-newlib \
+		--disable-shared \
+		--with-gnu-as \
+		--with-gnu-ld \
+		-disable-nls \
+		$TARGET
+	make -j4 all
 	make install
 	popd
 	touch gcc.ok

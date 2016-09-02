@@ -50,12 +50,16 @@ DallasTemperature g_dallas(&g_ow);
 DeviceAddress g_addr;
 #endif
 
+#if defined(__arm__) && defined(TEENSYDUINO) && defined(KINETISK)
+static int freeRam () { return 0; }
+#else
 static int freeRam () 
 {
 	extern int __heap_start, *__brkval; 
 	int v; 
 	return (int) &v - (__brkval == nullptr ? (int) &__heap_start : (int) __brkval); 
 }
+#endif
 
 #ifdef DALLAS
 enum class dallasError : uint8_t { ok, deviceNotPresent, timeout };
@@ -90,18 +94,12 @@ static void processSyncMessage()
 	}
 }
 
-static bool lcd_write(char ch)
-{
-	lcd.print(ch); 
-	return true;
-}
 static time_t syncProvider()
 {
 	rtc.GetTime(); 
 
 	// se poi c'è il PC attaccato.... aggiorno....
-	Serial.print(F("7")); 
-	Serial.flush(); 
+	uprintf([](char ch) { Serial.write(ch); return true; }, F("7"));
 
 	// se per caso ho una data valida.....
 	if (rtc.Y() >= 2016 && rtc.Y() < 2050)
@@ -121,35 +119,34 @@ void setup()
 	lcd.gotoXY(0, 0);
 	lcd.setContrast(35);
 
-	rtc.GetTime();
-	uprintf(lcd_write, F("%d/%d/%d\n"), rtc.Y(), rtc.M(), rtc.D());
-	uprintf(lcd_write, F("%d:%d:%d\n"), rtc.h24(), rtc.m(), rtc.s());
-	uprintf(lcd_write, F("FREE MEM=%d\n"), freeRam());
-	lcd.update();
-	delay(2000);
+	uprintf_cb = [] (char ch) { lcd.write(ch); return true; };
 
-	if (true)
-	{
-		// Time
-		setSyncProvider(syncProvider);
-		setSyncInterval(60); // ogni 60 secondi leggo dal rtc
-	}
+	rtc.GetTime();
+	uprintf(F("%04d/%02d/%02d\n"), rtc.Y(), rtc.M(), rtc.D());
+	uprintf(F("%02d:%02d:%02d\n"), rtc.h24(), rtc.m(), rtc.s());
+	uprintf(F("FREE MEM=%d\n"), freeRam());
+	lcd.update();
+	delay(500);
+
+	// Time
+	setSyncProvider(syncProvider);
+	setSyncInterval(60); // ogni 60 secondi leggo dal rtc/PC
+
 
 #ifdef DALLAS
 	g_dallas.begin();
 	delay(100);
 	lcd.clear();
-	lcd.print(F("NUM=")); lcd.println(g_dallas.getDeviceCount());
-	lcd.print(F("PARASTIC=")); lcd.println(g_dallas.isParasitePowerMode());
-	if (g_dallas.getAddress(g_addr, 0) == false) lcd.println(F("getAddress ERRORE"));
+	uprintf(F("NUM=%d\n"), g_dallas.getDeviceCount());
+	uprintf(F("PARASTIC=%d\n"), g_dallas.isParasitePowerMode());
+	if (g_dallas.getAddress(g_addr, 0) == false) uprintf(F("getAddress ERRORE"));
 	g_dallas.setResolution(g_addr, 12);
-	lcd.print(F("RES="));
-	lcd.println(g_dallas.getResolution(g_addr));
+	uprintf(F("RES=%d\n"), g_dallas.getResolution(g_addr));
 
-	delay(100);
+	delay(500);
 	float t;
 	readDallasTemp(t);
-	lcd.print(F("T=")); lcd.println(t);
+	uprintf(F("T=%f\n"), t);
 
 	lcd.update();
 	delay(1000);
@@ -163,10 +160,31 @@ void setup()
 enum class CodaType { ti, hh, dp, te };
 struct CodaItem
 {
+	CodaItem() : ti(0), hh(0), dp(0), te(0), _tick(0) {}
 	int16_t ti;
 	int16_t hh;
 	int16_t dp;
 	int16_t te;
+
+	static int8_t size()
+	{
+		return 
+			sizeof(CodaItem::_tick) +
+			sizeof(CodaItem::ti) +
+			sizeof(CodaItem::hh) +
+			sizeof(CodaItem::dp) +
+			sizeof(CodaItem::te);
+	}
+
+	const time_t & tick() const { return _tick; }
+	time_t & rtick() { return _tick; }
+	void tick(time_t t) { _tick = t; }
+
+	time_t gtick() const { return _tick - DEFAULT_TIME; }
+	static time_t gtick(time_t t) { return t - DEFAULT_TIME; }
+private:
+	static const unsigned long DEFAULT_TIME = 1357041600; // Jan 1 2013
+	time_t  _tick;
 };
 
 
@@ -177,20 +195,15 @@ public:
 	{
 		uint8_t magic;
 		EEPROM.get(addr_magic, magic);
-		if (magic != 0xa7)
+		if (magic != 0xb7)
 		{
-			magic = 0xa7;
+			magic = 0xb7;
 			EEPROM.put(addr_magic, magic);
 
 			PrimoVuoto(0);
 			Len(0);
 
 			CodaItem it;
-			it.ti = 0;
-			it.hh = 0;
-			it.dp = 0;
-			it.te = 0;
-
 			for (int idx = 0; idx < _sz; ++idx)
 				put(idx, it);
 		}
@@ -228,11 +241,12 @@ public:
 
 		CodaItem it;
 
-		int a = addr_items + 4*sizeof(int16_t)*idx;
+		int a = addr_items + CodaItem::size()*idx;
 		EEPROM.get(a+0, it.ti);
 		EEPROM.get(a+2, it.hh);
 		EEPROM.get(a+4, it.dp);
 		EEPROM.get(a+6, it.te);
+		EEPROM.get(a+8, it.rtick());
 
 		return it;
 	}
@@ -245,11 +259,12 @@ private:
 
 	void put(int idx, const CodaItem &it)
 	{
-		int a = addr_items + 4*sizeof(int16_t)*idx;
+		int a = addr_items + CodaItem::size()*idx;
 		EEPROM.put(a+0, it.ti);
 		EEPROM.put(a+2, it.hh);
 		EEPROM.put(a+4, it.dp);
 		EEPROM.put(a+6, it.te);
+		EEPROM.put(a+8, it.tick());
 	}
 
 private:
@@ -260,15 +275,13 @@ Coda g_coda;
 
 static void PrintValue(const __FlashStringHelper *p, float f)
 {
-	lcd.print(p);
+	uprintf(p);
 	int8_t x = lcd.getX();
 	int8_t y = lcd.getY();
 	lcd.gotoXY(x + 2, y);
-	if (f < 10 && f > 0) lcd.print(' ');
-	lcd.println(f, 1);
+
+	uprintf(F("%4.1f\n"), f);
 }
-
-
 
 class TempSource : public GraphSource
 {
@@ -279,10 +292,11 @@ class TempSource : public GraphSource
 public:
 	TempSource(const CodaItem &misura, CodaType ct, int d) : _misura(misura), _i(-1), _ct(ct), _d(d) {}
 
-	bool Next() { _i += 1; return _i <= g_coda.Len(); }
-	void Get(Point &p)
+	bool Next() override { _i += 1; return _i <= g_coda.Len(); }
+	void Get(Point &p) override
 	{
 		int16_t c=0;
+		float tt;
 		if (_i < g_coda.Len())
 		{
 			switch (_ct)
@@ -292,6 +306,7 @@ public:
 			case CodaType::dp: c = g_coda[_i].dp; break;
 			case CodaType::te: c = g_coda[_i].te; break;
 			}
+			tt = g_coda[_i].gtick();
 		}
 		else
 		{
@@ -302,13 +317,14 @@ public:
 			case CodaType::dp: c = _misura.dp; break;
 			case CodaType::te: c = _misura.te; break;
 			}
+			tt = _misura.gtick();
 		}
-		p.x = _i;
+		p.x = tt;
 		p.y = c/100.0f;
 	}
-	void Reset() { _i = -1; }
+	void Reset() override { _i = -1; }
 
-	void DrawLine(const Line &r)
+	void DrawLine(const Line &r) override
 	{
 		int x0 = int(r.a.x);
 		int y0 = int(r.a.y);
@@ -331,17 +347,16 @@ void loop()
 	lcd.clear();
 	lcd.gotoXY(0, 0);
 
-
 #ifdef DALLAS
 	float te;
 	dallasError de = readDallasTemp(te);
 	switch (de)
 	{
 	case dallasError::deviceNotPresent:
-		lcd.print(F("Dallas\n\rdevice fail"));
+		uprintf(F("Dallas\ndevice fail"));
 		break;
 	case dallasError::timeout:
-		lcd.print(F("Dallas\n\rtimeout"));
+		uprintf(F("Dallas\ntimeout"));
 		break;
 	case dallasError::ok:
 		break;
@@ -352,24 +367,24 @@ void loop()
 	switch (dhtError)
 	{
 	case IDDHTLIB_ERROR_CHECKSUM: 
-		lcd.println(F("Error\n\r\tChecksum error")); 
+		uprintf(F("Error\nChecksum error")); 
 		break;
 	case IDDHTLIB_ERROR_TIMEOUT: 
-		lcd.println(F("Error\n\r\tTime out error")); 
+		uprintf(F("Error\nTime out error")); 
 		break;
 	case IDDHTLIB_ERROR_ACQUIRING: 
-		lcd.println(F("Error\n\r\tAcquiring")); 
+		uprintf(F("Error\nAcquiring")); 
 		break;
 	case IDDHTLIB_ERROR_DELTA: 
-		lcd.println(F("Error\n\r\tDelta time to small")); 
+		uprintf(F("Error\nDelta time to small")); 
 		break;
 	case IDDHTLIB_ERROR_NOTSTARTED: 
-		lcd.println(F("Error\n\r\tNot started")); 
+		uprintf(F("Error\nNot started")); 
 		break;
 	case IDDHTLIB_OK: 
 		break;
 	default: 
-		lcd.println(F("Unknown error")); 
+		uprintf(F("Unknown error")); 
 		break;
 	}
 
@@ -385,13 +400,21 @@ void loop()
 		cc.hh = int16_t(hh*100);
 		cc.dp = int16_t(dp*100);
 		cc.te = int16_t(te*100);
+		cc.tick(now());
 
 		// ogni ora storicizzo ==> 24 ore di storia
-		static unsigned long sec = 0;
-		sec += tPeriod;
-		if (sec >= 60*60)
+		static time_t last = 0;
+		if (last == 0)
 		{
-			sec = 0;
+			tmElements_t xtm;
+			breakTime(cc.tick(), xtm);
+			xtm.Second = 0;
+			xtm.Minute = 0;
+			last = makeTime(xtm);
+		}
+		if (cc.tick() - last >= 60L*60L)
+		{
+			last = cc.tick();
 			g_coda.push(cc);
 		}
 
@@ -408,14 +431,14 @@ void loop()
 				{
 				case timeNotSet:
 					lcd.setInverse(true);
-					uprintf(lcd_write, "????");
+					uprintf(F("????"));
 					lcd.setInverse(false);
 					break;
 
 				case timeNeedsSync:
 					lcd.setInverse(true);
 				case timeSet:
-					uprintf(lcd_write, F("%02d:%02d\n"), hour(), minute());
+					uprintf(F("%02d:%02d\n"), hour(), minute());
 					lcd.setInverse(false);
 					break;
 				}
@@ -430,7 +453,7 @@ void loop()
 					{
 					case timeNotSet:
 						lcd.setInverse(true);
-						uprintf(lcd_write, F("????"));
+						uprintf(F("????"));
 						lcd.setInverse(false);
 						break;
 
@@ -438,18 +461,19 @@ void loop()
 						lcd.setInverse(true);
 					case timeSet:
 						{
-							const char *wd="???";
+							const __FlashStringHelper *wd;
 							switch (weekday())
 							{
-							case 1: wd = "DOM"; break;
-							case 2: wd = "LUN"; break;
-							case 3: wd = "MAR"; break;
-							case 4: wd = "MER"; break;
-							case 5: wd = "GIO"; break;
-							case 6: wd = "VEN"; break;
-							case 7: wd = "SAB"; break;
+							case 1: wd = F("DOM"); break;
+							case 2: wd = F("LUN"); break;
+							case 3: wd = F("MAR"); break;
+							case 4: wd = F("MER"); break;
+							case 5: wd = F("GIO"); break;
+							case 6: wd = F("VEN"); break;
+							case 7: wd = F("SAB"); break;
+							default: wd = F("???"); break;
 							}
-							uprintf(lcd_write, F("%s %02d/%02d/%d"), wd, day(), month(), year());
+							uprintf(F("%S %02d/%02d/%d"), wd, day(), month(), year());
 							lcd.setInverse(false);
 						}
 						break;
@@ -457,13 +481,15 @@ void loop()
 				}
 				else
 				{
-					/***/if (dp <= 10) lcd.println(F("1 Molto secco"));
-					else if (dp <= 12) lcd.println(F("2 Secco"));
-					else if (dp <= 16) lcd.println(F("3 Confort"));
-					else if (dp <= 18) lcd.println(F("4 Poco umido"));
-					else if (dp <= 21) lcd.println(F("5 Umido"));
-					else if (dp <= 24) lcd.println(F("6 Molto umido"));
-					else               lcd.println(F("7 Afa"));
+					const __FlashStringHelper *wd;
+					/***/if (dp <= 10) wd = F("1 Molto secco");
+					else if (dp <= 12) wd = F("2 Secco");
+					else if (dp <= 16) wd = F("3 Confort");
+					else if (dp <= 18) wd = F("4 Poco umido");
+					else if (dp <= 21) wd = F("5 Umido");
+					else if (dp <= 24) wd = F("6 Molto umido");
+					else               wd = F("7 Afa");
+					uprintf(F("%S\n"), wd);
 				}
 			}
 		}
@@ -482,8 +508,11 @@ void loop()
 				// 24 ore ....
 				lcd.clear();   // a schermo intero!
 
-				view.a.x = 0;
-				view.b.x = 24;
+				//view.a.x = 0;
+				//view.b.x = 24;
+				view.a.x = cc.gtick() - 24L*60*60;
+				view.b.x = cc.gtick();
+
 				view.a.y = -5;
 				view.b.y = +35;
 
@@ -492,8 +521,6 @@ void loop()
 				screen.a.y = 0;
 				screen.b.x = lcd.LCD_X-1;
 				screen.b.y = lcd.LCD_Y-1;
-
-
 			}
 			else
 			{
@@ -502,8 +529,10 @@ void loop()
 				int8_t y = 7*5+4;
 
 				// 12 ore ....
-				view.a.x = 12;
-				view.b.x = 24;
+				//view.a.x = 12;
+				//view.b.x = 24;
+				view.a.x = cc.gtick() - 12L*60*60;
+				view.b.x = cc.gtick();
 				view.a.y = -5;
 				view.b.y = +35;
 
@@ -514,7 +543,7 @@ void loop()
 				screen.b.y = y;
 
 			}
-			s_grafico = (s_grafico + 1) % 8;
+			s_grafico = (s_grafico + 1) % 5;
 
 			TempSource gte(cc, CodaType::te, 1);
 
@@ -544,8 +573,6 @@ void loop()
 			Graph gr;
 			gr.SetViewScreen(&view, &screen);
 
-			// questo voule +1 (estremi esclusi)
-			lcd.box(screen.a.x, screen.a.y, screen.b.x + 1, screen.b.y + 1);
 
 			// righello asse y ==> temperature
 			for (int8_t tc = -10; tc <= 50; tc += 10)
@@ -562,6 +589,7 @@ void loop()
 			}
 
 			// righello per le ore
+			/*
 			int8_t step = 4; // ogni 4 ore......
 			for (int8_t i = 0; i <= g_coda.sz(); i += step)
 			{
@@ -579,9 +607,42 @@ void loop()
 					lcd.v_line(int(t0.x), screen.b.y, screen.b.y-dd);
 				}
 			}
+			*/
+			time_t xti;
+			if (true)
+			{
+				tmElements_t xtm;
+				breakTime(cc.tick(), xtm);
+				xtm.Second = 0;
+				xtm.Minute = 0;
+				xti = makeTime(xtm) -26L*60*60;; // due ora in meno ... tanto poi si clippa
+			}
+
+			for (time_t xt = xti; xt <= cc.tick(); xt += 60*60)
+			{
+				int8_t xh = hour(xt);
+				if (xh & 1) continue; // faccio vedere le ore pari
+
+				Point t0;
+				t0.x = CodaItem::gtick(xt);
+				t0.y = (view.a.y+view.b.y)/2;  // un punto del centro... cosi ci sta sicuramente dentro
+
+				if (gr.Clip(t0))
+				{
+					gr.Translate(t0);
+
+					int8_t dd = 1;
+					if (xh == 6 || xh == 18) dd = 2;
+					if (xh == 0 || xh == 12) dd = 4;
+					lcd.v_line(int(t0.x), screen.b.y, screen.b.y-dd);
+				}
+			}
 
 			// qui si plotta
 			gr.Plot(gte);
+	
+			// questo voule +1 (estremi esclusi)
+			lcd.box(screen.a.x, screen.a.y, screen.b.x + 1, screen.b.y + 1);
 		}
 	}
 

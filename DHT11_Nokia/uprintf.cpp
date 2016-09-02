@@ -202,13 +202,16 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 				break;
 
 			case 's':
-			case 'S':
 				{
 					s = va_arg(args, const char *);
-					if (!opz_l)
-						n = (int)strlen(s);
-					else
-						n = (int)strlen_P(s);
+					n = (int)strlen(s);
+				}
+				break;
+
+			case 'S':
+				{
+					f = va_arg(args, const char *);
+					n = (int)strlen_P(s);
 				}
 				break;
 

@@ -1,16 +1,5 @@
 #include <Arduino.h>
 #include <math.h>
-#include <t_io.h>
-
-extern "C" {
-	extern char *__brkval;
-	/*
-	void *_sbrk(int incr) {
-
-		return nullptr;
-	}
-	*/
-}
 
 
 // Pin 13 has an LED connected on most Arduino boards.
@@ -23,11 +12,14 @@ int led = 13;
 void setup()
 {
 	pinMode(led, OUTPUT);
-	Serial.begin(9600);
+	/*
+	Serial.begin(38400);
 	while (!Serial) ; // wait for Arduino Serial Monitor
 	Serial.println("Ciao");
-	t::SetPrint(&Serial);
+	*/
 }
+
+float f = 0;
 
 void blink(int msec)
 {
@@ -37,17 +29,13 @@ void blink(int msec)
 	delay(msec);
 }
 
-int n = 0;
-float f = 0;
-
 void loop() {
 	blink(100);
-	printf("ciao %d %f\n", n++, f++);
-	if (f > 10)
-	{
-		if (n&1)
-			blink(200);
-		else
-			blink(1000);
-	}
+	blink(100);
+	blink(1000);
+	blink(500);
+	f += 1.1 + sin(f);
+
+	if (f > 30)
+	blink(1000);
 }
