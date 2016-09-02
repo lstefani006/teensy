@@ -27,8 +27,8 @@
  * The reader can be found on eBay for around 5 dollars. Search for "mf-rc522" on ebay.com. 
  */
 
-#include <t_io.h>
 #include <MFRC522.h>
+#include <uprintf.hpp>
 
 #include "crypto/des.h"
 #include "crypto/des3.h"
@@ -86,7 +86,6 @@ void setup()
 	Serial.begin(38400);	// Initialize serial communications with the PC
 	while (!Serial);
 	Serial.println("Start");
-	t::SetPrint(&Serial);
 
 	SPI.begin();		// Init SPI bus
 	pdc.PCD_Init();	// Init MFRC522 card
@@ -121,14 +120,14 @@ void dumpUL()
 				Serial.print(page);
 				Serial.print(" ");
 				for (int i = 0; i < 4; ++i)
-					printf(" %02x", bb[i]);
-				printf("\n");
+					uprintf(" %02x", bb[i]);
+				uprintf("\n");
 			}
 			else
-				printf("Ritorna %d\n", bsz);
+				uprintf("Ritorna %d\n", bsz);
 		}
 		else
-			printf("Errore\n");
+			uprintf("Errore\n");
 
 		if (page == 3) {
 			LB1 = bb[2];
@@ -138,38 +137,38 @@ void dumpUL()
 
 	if (true)
 	{
-		printf("LOCK BITS\n");
-		printf("Lock Bit - se settato la pagina e' a sola lettura\n");
+		uprintf("LOCK BITS\n");
+		uprintf("Lock Bit - se settato la pagina e' a sola lettura\n");
 		uint8_t m = 0b10000000;
 		for (int i = 7; i >= 3; i--)
 		{
 			if (i == 3)
-				printf("L%01x OTP", i);
+				uprintf("L%01x OTP", i);
 			else
-				printf("L%01x    ", i);
-			if (LB1 & m) printf(" LOCKED"); else printf(" unlocked");
-			printf("\n");
+				uprintf("L%01x    ", i);
+			if (LB1 & m) uprintf(" LOCKED"); else uprintf(" unlocked");
+			uprintf("\n");
 			m>>=1;
 		}
 		m = 0b10000000;
 		for (int i = 7; i >= 0; i--)
 		{
-			printf("L%01x    ", i+8);
-			if (LB2 & m) printf(" LOCKED"); else printf(" unlocked");
-			printf("\n");
+			uprintf("L%01x    ", i+8);
+			if (LB2 & m) uprintf(" LOCKED"); else uprintf(" unlocked");
+			uprintf("\n");
 			m>>=1;
 		}
-		printf("BLOCK BITS\n");
-		printf("Block Bits - se settato blocca la modifica ai LOCK BITS\n");
+		uprintf("BLOCK BITS\n");
+		uprintf("Block Bits - se settato blocca la modifica ai LOCK BITS\n");
 		
-		printf("\nLB for 0xf to 0xa pages %s", ((LB1 & 0b100) ? "FROZEN" : "free"));
-		printf("\nLB for 0x9 to 0x4 pages %s", ((LB1 & 0b010) ? "FROZEN" : "free"));
-		printf("\nLB for 0x3 (OTP)        %s", ((LB1 & 0b001) ? "FROZEN" : "free"));
+		uprintf("\nLB for 0xf to 0xa pages %s", ((LB1 & 0b100) ? "FROZEN" : "free"));
+		uprintf("\nLB for 0x9 to 0x4 pages %s", ((LB1 & 0b010) ? "FROZEN" : "free"));
+		uprintf("\nLB for 0x3 (OTP)        %s", ((LB1 & 0b001) ? "FROZEN" : "free"));
 
-		printf("\nOTP\n");
-		printf("Sono bit settati a ZERO in fabbrica\n");
-		printf("se scritti a UNO rimangono a UNO");
-		printf("se si fa write con un ZERO su di un UNO rimane uno\n");
+		uprintf("\nOTP\n");
+		uprintf("Sono bit settati a ZERO in fabbrica\n");
+		uprintf("se scritti a UNO rimangono a UNO");
+		uprintf("se si fa write con un ZERO su di un UNO rimane uno\n");
 	}
 }
 
@@ -186,7 +185,7 @@ void loop() {
 		return;
 
 	// Dump debug info about the card. PICC_HaltA() is automatically called.
-	printf("\n\n");
+	uprintf("\n\n");
 	pdc.PICC_DumpToSerial(&(pdc.uid));
 
 	if (pdc.PICC_GetType(pdc.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL)
@@ -202,20 +201,20 @@ void loop() {
 		auto st = pdc.MIFARE_Read(addr, bb, &bbsz);
 		if (st == MFRC522::STATUS_OK)
 		{
-			printf("Leggo pagina=%02x ==> %02x\n", addr, bb[0]);
+			uprintf("Leggo pagina=%02x ==> %02x\n", addr, bb[0]);
 
 			bb[0] += 1;
 			st = pdc.MIFARE_Ultralight_Write(addr, bb, 4);
 			if (st == MFRC522::STATUS_OK)
 			{
-				printf("OK\n");
+				uprintf("OK\n");
 				delay(1000*3);
 			}
 			else
-				printf("error %s\n", pdc.GetStatusCodeName(st));
+				uprintf("error %s\n", pdc.GetStatusCodeName(st));
 		}
 		else
-			printf("error %s\n", pdc.GetStatusCodeName(st));
+			uprintf("error %s\n", pdc.GetStatusCodeName(st));
 	}
 }
 

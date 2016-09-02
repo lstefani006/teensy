@@ -1,13 +1,11 @@
 W=1
 
 ifdef TEENSY
-	#CXXFLAGS=-I../TeensyLib -I.
-	CXXFLAGS=-I.
-	#VPATH=../TeensyLib
+	CXXFLAGS=-I../util -I.
+	VPATH=../util
 else
-	CXXFLAGS=-I.
-	#CXXFLAGS=-I../AvrLib -I.
-	#VPATH=../AvrLib
+	CXXFLAGS=-I../util -I.
+	VPATH=../util
 endif
 
 ifdef TEENSY

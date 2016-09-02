@@ -7,8 +7,7 @@ VPATH+=./crypto
 ifdef TEENSY
 	VPATH   +=../TeensyLib
 	CXXFLAGS+= -DUSE_NO_RTOS
-	CXXFLAGS+= -W3 -Os
-	CXXFLAGS+=-I../TeensyLib -V
+	CXXFLAGS+=-I../TeensyLib
 else ifdef ESP8266
 else
 	VPATH   +=../AvrLib
@@ -19,9 +18,10 @@ endif
 TARGET=522.hex
 SRC+=\
 	MFRC522.cpp \
-	main.cpp \
+	522_main.cpp \
 	SPI.cpp \
-	des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp
+	des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp \
+	uprintf.cpp
 
 ifdef TEENSY
 include ../TeensyLib/teensy_makefile.mk
