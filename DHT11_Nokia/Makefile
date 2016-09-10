@@ -1,4 +1,4 @@
-W=1
+W=2
 
 ifdef TEENSY
 	CXXFLAGS=-I../util -I.
@@ -55,9 +55,9 @@ VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/Time
 SRC+=Time.cpp
 
 ifdef TEENSY
-	include ../TeensyLib/teensy_makefile.mk
+	include ../util/teensy_makefile.mk
 else
-	include ../AvrLib/avr_makefile.mk
+	include ../util/avr_makefile.mk
 endif
 
 tags : 

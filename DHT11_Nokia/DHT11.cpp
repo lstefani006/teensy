@@ -36,6 +36,9 @@ idDHTLib DHTLib(idDHTLibPin, idDHTLibIntNumber, dhtLib_wrapper);
 void dhtLib_wrapper() { DHTLib.dht11Callback(); }
 
 
+constexpr int PIN_LED = 6;
+constexpr int PIN_DALLAS = 7;
+
 constexpr int PIN_CE    = 10;
 constexpr int PIN_SCLK  = 13;
 constexpr int PIN_SDIN  = 11;
@@ -45,7 +48,7 @@ t::hwSPI<PIN_CE, PIN_SCLK, PIN_SDIN, /*-1*/SPI_MODE0> spi;
 t::Lcd<typeof(spi), PIN_RESET, PIN_DC, false> lcd(spi);
 
 #ifdef DALLAS
-OneWire g_ow(6);
+OneWire g_ow(PIN_DALLAS);
 DallasTemperature g_dallas(&g_ow);
 DeviceAddress g_addr;
 #endif
@@ -110,6 +113,7 @@ static time_t syncProvider()
 
 void setup()
 {
+
 	Serial.begin(38400);
 	rtc.begin();
 	spi.begin();
@@ -117,7 +121,10 @@ void setup()
 
 	lcd.clear();
 	lcd.gotoXY(0, 0);
-	lcd.setContrast(35);
+	lcd.setContrast(44);
+
+	pinMode(PIN_LED, OUTPUT);
+	analogWrite(PIN_LED, 0);  // massima luce.. compatibilmente con la resistenza di 100ohm
 
 	uprintf_cb = [] (char ch) { lcd.write(ch); return true; };
 
@@ -338,6 +345,29 @@ public:
 
 void loop()
 {
+	if (false)
+	{
+		static int cc = 35;
+		lcd.setContrast(cc);
+		cc+=1;
+		lcd.clear();
+		uprintf("%d   ", cc);
+		lcd.update();
+		delay(1000);
+		return;
+	}
+	if (true)
+	{
+		int v;
+		int8_t h = hour();
+		if (h >= 23 || h < 6)
+			v = 150;
+		else
+			v = 0;
+		analogWrite(PIN_LED, v);
+	}
+
+
 	if (Serial.available()) 
 		processSyncMessage();
 
@@ -549,7 +579,8 @@ void loop()
 
 			if (true)
 			{
-				float tMin = 100, tMax = -100;
+				float tMin = 100; 
+				float tMax = -100;
 				while(gte.Next())
 				{
 					Point r;
@@ -557,14 +588,20 @@ void loop()
 					if (r.y < tMin) tMin = r.y;
 					if (r.y > tMax) tMax = r.y;
 				}
-				tMin -= 5;
-				tMax += 5;
-				if (tMax - tMin < 20)
-				{
-					auto c = (tMax+tMin)/2;
-					tMax = c+10;
-					tMin = c-10;
-				}
+
+				auto tCentre = (tMax + tMin) / 2.f;
+				auto tDelta  = (tMax - tMin) / 2.f * 1.5f;
+
+				tMin = tCentre - tDelta;
+				tMax = tCentre + tDelta;
+
+				/*
+				lcd.clear();
+				uprintf("%f\n%f\n", tMin, tMax);
+				lcd.update();
+				delay(1000);
+				*/
+
 				view.a.y = tMin;
 				view.b.y = tMax;
 			}
@@ -587,27 +624,23 @@ void loop()
 					lcd.h_line(screen.a.x, screen.b.x, int(t0.y), tc == 0 ? 2 : 4); 
 				}
 			}
-
-			// righello per le ore
-			/*
-			int8_t step = 4; // ogni 4 ore......
-			for (int8_t i = 0; i <= g_coda.sz(); i += step)
+			for (int8_t tc = -10; tc <= 50; tc += 1)
 			{
 				Point t0;
-				t0.x = i;
-				t0.y = (view.a.y+view.b.y)/2;  // un punto del centro... cosi ci sta sicuramente dentro
+				t0.x = (view.a.x+view.b.x)/2;
+				t0.y = tc;
 
 				if (gr.Clip(t0))
 				{
 					gr.Translate(t0);
-
-					int8_t dd = 1;
-					if (i %  6 == 0) dd = 2;
-					if (i % 12 == 0) dd = 4;
-					lcd.v_line(int(t0.x), screen.b.y, screen.b.y-dd);
+					if (tc % 5 == 0)
+						lcd.h_line(screen.a.x, screen.a.x+3, int(t0.y));
+					else
+						lcd.h_line(screen.a.x, screen.a.x+1, int(t0.y));
 				}
 			}
-			*/
+
+			// righello per le ore
 			time_t xti;
 			if (true)
 			{

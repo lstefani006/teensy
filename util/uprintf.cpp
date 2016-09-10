@@ -6,10 +6,60 @@
 #include <Arduino.h>
 #else
 inline uint8_t pgm_read_byte(const char *s) { return *s; }
+inline unsigned long pgm_read_dword(const unsigned long *s) { return *s; }
 inline size_t strlen_P(const char *s) { return strlen(s); }
+#define PROGMEM
 #endif
 
 #include "uprintf.hpp"
+
+int ulong_to_10a(unsigned long v, char *b, bool neg)
+{
+	static const unsigned long dec[] PROGMEM = {
+		1000000000UL,
+		100000000UL,
+		10000000UL,
+		1000000UL,
+		100000UL,
+		10000UL,
+		1000UL,
+		100UL,
+		10UL,
+		1UL,
+	};
+
+	char *p = b;
+
+	if (v == 0) 
+	{
+		*p++ = '0';
+	}
+	else
+	{
+		if (neg)
+			*p++ = '-';
+
+		const unsigned long *ks = &dec[0];
+
+		while (v < pgm_read_dword(ks))
+			ks++;
+
+		do
+		{
+			char c = '0';
+			auto t = pgm_read_dword(ks);
+			while (v >= t)
+			{
+				v -= t;
+				++c;
+			}
+			*p++ = c;
+		}
+		while (++ks != &dec[sizeof(dec)/sizeof(dec[0])]);
+	}
+	*p = 0;
+	return p-b;
+}
 
 static inline int ulong_to_a(unsigned long v, uint8_t base, char *p, bool neg)
 {
@@ -18,7 +68,7 @@ static inline int ulong_to_a(unsigned long v, uint8_t base, char *p, bool neg)
 	{
 		char r = char(v % base);
 		v /= base;
-		*p++ = r + (r < 10 ? '0' : 'A' - 10);
+		*p++ = char(r + (r < 10 ? '0' : 'A' - 10));
 	}
 	while (v);
 
@@ -41,9 +91,9 @@ static inline int ulong_to_a(unsigned long v, uint8_t base, char *p, bool neg)
 
 	return p-b;
 }
-static inline int numeric_to_a(unsigned long v, uint8_t base, char *p) { return ulong_to_a(v, base, p, false); }
+static inline int numeric_to_asc(unsigned long v, uint8_t base, char *p) { return ulong_to_a(v, base, p, false); }
 
-static inline int numeric_to_a(long v, uint8_t base, char *p) 
+static inline int numeric_to_asc(long v, uint8_t base, char *p) 
 {
 	bool neg = false;
 	if (v < 0) { neg = true; v = -v; }
@@ -51,7 +101,7 @@ static inline int numeric_to_a(long v, uint8_t base, char *p)
 }
 
 
-static inline int float_to_a(float f, char *p, int8_t prec)
+static inline int float_to_asc(float f, char *p, int prec)
 {
 	const char *b = p;
 
@@ -62,20 +112,20 @@ static inline int float_to_a(float f, char *p, int8_t prec)
 	}
 
 	long nf = (long)f;
-	p += numeric_to_a(nf, 10, p);
+	p += numeric_to_asc(nf, 10, p);
 
 	if (prec > 0)
 	{
-		f -= nf;
+		f -= float(nf);
 		*p++ = '.';
 
 		while (prec > 0)
 		{
 			f *= 10;
 			nf = (long)f;
-			f -= nf;
+			f -= float(nf);
 
-			*p++ = (nf + '0');
+			*p++ = char(char(nf) + '0');
 			--prec;
 		}
 	}
@@ -84,6 +134,81 @@ static inline int float_to_a(float f, char *p, int8_t prec)
 	return p-b;
 }
 
+template<typename T> class Yield {
+protected:
+	Yield() { __line__ = 0; }
+	void Init() { __line__ = 0; }
+	unsigned short __line__; 
+	T __ret__;
+
+public:
+	const T & Current() const { return __ret__; }
+};
+template<> class Yield<void> {
+protected:
+	Yield() { Init(); }
+	void Init() { __line__ = 0; }
+	unsigned short __line__; 
+};
+#define Y_BEGIN()         switch (this->__line__) { case 0:
+#define Y_YIELD0()                               this->__line__ = __LINE__; return true; case __LINE__:
+#define Y_YIELD1(__r__)   this->__ret__ = __r__; this->__line__ = __LINE__; return true; case __LINE__:
+#define Y_END()           } this->__line__ = 0; return false
+
+class binFormatter : public Yield<char>
+{
+	typedef Yield<char> base;
+public:
+	void Init(unsigned long _v)
+	{
+		base::Init();
+		this->k = 1UL << (sizeof(unsigned long)*8 - 1);
+		this->v = _v;
+		this->__ret__ = 0;
+	}
+	int8_t Len()
+	{
+		int8_t ret = 0;
+		while (NumToBin())
+			ret += 1;
+		return ret;
+	}
+	char Next()
+	{
+		if (NumToBin())
+			return Current();
+		return 0;
+	}
+
+private:
+	bool NumToBin()
+	{
+		Y_BEGIN();
+
+		if (v == 0)
+		{
+			Y_YIELD1('0');
+		}
+		else
+		{
+			while ((v & k) == 0)
+				k = k >> 1;
+
+			while (k)
+			{
+				Y_YIELD1('0' + ((v & k) ? 1 : 0));
+				k = k >> 1;
+			}
+		}
+		Y_YIELD1(0);
+		Y_END();
+	}
+
+	unsigned long v;
+	unsigned long k;
+};
+
+/////////////////////////////////////////
 
 typedef bool (*pfp)(char);
 
@@ -172,37 +297,67 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 			int n=0;
 			const char *s = nullptr;
 			const char *f = nullptr;
+			binFormatter bf;
 			switch (fmt)
 			{
 			case 0:
 				return -1;
 
 			case 'd':
-			case 'x':
 				{
-					int8_t base = (fmt == 'x')? 16 : 10;
 					long v;
 					if (!opz_l)
 						v = va_arg(args, int);
 					else
 						v = va_arg(args, long);
 					s = b;
-					n = numeric_to_a(v, base, b);
+					n = numeric_to_asc(v, 10, b);
+				}
+				break;
+
+			case 'u':
+			case 'o':
+			case 'x':
+				{
+					uint8_t base;
+					if (fmt == 'x') base = 16;
+					else if (fmt == 'o') base = 8;
+					else base = 10;
+
+					unsigned long v;
+					if (!opz_l)
+						v = va_arg(args, unsigned int);
+					else
+						v = va_arg(args, unsigned long);
+					s = b;
+					n = numeric_to_asc(v, base, b);
+				}
+				break;
+
+			case 'b':
+				{
+					unsigned long v;
+					if (!opz_l)
+						v = va_arg(args, unsigned int);
+					else
+						v = va_arg(args, unsigned long);
+					bf.Init(v);
+					n = bf.Len();
+					bf.Init(v);
 				}
 				break;
 
 			case 'p':
 				{
-					int8_t base = (fmt == 'x')? 16 : 10;
 					unsigned long v = (unsigned long)va_arg(args, void *);
 					s = b;
-					n = numeric_to_a(v, base, b);
+					n = numeric_to_asc(v, 16, b);
 				}
 				break;
 			case 'c':
 				{
 					int v = va_arg(args, int);
-					b[0] = v;
+					b[0] = char(v);
 					b[1] = 0;
 					s = b;
 					n = 1;
@@ -227,7 +382,7 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 				{
 					double v = va_arg(args, double);
 					s = b;
-					n = float_to_a(v, b, opz_prec);
+					n = float_to_asc(v, b, opz_prec);
 				}
 				break;
 
@@ -239,7 +394,11 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 			if (a > 0) { if (!align(pf, opz_align_char, a)) return -1; else ret += a; }
 			for (;;)
 			{
-				char cc = s? *s++ : pgm_read_byte(f++);
+				char cc;
+				/***/if (s) cc = *s++ ;
+				else if (f) cc = pgm_read_byte(f++);
+				else cc = bf.Next();
+
 				if (!cc) break;
 				if (!pf(cc)) return -1;
 			}
@@ -318,23 +477,42 @@ bool pf2(char s)
 	return true;
 }
 
-main()
+int main()
 {
 	int r;
-	
+
 	//printf("%d\n", sizeof(int));
 	//printf("%d\n", sizeof(long));
 
-	r = uprintf(pf2, "leo\n");
-	printf("%d\n", r);
-	r = uprintf(pf2, "leo #%6d#\n", -1234);
-	printf("%d\n", r);
-	r = uprintf(pf2, "leo #%-10d#\n", 1234);
-	printf("%d\n", r);
-	r = uprintf(pf2, "leo #%10.4f#\n", 33.5);
-	printf("%d\n", r);
-	r = uprintf(pf2, "leo #%-10.4f#\n", -3.5);
-	printf("%d\n", r);
+	r = uprintf(pf2, "%b\n", 18);
+	if (false)
+	{
+		r = uprintf(pf2, "leo\n");
+		printf("%d\n", r);
+		r = uprintf(pf2, "leo #%6d#\n", -1234);
+		printf("%d\n", r);
+		r = uprintf(pf2, "leo #%-10d#\n", 1234);
+		printf("%d\n", r);
+		r = uprintf(pf2, "leo #%10.4f#\n", 33.5);
+		printf("%d\n", r);
+		r = uprintf(pf2, "leo #%-10.4f#\n", -3.5);
+		printf("%d\n", r);
+
+		uprintf(pf2, "$$$%b\n", 17+2);
+
+		char b[100];
+		ulong_to_10a(153, b, false);
+		printf("%s\n", b);
+		for (long i = 0; i < 1000*1000*20; ++i)
+		{
+			//numeric_to_asc(i, 10, b);
+			ulong_to_10a(i, b, false);
+			//printf("%s\n", b);
+		}
+		printf("%s\n", b);
+	}
+
+	return 0;
 }
 
 #endif

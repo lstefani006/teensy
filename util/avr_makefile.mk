@@ -1,63 +1,11 @@
-W?=4
+include ../util/base_makefile.mk
 
-ifeq ($(shell test $(W) -ge 1; echo $$?),0)
-	WCOMMON_1=-Wreturn-type
-	WC+=$(WCOMMON_1)
-	WCXX+=$(WCOMMON_1)
-endif
-
-ifeq ($(shell test $(W) -ge 2; echo $$?),0)
-	WCOMMON_2= -Wall \
-			 -Wdouble-promotion \
-			 -Wformat \
-			 -Winit-self \
-			 -Wmissing-include-dirs \
-			 -Wparentheses \
-			 -Wswitch-enum \
-			 -Wuninitialized \
-			 -Wmaybe-uninitialized \
-			 -Wstrict-overflow \
-			 -Wshadow \
-			 -Wcast-qual \
-			 -Wwrite-strings \
-			 -Wlogical-op \
-			 -Wwrite-strings \
-			 -Wcast-align \
-			 -Wcast-qual \
-			 -Wpointer-arith \
-			 -Wstrict-aliasing \
-			 -Wformat \
-			 -Wmissing-include-dirs \
-			 -Wno-unused-parameter \
-			 -Wuninitialized 
-	WC+= $(WCOMMON_2) \
-		 -Wstrict-prototypes 
-	WCXX+= $(WCOMMON_2) \
-		 -Wuseless-cast \
-		 -Wzero-as-null-pointer-constant
-endif
-
-ifeq ($(shell test $(W) -ge 3; echo $$?),0)
-	WCOMMON_3= -Wextra \
-			 -Wempty-body
-	WC+=$(WCOMMON_3)
-	WCXX+=$(WCOMMON_3)
-endif
-
-ifeq ($(shell test $(W) -ge 4; echo $$?),0)
-	# -Wpedantic emette warnings per violazioni ISC C++... ma non aiuta molto
-	WCOMMON_4= \
-			   -Waggregate-return \
-			   -Wconversion
-	WC+=$(WCOMMON_4)
-	WCXX+=$(WCOMMON_4)
-endif
 
 ##################################################
 CCOMMON= \
 		 -g \
-		 -MMD \
 		 -Os \
+		 -MMD \
 		 -ffunction-sections -fdata-sections \
 		 -mmcu=atmega328p -DF_CPU=8000000L \
 		 -DARDUINO=10608 -DARDUINO_AVR_PRO -DARDUINO_ARCH_AVR \
@@ -65,7 +13,7 @@ CCOMMON= \
 		 -I$(ARDUINO)/hardware/arduino/avr/variants/eightanaloginputs
 
 CFLAGS+=$(CCOMMON) $(WC)
-CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++11 -fno-threadsafe-statics \
+CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++14 -fno-threadsafe-statics \
 		  -fno-exceptions
 
 .obj/%.o : %.cpp | .obj

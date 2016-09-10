@@ -15,9 +15,9 @@ SRC+=\
 
 
 ifdef TEENSY
-	include ../TeensyLib/teensy_makefile.mk
+	include ../util/teensy_makefile.mk
 else ifdef ESP8266
-	include ../EspLib/esp_makefile.mk
+	include ../util/esp_makefile.mk
 else
-	include ../AvrLib/avr_makefile.mk
+	include ../util/avr_makefile.mk
 endif
