@@ -1,3 +1,5 @@
+V=1
+
 ifdef TEENSY
 	CXXFLAGS=-I../TeensyLib 
 	VPATH=../TeensyLib

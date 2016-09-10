@@ -8,7 +8,7 @@ CCOMMON=-Os \
 		-MMD \
 		-mthumb -mcpu=cortex-m4 -fsingle-precision-constant \
 		-D__MK20DX256__ -DTEENSYDUINO=128 -DARDUINO=10608 -DF_CPU=72000000 -DUSB_SERIAL -DLAYOUT_US_ENGLISH \
-		-I/home/leo/arduino-1.6.8/hardware/teensy/avr/cores/teensy3
+		-I$(ARDUINO)/hardware/teensy/avr/cores/teensy3
 
 CFLAGS+=$(CCOMMON) $(WC)
 CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++11 -fno-exceptions -felide-constructors -fno-rtti
