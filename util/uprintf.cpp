@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
+#include <Yield.hpp>
 
 #ifdef ARDUINO
 #include <Arduino.h>
@@ -134,26 +135,7 @@ static inline int float_to_asc(float f, char *p, int prec)
 	return p-b;
 }
 
-template<typename T> class Yield {
-protected:
-	Yield() { __line__ = 0; }
-	void Init() { __line__ = 0; }
-	unsigned short __line__; 
-	T __ret__;
-
-public:
-	const T & Current() const { return __ret__; }
-};
-template<> class Yield<void> {
-protected:
-	Yield() { Init(); }
-	void Init() { __line__ = 0; }
-	unsigned short __line__; 
-};
-#define Y_BEGIN()         switch (this->__line__) { case 0:
-#define Y_YIELD0()                               this->__line__ = __LINE__; return true; case __LINE__:
-#define Y_YIELD1(__r__)   this->__ret__ = __r__; this->__line__ = __LINE__; return true; case __LINE__:
-#define Y_END()           } this->__line__ = 0; return false
+//////////////////////////////////////////////////////////////////
 
 class binFormatter : public Yield<char>
 {
@@ -162,9 +144,7 @@ public:
 	void Init(unsigned long _v)
 	{
 		base::Init();
-		this->k = 1UL << (sizeof(unsigned long)*8 - 1);
 		this->v = _v;
-		this->__ret__ = 0;
 	}
 	int8_t Len()
 	{
@@ -191,6 +171,8 @@ private:
 		}
 		else
 		{
+			k = 1UL << (sizeof(unsigned long)*8 - 1);
+
 			while ((v & k) == 0)
 				k = k >> 1;
 
@@ -477,14 +459,73 @@ bool pf2(char s)
 	return true;
 }
 
+class Node {
+public:
+	Node(int v) : v(v), L(nullptr), R(nullptr) {}
+
+	int v;
+	Node *L;
+	Node *R;
+};
+
+class NodeNav : public Yield<int>
+{
+public:
+	NodeNav(Node *r) : r(r), next(nullptr) {}
+	Node *r;
+	NodeNav *next;
+
+	bool Next()
+	{
+		Y_BEGIN();
+
+		if (r->L)
+		{
+			next = new NodeNav(r->L);
+			while (next->Next())
+				Y_YIELD1(next->Current());
+			delete next;
+			next = nullptr;
+		}
+
+		Y_YIELD1(r->v);
+
+		if (r->R)
+		{
+			next = new NodeNav(r->R);
+			while (next->Next())
+				Y_YIELD1(next->Current());
+			delete next;
+			next = nullptr;
+		}
+
+		Y_END();
+	}
+};
+
 int main()
 {
 	int r;
 
+	if (true)
+	{
+		Node *r = new Node(10);
+		r->L = new Node(3);
+		r->R = new Node(12);
+		r->R->L = new Node(11);
+		r->L->L = new Node(-1);
+
+		NodeNav n(r);
+		while (n.Next())
+		{
+			printf("%d\n", n.Current());
+		}
+	}
+
 	//printf("%d\n", sizeof(int));
 	//printf("%d\n", sizeof(long));
 
-	r = uprintf(pf2, "%b\n", 18);
+	r = uprintf(pf2, "%b\n", 0b101010101010);
 	if (false)
 	{
 		r = uprintf(pf2, "leo\n");
