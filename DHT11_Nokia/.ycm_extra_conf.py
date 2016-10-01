@@ -49,7 +49,7 @@ flags = [
         "-D__ATTR_PROGMEM__=/**/",
         "-D__AVR_ARCH__=5",
         "-D__AVR_ATmega328P__",
-        "-std=gnu++11"
+        "-std=gnu++14"
         ,'-Wall'
         ,'-x' ,'c++'  # tratta i successivi files come C++
         # Customize microcontroler and Arduino version
