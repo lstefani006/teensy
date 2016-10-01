@@ -14,6 +14,19 @@ inline size_t strlen_P(const char *s) { return strlen(s); }
 
 #include "uprintf.hpp"
 
+static unsigned divu10(unsigned n) {
+	unsigned q, r;
+
+	q = (n >> 1) + (n >> 2);
+	q = q + (q >> 4);
+	q = q + (q >> 8);
+	q = q + (q >> 16);
+	q = q >> 3;
+	r = n - q*10;
+	return q + ((r + 6) >> 4);
+}
+
+
 int ulong_to_10a(unsigned long v, char *b, bool neg)
 {
 	static const unsigned long dec[] PROGMEM = {

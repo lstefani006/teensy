@@ -60,7 +60,7 @@ static int freeRam ()
 {
 	extern int __heap_start, *__brkval; 
 	int v; 
-	return (int) &v - (__brkval == nullptr ? (int) &__heap_start : (int) __brkval); 
+	return int((long) &v - (__brkval == nullptr ? (long) &__heap_start : (long) __brkval)); 
 }
 #endif
 
