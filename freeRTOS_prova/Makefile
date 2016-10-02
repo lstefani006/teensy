@@ -1,4 +1,4 @@
-V=1
+W=1
 
 ifdef TEENSY
 	CXXFLAGS=-I../TeensyLib 
@@ -15,6 +15,9 @@ TARGET=freeRTOS_prova.hex
 SRC+=\
 	Prova.cpp
 
+CXXFLAGS+=-I../util
+VPATH+=../util
+
 
 VPATH+=/home/leo/Arduino/libraries/FreeRTOS/src
 CXXFLAGS+=-I/home/leo/Arduino/libraries/FreeRTOS/src
@@ -27,7 +30,9 @@ SRC+= \
 	  queue.c \
 	  tasks.c \
 	  timers.c \
-	  variantHooks.cpp
+	  variantHooks.cpp \
+	  \
+	  uprintf.cpp
 
 
 
