@@ -14,8 +14,9 @@ inline size_t strlen_P(const char *s) { return strlen(s); }
 
 #include "uprintf.hpp"
 
-static unsigned divu10(unsigned n) {
-	unsigned q, r;
+#ifndef ARDUINO
+static unsigned divu10(uint32_t n) {
+	uint32_t q, r;
 
 	q = (n >> 1) + (n >> 2);
 	q = q + (q >> 4);
@@ -74,6 +75,7 @@ int ulong_to_10a(unsigned long v, char *b, bool neg)
 	*p = 0;
 	return p-b;
 }
+#endif
 
 static inline int ulong_to_a(unsigned long v, uint8_t base, char *p, bool neg)
 {
@@ -177,7 +179,6 @@ private:
 	bool NumToBin()
 	{
 		Y_BEGIN();
-
 		if (v == 0)
 		{
 			Y_YIELD1('0');
