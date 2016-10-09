@@ -4,7 +4,7 @@
 
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
-#include <queue.h>
+#include <task.h>
 
 #include <uprintf.hpp>
 
@@ -88,7 +88,7 @@ private:
 
 
 void Blink(void *);
-void Print(void *);
+void PrintSerial(void *);
 void Luca(void *);
 
 Task taskLuca;
@@ -108,14 +108,14 @@ void setup()
 
 	taskBlink.create(Blink, "Blink", 200, nullptr, 1);
 	taskLuca.create(Luca,  "Luca", 200, nullptr, 1);
-	taskPrint.create(Print, "Print", 200, nullptr, 1);
+	taskPrint.create(PrintSerial, "Print", 200, nullptr, 1);
 }
 
 void loop()
 {
 }
 
-void Print(void *)
+void PrintSerial(void *)
 {
 	for (;;)
 	{
@@ -130,11 +130,11 @@ void Luca(void *)
 	int n = 0;
 	for (;;)
 	{
-		uprintf("Luca %d %d\n", n++, portTICK_PERIOD_MS);
+		uprintf(F("Luca %d %d\n"), n++, portTICK_PERIOD_MS);
 		vTaskDelay(10000 / portTICK_PERIOD_MS );
 
 		auto vv = uxTaskGetStackHighWaterMark(nullptr);
-		uprintf("Stack mark = %d\n", vv);
+		uprintf(F("Stack mark = %d\n"), vv);
 	}
 }
 void Blink(void *)
@@ -142,11 +142,11 @@ void Blink(void *)
 	int n = 0;
 	for (;;)
 	{
-		uprintf("b %d\n", n++);
+		uprintf(F("b %d\n"), n++);
 
 		digitalWrite(LED_BUILTIN, HIGH); 
-		vTaskDelay(500 / portTICK_PERIOD_MS );
+		vTaskDelay(200 / portTICK_PERIOD_MS );
 		digitalWrite(LED_BUILTIN, LOW);   
-		vTaskDelay(500 / portTICK_PERIOD_MS );
+		vTaskDelay(200 / portTICK_PERIOD_MS );
 	}
 }
