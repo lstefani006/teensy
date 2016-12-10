@@ -7,8 +7,8 @@ export V=6.2.0
 export B=2.27
 export N=2.4.0
 
-export MYTOOLS=$PWD/teensy-gcc-$V
-TARGET="--with-cpu=cortex-m4 --with-float=soft --with-mode=thumb"
+export MYTOOLS=$PWD/st32f1-gcc-$V
+TARGET="--with-cpu=cortex-m3 --with-float=soft --with-mode=thumb"
 
 OPTIND=1
 x=0
@@ -137,8 +137,8 @@ if [ ! -e newlib.ok ] ; then
 		--with-gnu-as \
 		--disable-shared \
 		$TARGET
-	make CFLAGS_FOR_TARGET="-ffunction-sections -fdata-sections -DPREFER_SIZE_OVER_SPEED -D__OPTIMIZE_SIZE__ -Os -fomit-frame-pointer -mcpu=cortex-m4 -mthumb -D__thumb2__ -D__BUFSIZ__=256" \
-		CCASFLAGS="-mcpu=cortex-m4 -mthumb -D__thumb2__"
+	make CFLAGS_FOR_TARGET="-ffunction-sections -fdata-sections -DPREFER_SIZE_OVER_SPEED -D__OPTIMIZE_SIZE__ -Os -fomit-frame-pointer -mcpu=cortex-m3 -mthumb -D__thumb2__ -D__BUFSIZ__=256" \
+		CCASFLAGS="-mcpu=cortex-m3 -mthumb -D__thumb2__"
 	make install
 	popd
 	touch newlib.ok
