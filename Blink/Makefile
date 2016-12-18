@@ -6,6 +6,9 @@ ifdef TEENSY
 else  ifdef ESP8266
 	CXXFLAGS=-I../EspLib
 	VPATH=../EspLib
+else ifdef STM32F103
+	CXXFLAGS=-I../StLib
+	VPATH=../StLib
 else
 	CXXFLAGS=-I../AvrLib
 	VPATH=../AvrLib
@@ -20,6 +23,8 @@ ifdef TEENSY
 	include ../util/teensy_makefile.mk
 else ifdef ESP8266
 	include ../util/esp_makefile.mk
+else ifdef STM32F103
+	include ../util/st_makefile.mk
 else
 	include ../util/avr_makefile.mk
 endif

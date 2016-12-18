@@ -1,14 +1,19 @@
 #!/bin/bash
-
 set -e
 set -x
 
-export V=6.2.0
-export B=2.27
-export N=2.4.0
+#le versioni del compilatore, delle binutils della newlib
+V=6.2.0
+B=2.27
+N=2.4.0
 
-export MYTOOLS=$PWD/st32f1-gcc-$V
-TARGET="--with-cpu=cortex-m3 --with-float=soft --with-mode=thumb"
+# qui si imposta la cpu....
+#CPU="cortex-m4"   # teensy
+CPU="cortex-m3"    # st32m103c
+
+PREFIX=$PWD/$CPU-gcc-$V
+TARGET=arm-none-eabi
+CONFIGURE="--with-cpu=$CPU --with-float=soft --with-mode=thumb"
 
 OPTIND=1
 x=0
@@ -32,7 +37,7 @@ while getopts "xh?f:" opt; do
 done
 
 if [ $x -gt 0 ] ; then
-	rm -rf $MYTOOLS
+	rm -rf $PREFIX
 	rm -f *.ok
 	rm -rf build
 fi
@@ -59,9 +64,6 @@ fi
 
 if [ ! -e binutils-$B ] ; then
 	tar xvf binutils-$B.tar.gz
-	#pushd binutils-$B
-	#../gcc-$V/contrib/download_prerequisites
-	#popd
 fi
 
 if [ ! -e newlib-$N ] ; then
@@ -80,16 +82,16 @@ if [ ! -e binutils.ok ] ; then
 	rm -rf binutils
 	mkdir binutils
 	pushd binutils
-	../../binutils-$B/configure \
-		--prefix=$MYTOOLS  \
-		--target=arm-none-eabi \
-		--disable-nls      \
-		--disable-werror   \
+	../../binutils-$B/configure   \
+		--prefix=$PREFIX          \
+		--target=$TARGET          \
+		--disable-nls             \
+		--disable-werror          \
 		--with-no-thumb-interwork \
-		--disable-multilib \
-		--with-gnu-as \
-		--with-gnu-ls \
-		$TARGET
+		--disable-multilib        \
+		--with-gnu-as             \
+		--with-gnu-ls             \
+		$CONFIGURE
 	make all
 	make install
 	popd
@@ -100,45 +102,56 @@ if [ ! -e gcc-first.ok ] ; then
 	rm -rf gcc
 	mkdir gcc
 	pushd gcc
-	../../gcc-$V/configure \
-		--target=arm-none-eabi \
-		--prefix=$MYTOOLS \
-		--enable-interwork \
-		--disable-multilib \
-		--disable-werror \
+	../../gcc-$V/configure     \
+		--target=$TARGET       \
+		--prefix=$PREFIX       \
+		--enable-interwork     \
+		--disable-multilib     \
+		--disable-werror       \
 		--enable-languages="c" \
-		--with-newlib \
-		--without-headers \
-		--disable-shared \
-		--with-gnu-as \
-		--with-gnu-ld \
-		-disable-nls \
-		$TARGET
-	make -j4 all-gcc
+		--with-newlib          \
+		--without-headers      \
+		--disable-shared       \
+		--with-gnu-as          \
+		--with-gnu-ld          \
+		-disable-nls           \
+		$CONFIGURE
+	make -j2 all-gcc
 	make install-gcc
 	popd
 	touch gcc-first.ok
 fi
 
-export PATH=$MYTOOLS/bin:$PATH
+export PATH=$PREFIX/bin:$PATH
+
+CFLAGS_FOR_TARGET="\
+	-mcpu=$CPU -mthumb -D__thumb2__              \
+	-ffunction-sections -fdata-sections          \ # put code and data into separate sections allowing for link-time
+	-DPREFER_SIZE_OVER_SPEED -D__OPTIMIZE_SIZE__ \ # pick simpler, smaller code over larger optimized code
+	-Os                                          \ # same as O2, but turns off optimizations that would increase code size
+	-fomit-frame-pointer                         \ # don't keep the frame pointer in a register for functions that don't need one
+	-fno-unroll-loops                            \ # don't unroll loops
+	-D__BUFSIZ__=256"                              # limit default buffer size to 256 rather than 1024
+
+CCASFLAGS=$CFLAGS_FOR_TARGET
 
 if [ ! -e newlib.ok ] ; then
 	rm -rf newlib
 	mkdir newlib
 	pushd newlib
-	../../newlib*/configure \
-		--target=arm-none-eabi \
-		--prefix=$MYTOOLS \
-		--disable-multilib \
-		--disable-werror \
-		--disable-nls \
+	../../newlib*/configure    \
+		--target=$TARGET       \
+		--prefix=$PREFIX       \
+		--disable-multilib     \
+		--disable-werror       \
+		--disable-nls          \
 		--disable-newlib-supplied-syscalls \
-		--with-gnu-ld \
-		--with-gnu-as \
-		--disable-shared \
-		$TARGET
-	make CFLAGS_FOR_TARGET="-ffunction-sections -fdata-sections -DPREFER_SIZE_OVER_SPEED -D__OPTIMIZE_SIZE__ -Os -fomit-frame-pointer -mcpu=cortex-m3 -mthumb -D__thumb2__ -D__BUFSIZ__=256" \
-		CCASFLAGS="-mcpu=cortex-m3 -mthumb -D__thumb2__"
+		--with-gnu-ld          \
+		--with-gnu-as          \
+		--disable-shared       \
+		$CONFIGURE
+	make CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET) CCASFLAGS=$(CCASFLAGS)
+
 	make install
 	popd
 	touch newlib.ok
@@ -149,20 +162,20 @@ if [ ! -e gcc.ok ] ; then
 	#rm -rf gcc
 	#mkdir gcc
 	pushd gcc
-	../../gcc-$V/configure \
-		--target=arm-none-eabi \
-		--prefix=$MYTOOLS \
-		--enable-interwork \
-		--disable-multilib \
-		--disable-werror \
+	../../gcc-$V/configure     \
+		--target=$TARGET       \
+		--prefix=$PREFIX       \
+		--enable-interwork     \
+		--disable-multilib     \
+		--disable-werror       \
 		--enable-languages="c,c++" \
-		--with-newlib \
-		--disable-shared \
-		--with-gnu-as \
-		--with-gnu-ld \
-		-disable-nls \
-		$TARGET
-	make -j4 all
+		--with-newlib          \
+		--disable-shared       \
+		--with-gnu-as          \
+		--with-gnu-ld          \
+		-disable-nls           \
+		$CONFIGURE
+	make -j2 all
 	make install
 	popd
 	touch gcc.ok
