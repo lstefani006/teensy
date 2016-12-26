@@ -1,3 +1,5 @@
+*.map
+*.bin
 *.hex
 *.dis
 *.eep
@@ -7,5 +9,6 @@
 *.o
 *.s
 *.d
+*.pyc
 */obj
 teensy_loader_cli
