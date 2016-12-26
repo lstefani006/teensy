@@ -50,10 +50,10 @@ CF_CXX_LIB=\
 		   -fno-rtti \
 		   -fno-exceptions 
 
-CFLAGS = $(CF_C_LIB) \
+CFLAGS+=$(CF_C_LIB) \
 		 -Wall  \
 		 -Wextra
-CXXFLAGS = $(CF_CXX_LIB) \
+CXXFLAGS+=$(CF_CXX_LIB) \
 		 -Wall  \
 		 -Wextra
 
@@ -64,11 +64,11 @@ LIB_DIR=.lib_st
 
 $(OBJ_DIR)/%.o : %.cpp | $(OBJ_DIR)
 	@echo $<
-	@arm-none-eabi-g++ -c $(CF_CXX_LIB) $< -o $@
+	@arm-none-eabi-g++ -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.o : %.c | $(OBJ_DIR)
 	@echo $<
-	@arm-none-eabi-gcc -c $(CF_C_LIB) $< -o $@
+	@arm-none-eabi-gcc -c $(CFLAGS) $< -o $@
 
 $(LIB_DIR)/%.o : %.S | $(LIB_DIR)
 	@echo $<
@@ -76,11 +76,11 @@ $(LIB_DIR)/%.o : %.S | $(LIB_DIR)
 
 $(LIB_DIR)/%.o : %.cpp | $(LIB_DIR)
 	@echo $<
-	@arm-none-eabi-g++ -c $(CXXFLAGS) $< -o $@
+	@arm-none-eabi-g++ -c $(CF_CXX_LIB) $< -o $@
 
 $(LIB_DIR)/%.o : %.c | $(LIB_DIR)
 	@echo $<
-	@arm-none-eabi-gcc -c $(CFLAGS) $< -o $@
+	@arm-none-eabi-gcc -c $(CF_C_LIB) $< -o $@
 
 
 
@@ -173,12 +173,12 @@ TARGET:=$(TARGET:.hex=)
 
 .PHONY: clean upload
 
-all : $(TARGET).hex
+all : $(TARGET).bin
 
-$(TARGET).hex : libST.a $(OBJ) $(LIB_DIR)/start.o $(LIB_DIR)/start_c.o $(LIB_DIR)/syscalls.o $(LIB_DIR)/board.o $(LIB_DIR)/boards.o $(LIB_DIR)/boards_setup.o
+$(TARGET).bin : libST.a $(OBJ) $(LIB_DIR)/start.o $(LIB_DIR)/start_c.o $(LIB_DIR)/syscalls.o $(LIB_DIR)/board.o $(LIB_DIR)/boards.o $(LIB_DIR)/boards_setup.o
 	arm-none-eabi-gcc -Os -Wl,--gc-sections -mcpu=cortex-m3 \
 	-T$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld/jtag.ld \
-	"-Wl,-Map,$(TARGET).ino.map" \
+	"-Wl,-Map,$(TARGET).map" \
 	"-L$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld" \
 	-o "$(TARGET).elf" \
 	"-L." \
@@ -195,8 +195,9 @@ $(TARGET).hex : libST.a $(OBJ) $(LIB_DIR)/start.o $(LIB_DIR)/start_c.o $(LIB_DIR
 	$(LIB_DIR)/boards_setup.o \
 	libST.a \
 	-Wl,--end-group
-	"arm-none-eabi-objcopy" -O binary  "$(TARGET).elf" "$(TARGET).bin"
+	@arm-none-eabi-objcopy -O binary  "$(TARGET).elf" "$(TARGET).bin"
 	@arm-none-eabi-size $(TARGET).elf
+	@arm-none-eabi-objdump -h -S $(TARGET).elf > $(TARGET).dis
 
 libST.a : $(LIB_OBJ)
 	@rm -f $@
@@ -214,12 +215,13 @@ clean:
 	-rm -rf $(LIB_DIR)
 	-rm -f $(TARGET).elf
 	-rm -f $(TARGET).eep
-	-rm -f $(TARGET).hex
+	-rm -f $(TARGET).bin
 	-rm -f $(TARGET).dis
+	-rm -f $(TARGET).map
 
 #VERBOSE=-v
 VERBOSE=
-upload : $(TARGET).hex
+upload : $(TARGET).bin
 	@ArduinoSerialMonitor.exe -stop
 	/home/leo/Arduino/hardware/Arduino_STM32/tools/linux/serial_upload ttyUSB0 1 2 $(TARGET).bin
 	@ArduinoSerialMonitor.exe -run

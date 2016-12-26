@@ -18,13 +18,4 @@ TARGET=Blink.hex
 SRC+=\
 	Blink.cpp
 
-
-ifdef TEENSY
-	include ../util/teensy_makefile.mk
-else ifdef ESP8266
-	include ../util/esp_makefile.mk
-else ifdef STM32F103
-	include ../util/st_makefile.mk
-else
-	include ../util/avr_makefile.mk
-endif
+include ../util/makefile.mk
