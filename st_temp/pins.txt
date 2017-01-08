@@ -1,0 +1,120 @@
+
+
+#define digitalPinToPort(P)        ( PIN_MAP[P].gpio_device )
+#define digitalPinToBitMask(P)     ( BIT(PIN_MAP[P].gpio_bit) )
+#define portOutputRegister(port)   ( &(port->regs->ODR) )
+#define portInputRegister(port)    ( &(port->regs->IDR) )
+
+#define portSetRegister(pin)        ( &(PIN_MAP[pin].gpio_device->regs->BSRR) )
+#define portClearRegister(pin)      ( &(PIN_MAP[pin].gpio_device->regs->BRR) )
+#define portConfigRegister(pin)     ( &(PIN_MAP[pin].gpio_device->regs->CRL) )
+
+static const uint8_t SS   = BOARD_SPI1_NSS_PIN;
+static const uint8_t SS1  = BOARD_SPI2_NSS_PIN;
+static const uint8_t MOSI = BOARD_SPI1_MOSI_PIN;
+static const uint8_t MISO = BOARD_SPI1_MISO_PIN;
+static const uint8_t SCK  = BOARD_SPI1_SCK_PIN;
+
+////////////////////////////////////////////////////////////////////////////
+
+// Note this needs to match with the PIN_MAP array in board.cpp
+enum 
+{
+    PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7, PA8, PA9, PA10, PA11, PA12, PA13,PA14,PA15,
+    PB0, PB1, PB2, PB3, PB4, PB5, PB6, PB7, PB8, PB9, PB10, PB11, PB12, PB13,PB14,PB15,
+    PC13, PC14,PC15
+};
+
+
+
+
+typedef struct stm32_pin_info {
+      gpio_dev      *gpio_device;      /**< Maple pin's GPIO device */
+      timer_dev     *timer_device;     /**< Pin's timer device, if any. */
+      const adc_dev *adc_device;       /**< ADC device, if any. */
+      uint8          gpio_bit;         /**< Pin's GPIO port bit. */
+      uint8          timer_channel;    /**< Timer channel, or 0 if none. */
+      uint8          adc_channel;      /**< Pin ADC channel, or ADCx if none. */
+      uint8          pinMode;          /**< mode specific by pinMode call (Roger Clark added to optimize compatibility with Arduino)*/
+  } stm32_pin_info;
+
+
+
+const stm32_pin_info PIN_MAP[BOARD_NR_GPIO_PINS] = {
+      {&gpioa, &timer2, &adc1,  0, 1,    0}, /* PA0 */
+      {&gpioa, &timer2, &adc1,  1, 2,    1}, /* PA1 */
+      {&gpioa, &timer2, &adc1,  2, 3,    2}, /* PA2 */
+      {&gpioa, &timer2, &adc1,  3, 4,    3}, /* PA3 */
+      {&gpioa, NULL,    &adc1,  4, 0,    4}, /* PA4 */
+      {&gpioa, NULL,    &adc1,  5, 0,    5}, /* PA5 */
+      {&gpioa, &timer3, &adc1,  6, 1,    6}, /* PA6 */
+      {&gpioa, &timer3, &adc1,  7, 2,    7}, /* PA7 */
+      {&gpioa, &timer1, NULL,   8, 1, ADCx}, /* PA8 */ 
+      {&gpioa, &timer1, NULL,   9, 2, ADCx}, /* PA9 */
+      {&gpioa, &timer1, NULL,  10, 3, ADCx}, /* PA10 */
+      {&gpioa, &timer1, NULL,  11, 4, ADCx}, /* PA11 */
+      {&gpioa, NULL,    NULL,  12, 0, ADCx}, /* PA12 */ 
+      {&gpioa, NULL,    NULL,  13, 0, ADCx}, /* PA13 */
+      {&gpioa, NULL,    NULL,  14, 0, ADCx}, /* PA14 */
+      {&gpioa, NULL,    NULL,  15, 0, ADCx}, /* PA15 */
+      
+      {&gpiob, &timer3, &adc1,  0, 3,    8}, /* PB0 */
+      {&gpiob, &timer3, &adc1,  1, 4,    9}, /* PB1 */
+      {&gpiob, NULL,    NULL,   2, 0, ADCx}, /* PB2 */
+      {&gpiob, NULL,    NULL,   3, 0, ADCx}, /* PB3 */
+      {&gpiob, NULL,    NULL,   4, 0, ADCx}, /* PB4 */
+      {&gpiob, NULL,    NULL,   5, 0, ADCx}, /* PB5 */
+      {&gpiob, &timer4, NULL,   6, 1, ADCx}, /* PB6 */
+      {&gpiob, &timer4, NULL,   7, 2, ADCx}, /* PB7 */
+      {&gpiob, &timer4, NULL,   8, 3, ADCx}, /* PB8 */
+      {&gpiob, &timer4, NULL,   9, 4, ADCx}, /* PB9 */
+      {&gpiob, NULL,    NULL,  10, 0, ADCx}, /* PB10 */
+      {&gpiob, NULL,    NULL,  11, 0, ADCx}, /* PB11 */
+      {&gpiob, NULL,    NULL,  12, 0, ADCx}, /* PB12 */
+      {&gpiob, NULL,    NULL,  13, 0, ADCx}, /* PB13 */
+      {&gpiob, NULL,    NULL,  14, 0, ADCx}, /* PB14 */
+      {&gpiob, NULL,    NULL,  15, 0, ADCx}, /* PB15 */
+      
+      {&gpioc, NULL,    NULL,  13, 0, ADCx}, /* PC13 */
+      {&gpioc, NULL,    NULL,  14, 0, ADCx}, /* PC14 */
+      {&gpioc, NULL,    NULL,  15, 0, ADCx}, /* PC15 */
+  };  
+
+
+
+#define CYCLES_PER_MICROSECOND    72
+#define SYSTICK_RELOAD_VAL     (F_CPU/1000) - 1 /* takes a cycle to reload */
+
+#define BOARD_NR_USARTS           3
+#define BOARD_USART1_TX_PIN       PA9
+#define BOARD_USART1_RX_PIN       PA10
+#define BOARD_USART2_TX_PIN       PA2
+#define BOARD_USART2_RX_PIN       PA3
+#define BOARD_USART3_TX_PIN       PB10
+#define BOARD_USART3_RX_PIN       PB11
+
+#define BOARD_NR_SPI              2
+#define BOARD_SPI1_NSS_PIN        PA4
+#define BOARD_SPI1_MOSI_PIN       PA7
+#define BOARD_SPI1_MISO_PIN       PA6
+#define BOARD_SPI1_SCK_PIN        PA5
+
+#define BOARD_SPI2_NSS_PIN        PB12
+#define BOARD_SPI2_MOSI_PIN       PB15
+#define BOARD_SPI2_MISO_PIN       PB14
+#define BOARD_SPI2_SCK_PIN        PB13
+
+#define BOARD_NR_GPIO_PINS        35
+#define BOARD_NR_PWM_PINS         12
+#define BOARD_NR_ADC_PINS          9
+#define BOARD_NR_USED_PINS         4
+
+
+#define BOARD_JTMS_SWDIO_PIN      22
+#define BOARD_JTCK_SWCLK_PIN      21
+#define BOARD_JTDI_PIN            20
+#define BOARD_JTDO_PIN            19
+#define BOARD_NJTRST_PIN          18
+
+#define BOARD_USB_DISC_DEV        GPIOB
+#define BOARD_USB_DISC_BIT        10
