@@ -2,28 +2,21 @@
 #include <math.h>
 #include <DallasTemperature.h>
 #include "SPI.h"
-#include <Adafruit_GFX_AS.h>    // Core graphics library, with extra fonts.
-#include <Adafruit_ILI9341_STM.h> // STM32 DMA Hardware-specific library
 #include <uprintf.hpp>
+#include "t_ILI9341.hpp"
+#include "Graph.hpp"
+
 
 // For the Adafruit shield, these are the default.
-#define TFT_CS         8                  
-#define TFT_DC         10                
-#define TFT_RST        9 
-
-// Use hardware SPI (on Uno, #13, #12, #11) and the above for CS/DC
-Adafruit_ILI9341_STM g_gr(TFT_CS, TFT_DC, TFT_RST);
-bool g_use_gr = false;
+constexpr int TFT_CS = PB12;
+constexpr int TFT_DC = PB14;
+constexpr int TFT_RST = PB13; 
+t_ILI9341<TFT_CS, TFT_DC, TFT_RST> g_gr;
 
 OneWire g_ow(PA0);
 DallasTemperature g_dt(&g_ow);
 DeviceAddress g_da[1];
 
-
-// Pin 13 has an LED connected on most Arduino boards.
-// Pin 11 has the LED on Teensy 2.0
-// Pin 6  has the LED on Teensy++ 2.0
-// Pin 13 has the LED on Teensy 3.0
 constexpr int led = PC13;
 
 void printAddress(DeviceAddress deviceAddress)
@@ -32,10 +25,9 @@ void printAddress(DeviceAddress deviceAddress)
 		uprintf("%02x", deviceAddress[i]);
 }
 
-
 void setup()
 {
-	delay(1000*10);
+	delay(1000*1);
 	pinMode(led, OUTPUT);
 
 	Serial.begin(38400);
@@ -74,34 +66,280 @@ void setup()
 		uprintf("Device 0 Resolution: %d\n", g_dt.getResolution(g_da[0])); 
 	}
 
-
-	if (g_use_gr)
+	if (true)
 	{
 		g_gr.begin();
-		g_gr.fillScreen(ILI9341_BLACK);
+		g_gr.fillScreen(Color::BLACK);
+		g_gr.setRotation(1);
+		g_gr.setForeColor(Color::WHITE);
+		g_gr.setFont(font_10x16);
+
+		uprintf_cb = [](char c) -> bool { g_gr.drawChar(c); return true; };
 	}
 }
 
-constexpr int msec = 300;
+
+struct Mis { int sec; float temp; };
+Mis g_t[24*10] = {0,0,};
+int g_primoVuoto = 0;
+
+
+
+class TempSource : public GraphSource
+{
+	int16 _i;
+	Color _color;
+public:
+	TempSource(Color color) : _i(-1), _color(color) {}
+
+	bool Next() override { _i += 1; return _i < g_primoVuoto; }
+	void Get(Point &p) override
+	{
+		p.x = g_t[_i].sec;
+		p.y = g_t[_i].temp;
+	}
+	void Reset() override { _i = -1; }
+
+	void DrawLine(const Line &r) override
+	{
+		int x0 = int(r.a.x);
+		int y0 = int(r.a.y);
+
+		int x1 = int(r.b.x);
+		int y1 = int(r.b.y);
+
+		g_gr.drawLine(x0, y0, x1, y1, _color);
+	}
+};
+
+
+unsigned long g_sec = 0;
+
+const long t_range = 24*60*60;
+const long t_step  = 60*60;
+const long t_step_lbl  = 60*60*6;
+const int t_camp = 60;
+
+/*
+const long t_range = 60*60;
+const long t_step  = 60*5;
+const long t_step_lbl  = 60*15;
+const int t_camp = 10;
+*/
 
 void loop()
 {
-	digitalWrite(led, HIGH);
-	delay(msec);
 	digitalWrite(led, LOW);
-	delay(msec);
+	delay(100);
+	digitalWrite(led, HIGH);
+	delay(900);
+
 
 	if (g_dt.getDeviceCount() > 0)
 	{
-		uprintf("Requesting temperatures...");
-		g_dt.requestTemperatures(); // Send the command to get temperatures
-		uprintf("DONE\n");
-
-		// It responds almost immediately. Let's print out the data
+		g_dt.requestTemperatures();
 		auto tempC = g_dt.getTempC(g_da[0]);
-		if (tempC == DEVICE_DISCONNECTED_C)
-			uprintf("Device disconneted\n");
-		else
-			uprintf("Temp C: %f\n", tempC);
+
+		if (tempC != DEVICE_DISCONNECTED_C)
+		{
+			bool disegnaGrafico = false;
+
+			static long t_plot = 0;
+			if (t_plot == 0 || millis()-t_plot > 1000 * 30)
+			{
+				t_plot = millis();
+				disegnaGrafico = true;
+			}
+
+
+			long sec_start;
+			long sec_end;
+			if (true)
+			{
+				long ms = millis();
+				sec_end = ms / 1000;
+				sec_start = sec_end - t_range;
+
+				if (g_primoVuoto == 0) g_primoVuoto += 1;
+
+				static long g_ms = 0;
+				if (g_ms == 0) g_ms = millis();
+				if ((ms - g_ms) / 1000 < t_camp)
+				{
+					// se il tempo non e' scaduto... sovrascrivo l'ultimo valore
+					g_t[g_primoVuoto-1].temp = tempC;
+					g_t[g_primoVuoto-1].sec  = sec_end;
+				}
+				else
+				{
+					g_ms = ms;
+
+					g_t[g_primoVuoto-1].temp = tempC;
+					g_t[g_primoVuoto-1].sec  = sec_end;
+
+					const int sz = int(sizeof(g_t)/sizeof(g_t[0]));
+					if (g_primoVuoto >= sz)
+					{
+						for (int i = 1; i < g_primoVuoto; ++i)
+							g_t[i-1] = g_t[i];
+					}
+					else
+						g_primoVuoto += 1;
+				}
+			}
+
+			if (disegnaGrafico)
+				g_gr.fillScreen(Color::BLACK);
+
+			// le temperature le rinfresco sempre
+			if (true)
+			{
+				g_gr.setCursor(0, 10);
+				g_gr.setForeColor(Color::YELLOW);
+				uprintf("T %.1fC \n", tempC);
+
+				float M = -1000, m = +1000;
+				for (int i = 0; i < g_primoVuoto; ++i)
+				{
+					if (g_t[i].temp > M) M = g_t[i].temp;
+					if (g_t[i].temp < m) m = g_t[i].temp;
+				}
+				uprintf("\n");
+				g_gr.setForeColor(Color::RED);
+				if (M > -1000) uprintf("M %.1fC \n", M);
+				g_gr.setForeColor(Color::GREEN);
+				if (m < +1000) uprintf("m %.1fC \n", M);
+
+				g_gr.setForeColor(Color::PURPLE);
+				uprintf("nc %d   ", g_primoVuoto);
+			}
+
+			if (disegnaGrafico)
+			{
+				g_gr.setForeColor(Color::ORANGE);
+				const Color graphForeColor = Color::CYAN;
+
+				auto f = g_gr.setFont(font_08x08);
+
+				Rect view;
+				Rect screen;
+
+				screen.a.x = 100;//g_gr.w()/3;
+				screen.a.y = 0;
+				screen.b.x = g_gr.w()-1;
+				screen.b.y = g_gr.h()- g_gr.fontH() - 5;
+
+
+				view.a.x = sec_start;
+				view.b.x = sec_end;
+				view.a.y = -5;
+				view.b.y = +35;
+
+				Graph gr;
+				gr.SetViewScreen(&view, &screen);
+
+
+				// righello asse y ==> temperature
+				for (int tc = -10; tc <= 50; tc += 10)
+				{
+					Point t0;
+					t0.x = (view.a.x+view.b.x)/2;
+					t0.y = tc;
+
+					if (gr.Clip(t0))
+					{
+						gr.Translate(t0);
+						int y = int(t0.y);
+						g_gr.drawLine(screen.a.x, y, screen.b.x, y, graphForeColor);
+
+						int xch = g_gr.fontW();
+						g_gr.setCursor(screen.a.x - xch*3-2, y - g_gr.fontH() / 2);
+						uprintf("%3d", tc);
+					}
+				}
+				for (int tc = -10; tc <= 50; tc += 1)
+				{
+					Point t0;
+					t0.x = (view.a.x+view.b.x)/2;
+					t0.y = tc;
+
+					if (gr.Clip(t0))
+					{
+						gr.Translate(t0);
+						int y = int(t0.y);
+						if (tc % 5 == 0)
+							g_gr.drawLine(screen.a.x, y, screen.a.x+6, y, graphForeColor);
+						else
+							g_gr.drawLine(screen.a.x, y, screen.a.x+3, y, graphForeColor);
+					}
+				}
+
+				// asse delle X --- 
+				// Le coordinate sono in secondi
+				// t_step e' in secondi la distanza tra una tacca e l'altra
+				// t_range e' in secondi quanto copre l'asse delle x
+				int xh = 0;
+				for (typeof(sec_start) t = sec_end; t >= sec_start; t -= t_step)
+				{
+					Point t0;
+					t0.x = t;
+					t0.y = (view.a.y+view.b.y)/2;
+
+					if (gr.Clip(t0))
+					{
+						gr.Translate(t0);
+						int x = int(t0.x);
+
+						int8_t dd = 4;
+						if ((sec_end - t) % t_step_lbl == 0)
+							dd = 8;
+						g_gr.drawLine(x, screen.b.y, x, screen.b.y-dd, graphForeColor);
+
+
+						int sec = sec_end - t;
+
+						int hh = sec / 3600;
+						sec -= hh * 3600;
+
+						int mm = sec / 60;
+						sec -= mm * 60;
+
+						int ss = sec;
+
+
+						if ((sec_end - t) % t_step_lbl == 0)
+						{
+							int w = 0;
+							/***/if (hh >  0 && mm >  0 && ss >  0) w = uprintf(nullptr, "%dh:%02dm:%02ds", hh, mm, ss);
+							else if (hh >  0 && mm == 0 && ss == 0) w = uprintf(nullptr, "%dh", hh);
+							else if (hh == 0 && mm >  0 && ss == 0) w = uprintf(nullptr, "%dm", mm);
+							else if (hh == 0 && mm == 0 && ss >  0) w = uprintf(nullptr, "%ds", ss);
+							else if (hh >  0 && mm >  0 && ss == 0) w = uprintf(nullptr, "%dh:%02dm", hh, mm);
+							else if (hh == 0 && mm >  0 && ss >  0) w = uprintf(nullptr, "%dm:%02ds", mm, ss);
+
+							g_gr.setCursor(x - g_gr.fontW() * w/2, screen.b.y + 3);
+
+							/***/if (hh >  0 && mm >  0 && ss >  0) uprintf("%dh:%02dm:%02ds", hh, mm, ss);
+							else if (hh >  0 && mm == 0 && ss == 0) uprintf("%dh", hh);
+							else if (hh == 0 && mm >  0 && ss == 0) uprintf("%dm", mm);
+							else if (hh == 0 && mm == 0 && ss >  0) uprintf("%ds", ss);
+							else if (hh >  0 && mm >  0 && ss == 0) uprintf("%dh:%02dm", hh, mm);
+							else if (hh == 0 && mm >  0 && ss >  0) uprintf("%dm:%02ds", mm, ss);
+						}
+
+						xh += 1;
+					}
+				}
+
+				g_gr.drawRect(screen.a.x, screen.a.y, screen.b.x, screen.b.y, graphForeColor);
+				TempSource gte(Color::WHITE);
+
+				gr.Plot(gte);
+				g_gr.setFont(f);
+			}
+			return;
+		}
 	}
+	g_gr.fillScreen(Color::BLACK);
+	uprintf("Sonda temperatura NON connessa");
 }

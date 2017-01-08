@@ -51,36 +51,41 @@ CF_CXX_LIB=\
 		   -fno-exceptions 
 
 CFLAGS+=$(CF_C_LIB) \
-		 -Wall  \
-		 -Wextra
+		-MMD \
+		-Wall  \
+		-Wextra
 CXXFLAGS+=$(CF_CXX_LIB) \
-		 -Wall  \
-		 -Wextra
+		  -MMD \
+		  -Wall  \
+		  -Wextra \
+		  -std=gnu++14
 
 ##########################
 
 OBJ_DIR=.obj_st
 LIB_DIR=.lib_st
 
+E?=@
+
 $(OBJ_DIR)/%.o : %.cpp | $(OBJ_DIR)
 	@echo $<
-	@arm-none-eabi-g++ -c $(CXXFLAGS) $< -o $@
+	$(E)arm-none-eabi-g++ -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.o : %.c | $(OBJ_DIR)
 	@echo $<
-	@arm-none-eabi-gcc -c $(CFLAGS) $< -o $@
+	$(E)arm-none-eabi-gcc -c $(CFLAGS) $< -o $@
 
 $(LIB_DIR)/%.o : %.S | $(LIB_DIR)
 	@echo $<
-	@arm-none-eabi-gcc -c $(CF_S_LIB) $< -o $@
+	$(E)arm-none-eabi-gcc -c $(CF_S_LIB) $< -o $@
 
 $(LIB_DIR)/%.o : %.cpp | $(LIB_DIR)
 	@echo $<
-	@arm-none-eabi-g++ -c $(CF_CXX_LIB) $< -o $@
+	$(E)arm-none-eabi-g++ -c $(CF_CXX_LIB) $< -o $@
 
 $(LIB_DIR)/%.o : %.c | $(LIB_DIR)
 	@echo $<
-	@arm-none-eabi-gcc -c $(CF_C_LIB) $< -o $@
+	$(E)arm-none-eabi-gcc -c $(CF_C_LIB) $< -o $@
 
 
 
@@ -176,28 +181,29 @@ TARGET:=$(TARGET:.hex=)
 all : $(TARGET).bin
 
 $(TARGET).bin : libST.a $(OBJ) $(LIB_DIR)/start.o $(LIB_DIR)/start_c.o $(LIB_DIR)/syscalls.o $(LIB_DIR)/board.o $(LIB_DIR)/boards.o $(LIB_DIR)/boards_setup.o
-	arm-none-eabi-gcc -Os -Wl,--gc-sections -mcpu=cortex-m3 \
-	-T$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld/jtag.ld \
-	"-Wl,-Map,$(TARGET).map" \
-	"-L$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld" \
-	-o "$(TARGET).elf" \
-	"-L." \
-	-lm -lgcc -mthumb \
-	-Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--unresolved-symbols=report-all \
-	-Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols \
-	-Wl,--start-group \
-	$(OBJ) \
-	$(LIB_DIR)/start.o \
-	$(LIB_DIR)/start_c.o \
-	$(LIB_DIR)/syscalls.o \
-	$(LIB_DIR)/board.o \
-	$(LIB_DIR)/boards.o \
-	$(LIB_DIR)/boards_setup.o \
-	libST.a \
-	-Wl,--end-group
-	@arm-none-eabi-objcopy -O binary  "$(TARGET).elf" "$(TARGET).bin"
-	@arm-none-eabi-size $(TARGET).elf
-	@arm-none-eabi-objdump -h -S $(TARGET).elf > $(TARGET).dis
+	@echo link
+	$(E)arm-none-eabi-gcc -Os -Wl,--gc-sections -mcpu=cortex-m3 \
+		-T$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld/jtag.ld \
+		"-Wl,-Map,$(TARGET).map" \
+		"-L$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld" \
+		-o "$(TARGET).elf" \
+		"-L." \
+		-lm -lgcc -mthumb \
+		-Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--unresolved-symbols=report-all \
+		-Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols \
+		-Wl,--start-group \
+		$(OBJ) \
+		$(LIB_DIR)/start.o \
+		$(LIB_DIR)/start_c.o \
+		$(LIB_DIR)/syscalls.o \
+		$(LIB_DIR)/board.o \
+		$(LIB_DIR)/boards.o \
+		$(LIB_DIR)/boards_setup.o \
+		libST.a \
+		-Wl,--end-group
+	$(E)arm-none-eabi-objcopy -O binary  "$(TARGET).elf" "$(TARGET).bin"
+	$(E)arm-none-eabi-size $(TARGET).elf
+	$(E)arm-none-eabi-objdump -h -S $(TARGET).elf > $(TARGET).dis
 
 libST.a : $(LIB_OBJ)
 	@rm -f $@

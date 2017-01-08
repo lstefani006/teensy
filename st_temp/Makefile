@@ -23,10 +23,18 @@ SRC+=\
 	st_temp.cpp \
 	DallasTemperature.cpp \
 	OneWire.cpp \
-	Adafruit_ILI9341_STM.cpp \
-	Adafruit_GFX_AS.cpp \
 	SPI.cpp \
-	uprintf.cpp
+	uprintf.cpp \
+	AffineMatrix.cpp \
+	Graph.cpp \
+	fonts.cpp
 
+#Font16.c \
+#Font32.c \
+#Font64.c \
+#Font7s.c \
+#glcdfont.c
+#Adafruit_ILI9341_STM.cpp \
+#Adafruit_GFX_AS.cpp
 
 include ../util/makefile.mk
