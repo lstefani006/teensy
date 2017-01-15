@@ -77,6 +77,16 @@ void setup()
 	delay(2 * 1000);
 	g_gr.setFont(font_10x16);
 	g_gr.fillScreen(Color::BLACK);
+
+	if (1)
+	{
+		g_gr.drawRect(2,2, g_gr.w()-3, g_gr.h()-3, Color::RED);
+		g_gr.drawRect(1,1, g_gr.w()-2, g_gr.h()-2, Color::RED);
+		g_gr.drawRect(0,0, g_gr.w()-1, g_gr.h()-1, Color::YELLOW);
+	delay(5 * 1000);
+	g_gr.fillScreen(Color::BLACK);
+
+	}
 }
 
 

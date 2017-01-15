@@ -96,7 +96,7 @@ void AffineMatrix::Scale(float ra, float rb)
 	*this = r * *this;
 }
 
-#if 1
+#if 0
 
 struct Vector { float b[3]; };
 struct Matrix { float b[3][3]; };

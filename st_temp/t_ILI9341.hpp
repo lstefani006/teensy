@@ -311,7 +311,9 @@ public:
 		if (y < 0 || y >= _height) return;
 
 		spi_begin();
-		setAddrWindow(x, y, x+1, y+1);
+
+		// N.B. x/y -- (x+1)/(y+1)
+		setAddrWindow(x, y, /*x+1, y+1*/x,y);
 
 		*dcport |=  dcpinmask;
 		*csport &= ~cspinmask;
@@ -323,33 +325,21 @@ public:
 		spi_end();
 	}
 
+	// estremi inclusi
 	void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Color color)
 	{
-		/*
-		if (x0 == x1)
-		{
-			// linea verticale
-			if (y1 > y0)
-				drawFastVLine(x0, y0, y1-y0+1, color);
-			else if (y1 < y0)
-				drawFastVLine(x0, y0, y0-y1+1, color);
-			else 
-				drawPixel(x0, y0, color);
-
-			return;
-		}
 		if (y0 == y1)
 		{
 			// linea orizzontale
-			if (x1 > x0)
-				drawFastHLine(x0, y0, x1-x0+1, color);
-			else if (x1 < x0)
-				drawFastHLine(x0, y0, x0-x1+1, color);
-			else
-				drawPixel(x0, y0, color);
+			drawFastHLine(x0, y0, x1, color);
 			return;
 		}
-		*/
+		if (x0 == x1)
+		{
+			// linea verticale
+			drawFastVLine(x0, y0, y1, color);
+			return;
+		}
 
 		auto steep = abs(y1 - y0) > abs(x1 - x0);
 		if (steep)
@@ -408,7 +398,7 @@ public:
 		lineBuffer[0] = uint16_t(color);
 		SPI.dmaSend(lineBuffer, 65535, 0);
 		SPI.dmaSend(lineBuffer, _width * _height - 65535, 0);
-		SPI.setDataSize (0);
+		SPI.setDataSize(0);
 
 		_backColor = color;
 
@@ -544,51 +534,39 @@ private:
 		b = t;
 	}
 
-	void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+	void drawFastVLine(int16_t x0, int16_t y0, int16_t y1, Color color)
 	{
-		if ((x >= _width) || (y >= _height || h < 1)) return;
-		if ((y + h - 1) >= _height) h = _height - y;
-		if (h < 2 )
-		{
-			drawPixel(x, y, color);
-			return;
-		}
+		if (y0 > y1) swap(y0, y1);
+		if (y0 == y1) { drawPixel(x0, y0, color); return; }
 
 		spi_begin();
-		setAddrWindow(x, y, x, y + h - 1);
-
+		setAddrWindow(x0, y0, x0, y1);
 		*dcport |=  dcpinmask;
 		*csport &= ~cspinmask;
 
-		SPI.setDataSize (SPI_CR1_DFF); // Set SPI 16bit mode
-		lineBuffer[0] = color;
-		SPI.dmaSend(lineBuffer, h, 0);
-		SPI.setDataSize (0);
+		SPI.setDataSize(SPI_CR1_DFF); // Set SPI 16bit mode
+		lineBuffer[0] = uint16_t(color);
+		SPI.dmaSend(lineBuffer, y1-y0+1, 0);
+		SPI.setDataSize(0);
 		*csport |= cspinmask;
 		spi_end();
 	}
 
 
-	void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+	void drawFastHLine(int16_t x0, int16_t y0, int16_t x1, Color color)
 	{
-		// Rudimentary clipping
-		if (x >= _width || y >= _height || w < 1) return;
-		if (x + w - 1 >= _width)  w = _width - x;
-		if (w < 2)
-		{
-			drawPixel(x, y, color);
-			return;
-		}
+		if (x0 > x1) swap(x0, x1);
+		if (x1 == x0) { drawPixel(x0, y0, color); return; }
 
 		spi_begin();
-		setAddrWindow(x, y, x + w - 1, y);
+		setAddrWindow(x0, y0, x1, y0);
 		*dcport |=  dcpinmask;
 		*csport &= ~cspinmask;
 
-		SPI.setDataSize (SPI_CR1_DFF); // Set spi 16bit mode
-		lineBuffer[0] = color;
-		SPI.dmaSend(lineBuffer, w, 0);
-		SPI.setDataSize (0);
+		SPI.setDataSize(SPI_CR1_DFF); // Set spi 16bit mode
+		lineBuffer[0] = uint16_t(color);
+		SPI.dmaSend(lineBuffer, x1-x0+1, 0);
+		SPI.setDataSize(0);
 		*csport |= cspinmask;
 		spi_end();
 	}
