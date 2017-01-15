@@ -200,7 +200,7 @@ $(TARGET).bin : libST.a $(OBJ) $(LIB_DIR)/start.o $(LIB_DIR)/start_c.o $(LIB_DIR
 		$(LIB_DIR)/boards.o \
 		$(LIB_DIR)/boards_setup.o \
 		libST.a \
-		-Wl,--end-group
+		-Wl,--end-group -lstdc++
 	$(E)arm-none-eabi-objcopy -O binary  "$(TARGET).elf" "$(TARGET).bin"
 	$(E)arm-none-eabi-size $(TARGET).elf
 	$(E)arm-none-eabi-objdump -h -S $(TARGET).elf > $(TARGET).dis
