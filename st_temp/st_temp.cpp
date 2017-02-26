@@ -36,7 +36,7 @@ void setup()
 	if (true)
 	{
 		g_gr.begin();
-		g_gr.fillScreen(Color::BLACK);
+		g_gr.clear(Color::BLACK);
 		g_gr.setRotation(1);
 		g_gr.setForeColor(Color::WHITE);
 		g_gr.setFont(font_08x08);
@@ -76,15 +76,15 @@ void setup()
 
 	delay(2 * 1000);
 	g_gr.setFont(font_10x16);
-	g_gr.fillScreen(Color::BLACK);
+	g_gr.clear(Color::WHITE);
 
 	if (1)
 	{
-		g_gr.drawRect(2,2, g_gr.w()-3, g_gr.h()-3, Color::RED);
-		g_gr.drawRect(1,1, g_gr.w()-2, g_gr.h()-2, Color::RED);
-		g_gr.drawRect(0,0, g_gr.w()-1, g_gr.h()-1, Color::YELLOW);
+		g_gr.rect(2,2, g_gr.w()-3, g_gr.h()-3, Color::RED);
+		g_gr.rect(1,1, g_gr.w()-2, g_gr.h()-2, Color::RED);
+		g_gr.rect(0,0, g_gr.w()-1, g_gr.h()-1, Color::YELLOW);
 	delay(5 * 1000);
-	g_gr.fillScreen(Color::BLACK);
+	g_gr.clear(Color::BLACK);
 
 	}
 }
@@ -119,7 +119,7 @@ public:
 		int x1 = int(r.b.x);
 		int y1 = int(r.b.y);
 
-		g_gr.drawLine(x0, y0, x1, y1, _color);
+		g_gr.line(x0, y0, x1, y1, _color);
 	}
 };
 
@@ -222,7 +222,7 @@ void loop()
 		}
 
 		if (disegnaGrafico)
-			g_gr.fillScreen(Color::BLACK);
+			g_gr.clear(Color::BLACK);
 
 		// le temperature le rinfresco sempre
 		if (true)
@@ -282,7 +282,7 @@ void loop()
 				{
 					gr.Translate(t0);
 					int y = int(t0.y);
-					g_gr.drawLine(screen.a.x, y, screen.b.x, y, graphForeColor);
+					g_gr.line(screen.a.x, y, screen.b.x, y, graphForeColor);
 
 					int xch = g_gr.fontW();
 					g_gr.setCursor(screen.a.x - xch*3-2, y - g_gr.fontH() / 2);
@@ -300,9 +300,9 @@ void loop()
 					gr.Translate(t0);
 					int y = int(t0.y);
 					if (tc % 5 == 0)
-						g_gr.drawLine(screen.a.x, y, screen.a.x+6, y, graphForeColor);
+						g_gr.line(screen.a.x, y, screen.a.x+6, y, graphForeColor);
 					else
-						g_gr.drawLine(screen.a.x, y, screen.a.x+3, y, graphForeColor);
+						g_gr.line(screen.a.x, y, screen.a.x+3, y, graphForeColor);
 				}
 			}
 
@@ -324,7 +324,7 @@ void loop()
 					int8_t dd = 4;
 					if ((sec_end - t) % t_step_lbl == 0)
 						dd = 8;
-					g_gr.drawLine(x, screen.b.y, x, screen.b.y-dd, graphForeColor);
+					g_gr.line(x, screen.b.y, x, screen.b.y-dd, graphForeColor);
 
 
 					int sec = sec_end - t;
@@ -362,7 +362,7 @@ void loop()
 				}
 			}
 
-			g_gr.drawRect(screen.a.x, screen.a.y, screen.b.x, screen.b.y, graphForeColor);
+			g_gr.rect(screen.a.x, screen.a.y, screen.b.x, screen.b.y, graphForeColor);
 			TempSource gte(Color::WHITE);
 
 			gr.Plot(gte);
@@ -373,7 +373,7 @@ void loop()
 
 	if (ok == false)
 	{
-		g_gr.fillScreen(Color::BLACK);
+		g_gr.clear(Color::BLACK);
 		uprintf("Sonda temperatura NON connessa");
 		delay(1000*3);
 	}

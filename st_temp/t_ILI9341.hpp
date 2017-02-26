@@ -305,7 +305,7 @@ public:
 		spi_end();
 	}
 
-	void drawPixel(int16_t x, int16_t y, Color color)
+	void pixel(int16_t x, int16_t y, Color color)
 	{
 		if (x < 0 || x >= _width) return;
 		if (y < 0 || y >= _height) return;
@@ -326,18 +326,18 @@ public:
 	}
 
 	// estremi inclusi
-	void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Color color)
+	void line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Color color)
 	{
 		if (y0 == y1)
 		{
 			// linea orizzontale
-			drawFastHLine(x0, y0, x1, color);
+			hline(x0, y0, x1, color);
 			return;
 		}
 		if (x0 == x1)
 		{
 			// linea verticale
-			drawFastVLine(x0, y0, y1, color);
+			vline(x0, y0, y1, color);
 			return;
 		}
 
@@ -363,9 +363,9 @@ public:
 		while (x0 <= x1)
 		{
 			if (steep)
-				drawPixel(y0, x0, color);
+				pixel(y0, x0, color);
 			else
-				drawPixel(x0, y0, color);
+				pixel(x0, y0, color);
 
 			err -= dy;
 			if (err < 0)
@@ -378,16 +378,16 @@ public:
 		}
 	}
 
-	void drawRect(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Color color)
+	void rect(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Color color)
 	{
-		drawLine(x0, y0, x1, y0, color);
-		drawLine(x1, y0, x1, y1, color);
-		drawLine(x1, y1, x0, y1, color);
-		drawLine(x0, y1, x0, y0, color);
+		line(x0, y0, x1, y0, color);
+		line(x1, y0, x1, y1, color);
+		line(x1, y1, x0, y1, color);
+		line(x0, y1, x0, y0, color);
 	}
 
 
-	void fillScreen(Color color)
+	void clear(Color color)
 	{
 		spi_begin();
 
@@ -405,15 +405,50 @@ public:
 		spi_end();
 	}
 
+	void fill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Color color)
+	{
+		// normalizzo cosi x0/y0 sta in alto a sin e x1/y1 sta in basso a destra
+		if (x0 > x1) swap(x0, x1);
+		if (y0 > y1) swap(y0, y1);
+
+		if (x0 >= _width) return;
+		if (y0 >= _height) return;
+		if (x1 < 0) return;
+		if (y1 < 0) return;
+
+		if (x0 == x1 && y0 == y1) { pixel(x0, y0, color); return; }
+
+		spi_begin();
+		setAddrWindow(x0, y0, x1, y1);
+
+		*dcport |=  dcpinmask;
+		*csport &= ~cspinmask;
+
+		SPI.setDataSize (SPI_CR1_DFF); // Set spi 16bit mode
+		lineBuffer[0] = color;
+
+		int32_t sz = (x1-x0+1) * (y1-y1+1);
+
+		if (sz <= 65535)
+			SPI.dmaSend(lineBuffer, sz, 0);
+		else
+		{
+			SPI.dmaSend(lineBuffer, 65535, 0);
+			SPI.dmaSend(lineBuffer, sz - 65535, 0);
+		}
+		SPI.setDataSize (0);
+		*csport |= cspinmask;
+		spi_end();
+	}
+
 	void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, Color color)
 	{
-		// rudimentary clipping (drawChar w/big text requires this)
 		if ((x >= _width) || (y >= _height || h < 1 || w < 1)) return;
 		if ((x + w - 1) >= _width)  w = _width  - x;
 		if ((y + h - 1) >= _height) h = _height - y;
 		if (w == 1 && h == 1)
 		{
-			drawPixel(x, y, color);
+			pixel(x, y, color);
 			return;
 		}
 
@@ -534,10 +569,10 @@ private:
 		b = t;
 	}
 
-	void drawFastVLine(int16_t x0, int16_t y0, int16_t y1, Color color)
+	void vline(int16_t x0, int16_t y0, int16_t y1, Color color)
 	{
 		if (y0 > y1) swap(y0, y1);
-		if (y0 == y1) { drawPixel(x0, y0, color); return; }
+		if (y0 == y1) { pixel(x0, y0, color); return; }
 
 		spi_begin();
 		setAddrWindow(x0, y0, x0, y1);
@@ -553,10 +588,10 @@ private:
 	}
 
 
-	void drawFastHLine(int16_t x0, int16_t y0, int16_t x1, Color color)
+	void hline(int16_t x0, int16_t y0, int16_t x1, Color color)
 	{
 		if (x0 > x1) swap(x0, x1);
-		if (x1 == x0) { drawPixel(x0, y0, color); return; }
+		if (x1 == x0) { pixel(x0, y0, color); return; }
 
 		spi_begin();
 		setAddrWindow(x0, y0, x1, y0);
@@ -591,7 +626,7 @@ private:
 		{   
 			for (int16_t x = _cx; x < _width ; x++)
 				for (int16_t y = _cy; y < _cy + ch_h; ++y)
-					drawPixel(x, y, _backColor);
+					pixel(x, y, _backColor);
 
 			_cx = 0;
 			_cy += ch_h;
@@ -609,7 +644,7 @@ private:
 			for (uint16_t x = 0; x < ch_w; ++x)
 			{   
 				bool v = pxch(_font, character, x, y);
-				drawPixel(_cx + x, _cy + y, v ? _foreColor : _backColor);
+				pixel(_cx + x, _cy + y, v ? _foreColor : _backColor);
 			}
 		return 1;
 	}

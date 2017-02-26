@@ -230,4 +230,12 @@ upload : $(TARGET).bin
 	/home/leo/Arduino/hardware/Arduino_STM32/tools/linux/serial_upload ttyUSB0 1 2 $(TARGET).bin
 	@ArduinoSerialMonitor.exe -run
 
+info:
+	~/Arduino/hardware/Arduino_STM32/tools/linux64/stm32flash/stm32flash /dev/ttyUSB0
+
+disable_write_protection:
+	~/Arduino/hardware/Arduino_STM32/tools/linux64/stm32flash/stm32flash -k /dev/ttyUSB0
+
+
+
 -include $(OBJ:.o=.d)

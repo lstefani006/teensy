@@ -18,22 +18,6 @@ void setup()
 	*/
 }
 
-int msec = 300;
-float f = 0;
-void loop()
-{
-	digitalWrite(led, HIGH);
-	delay(msec);
-	digitalWrite(led, LOW);
-	delay(msec);
-
-	Serial.println("Ciao");
-	f += 0.1;
-	if (f > 5)
-	Serial.println("55555");
-}
-
-/*
 void blink(int msec)
 {
 	digitalWrite(led, HIGH);
@@ -41,6 +25,22 @@ void blink(int msec)
 	digitalWrite(led, LOW);
 	delay(msec);
 }
+
+int msec = 150;
+float f = 0;
+void loop()
+{
+	auto p = new char [100];
+	delete []p;
+	blink(200);
+
+	Serial.println("Ciao");
+	f += 0.1;
+	if (f > 5)
+		Serial.println("f >");
+}
+
+/*
 
 void loop() {
 	blink(100);
