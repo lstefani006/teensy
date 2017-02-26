@@ -18,7 +18,7 @@ void setup()
 	*/
 }
 
-int msec = 300;
+int msec = 100;
 float f = 0;
 void loop()
 {
