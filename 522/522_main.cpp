@@ -80,6 +80,10 @@ void kk()
 	}
 }
 
+bool swr(char ch) {
+	Serial.write(ch); return true;
+}
+
 void setup() 
 {
 	delay(1000*2);
@@ -87,7 +91,7 @@ void setup()
 	while (!Serial);
 	Serial.println("Start");
 
-	uprintf_cb = [] (char ch) { Serial.write(ch); return true; };
+	uprintf_cb = swr; // [] (char ch) { Serial.write(ch); return true; };
 
 	SPI.begin();		// Init SPI bus
 	pdc.PCD_Init();	// Init MFRC522 card

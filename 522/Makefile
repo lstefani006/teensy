@@ -1,17 +1,28 @@
-CXXFLAGS= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
-VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+V=1
+
 VPATH+=./crypto
 
 ifdef TEENSY
-	VPATH   +=../util
-	CXXFLAGS+= -DUSE_NO_RTOS
+	CXXFLAGS=-I../TeensyLib  -I.
+	CXXFLAGS= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
+	VPATH=../TeensyLib
+	VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+else  ifdef ESP8266
+	CXXFLAGS=-I../EspLib -I.
+	VPATH=../EspLib
+else ifdef STM32F103
+	CXXFLAGS=-I../StLib -I.
+	VPATH+=../StLib
+	VPATH+=../util
+	VPATH+=$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
 	CXXFLAGS+=-I../util
-else ifdef ESP8266
+	CXXFLAGS+=-I$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
 else
-	CXXFLAGS+= -DUSE_NO_RTOS
-	VPATH   +=../util
-	CXXFLAGS+=-I../util
+	CXXFLAGS=-I../AvrLib -I.
+	CXXFLAGS= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
+	VPATH=../AvrLib
 endif
+
 
 TARGET=522.hex
 SRC+=\
@@ -21,11 +32,7 @@ SRC+=\
 	des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp \
 	uprintf.cpp
 
-ifdef TEENSY
-include ../TeensyLib/teensy_makefile.mk
-else
-include ../AvrLib/avr_makefile.mk
-endif
+include ../util/makefile.mk
 
 tags : 
 	hdrtag *.c *.cpp *.h *.hpp \
