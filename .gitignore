@@ -5,6 +5,7 @@
 *.eep
 *.elf
 *.dix
+*.exe
 *.a
 *.o
 *.s

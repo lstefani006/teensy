@@ -24,6 +24,7 @@ CF_COMMON=\
 		  -DARDUINO_ARCH_STM32F1   \
 		  -D__STM32F1__ \
 		  -DMCU_STM32F103CB  \
+		  -DST_LEO
 
 CF_S_LIB=\
 		 $(CF_COMMON) \
