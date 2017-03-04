@@ -1,0 +1,31 @@
+;*****************************************************************
+;* XMC4500 linker scatter file (running code from internal SRAM) *
+;*****************************************************************
+
+LR_IROM1 0x10000000 0x10000
+{
+   ER_IROM1 0x10000000 0x10000
+   {
+      *.o (RESET, +First)
+      *(InRoot$$Sections)
+      .ANY (+RO)
+   }
+   
+   RW_IRAM1 0x20000000 0x8000
+   { 
+      .ANY (+RW +ZI)
+   }
+   
+   RW_IRAM2 0x30000000 0x7800
+   {
+      .ANY (ETH_RAM +RW +ZI)
+   }
+   
+   ARM_LIB_STACK 0x30008000 EMPTY -0x800
+   {
+   }
+   
+   ARM_LIB_HEAP 0x20008000 EMPTY 0x7FC0
+   {
+   }
+}
