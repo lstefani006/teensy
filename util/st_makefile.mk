@@ -24,7 +24,8 @@ CF_COMMON=\
 		  -DARDUINO_ARCH_STM32F1   \
 		  -D__STM32F1__ \
 		  -DMCU_STM32F103CB  \
-		  -DST_LEO
+		  -DST_LEO \
+		  -DCONFIG_MAPLE_MINI_NO_DISABLE_DEBUG
 
 CF_S_LIB=\
 		 $(CF_COMMON) \
@@ -32,7 +33,7 @@ CF_S_LIB=\
 
 CF_C_LIB=\
 		 $(CF_COMMON) \
-		 -Os  \
+		 $(O)  \
 		 -DDEBUG_LEVEL=DEBUG_ALL  \
 		 -ffunction-sections  \
 		 -fdata-sections  \
@@ -65,26 +66,28 @@ OBJ_DIR=.obj_st
 LIB_DIR=.lib_st
 
 E?=@
+G?=
+O?=-Os
 
 $(OBJ_DIR)/%.o : %.cpp | $(OBJ_DIR)
 	@echo $<
-	$(E)arm-none-eabi-g++ -c $(CXXFLAGS) $< -o $@
+	$(E)arm-none-eabi-g++ $(G) -c $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.o : %.c | $(OBJ_DIR)
 	@echo $<
-	$(E)arm-none-eabi-gcc -c $(CFLAGS) $< -o $@
+	$(E)arm-none-eabi-gcc $(G) -c $(CFLAGS) $< -o $@
 
 $(LIB_DIR)/%.o : %.S | $(LIB_DIR)
 	@echo $<
-	$(E)arm-none-eabi-gcc -c $(CF_S_LIB) $< -o $@
+	$(E)arm-none-eabi-gcc $(G) -c $(CF_S_LIB) $< -o $@
 
 $(LIB_DIR)/%.o : %.cpp | $(LIB_DIR)
 	@echo $<
-	$(E)arm-none-eabi-g++ -c $(CF_CXX_LIB) $< -o $@
+	$(E)arm-none-eabi-g++ $(G) -c $(CF_CXX_LIB) $< -o $@
 
 $(LIB_DIR)/%.o : %.c | $(LIB_DIR)
 	@echo $<
-	$(E)arm-none-eabi-gcc -c $(CF_C_LIB) $< -o $@
+	$(E)arm-none-eabi-gcc $(G) -c $(CF_C_LIB) $< -o $@
 
 
 
@@ -181,7 +184,7 @@ all : $(TARGET).bin
 
 $(TARGET).bin : libST.a $(OBJ) $(LIB_DIR)/start.o $(LIB_DIR)/start_c.o $(LIB_DIR)/syscalls.o $(LIB_DIR)/board.o $(LIB_DIR)/boards.o $(LIB_DIR)/boards_setup.o
 	@echo link
-	$(E)arm-none-eabi-gcc -Os -Wl,--gc-sections -mcpu=cortex-m3 \
+	$(E)arm-none-eabi-gcc $(G) $(O) -Wl,--gc-sections -mcpu=cortex-m3 \
 		-T$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld/jtag.ld \
 		"-Wl,-Map,$(TARGET).map" \
 		"-L$(ARDUINO_PRIV)/hardware/Arduino_STM32/STM32F1/variants/generic_stm32f103c/ld" \

@@ -26,18 +26,25 @@ void blink(int msec)
 	delay(msec);
 }
 
-int msec = 150;
 float f = 0;
 void loop()
 {
+	/*
 	auto p = new char [100];
 	delete []p;
-	blink(200);
+	*/
+	blink(500);
 
+	f += 0.1;
+	if (f > 12)
+		f = 0;
+
+	/*
 	Serial.println("Ciao");
 	f += 0.1;
 	if (f > 5)
 		Serial.println("f >");
+		*/
 }
 
 /*

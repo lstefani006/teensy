@@ -1,4 +1,7 @@
 V=1
+#E=
+G=-g
+O=
 
 ifdef TEENSY
 	CXXFLAGS=-I../TeensyLib 
@@ -7,7 +10,7 @@ else  ifdef ESP8266
 	CXXFLAGS=-I../EspLib
 	VPATH=../EspLib
 else ifdef STM32F103
-	CXXFLAGS=-I../StLib
+	CXXFLAGS=-I../StLib -g
 	VPATH=../StLib
 else
 	CXXFLAGS=-I../AvrLib

@@ -3,9 +3,14 @@ set -e
 set -x
 
 #le versioni del compilatore, delle binutils della newlib
-V=6.2.0
-B=2.27
-N=2.4.0
+#V=6.2.0
+#B=2.27
+#N=2.4.0
+
+V=6.3.0
+B=2.28
+N=2.5.0
+G=7.9.1
 
 # qui si imposta la cpu....
 #CPU="cortex-m4"   # teensy
@@ -51,6 +56,9 @@ fi
 if [ ! -e newlib-$N.tar.gz ] ; then
 	wget  ftp://sources.redhat.com/pub/newlib/newlib-$N.tar.gz
 fi
+if [ ! -e gdb-$G.tar.gz ] ; then
+	wget  ftp://ftp.gnu.org/gnu/gdb/gdb-$G.tar.gz
+fi
 
 
 #######################
@@ -68,6 +76,10 @@ fi
 
 if [ ! -e newlib-$N ] ; then
 	tar xvf newlib-$N.tar.gz
+fi
+
+if [ ! -e gdb-$G ] ; then
+	tar xvf gdb-$G.tar.gz
 fi
 
 #######################
@@ -179,6 +191,28 @@ if [ ! -e gcc.ok ] ; then
 	make install
 	popd
 	touch gcc.ok
+fi
+
+#####################################
+if [ ! -e gdb.ok ] ; then
+	rm -rf gdb
+	mkdir  gdb
+	pushd  gdb
+	../../gdb*/configure    \
+		--target=$TARGET       \
+		--prefix=$PREFIX       \
+		--disable-multilib     \
+		--disable-werror       \
+		--disable-nls          \
+		--disable-newlib-supplied-syscalls \
+		--with-gnu-ld          \
+		--with-gnu-as          \
+		--disable-shared       \
+		$CONFIGURE
+	make all
+	make install
+	popd
+	touch gdb.ok
 fi
 
 popd

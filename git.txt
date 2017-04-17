@@ -1,0 +1,7 @@
+
+# per creare un sottomodulo partendo dal suo indirizzo
+# nel progetto corrente
+git submodule add https://github.com/blacksphere/blackmagic.git
+
+# per nizializzare e tirare giu' i sorgenti
+git submodule update --init --recursive
