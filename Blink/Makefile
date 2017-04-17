@@ -5,15 +5,15 @@ O=
 
 ifdef TEENSY
 	CXXFLAGS=-I../TeensyLib 
-	VPATH=../TeensyLib
+	VPATH=../LibTeensy
 else  ifdef ESP8266
-	CXXFLAGS=-I../EspLib
+	CXXFLAGS=-I../LibEsp
 	VPATH=../EspLib
 else ifdef STM32F103
-	CXXFLAGS=-I../StLib -g
+	CXXFLAGS=-I../LibSt -g
 	VPATH=../StLib
 else
-	CXXFLAGS=-I../AvrLib
+	CXXFLAGS=-I../LibAvr
 	VPATH=../AvrLib
 endif
 

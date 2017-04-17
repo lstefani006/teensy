@@ -5,7 +5,11 @@
 // Pin 11 has the LED on Teensy 2.0
 // Pin 6  has the LED on Teensy++ 2.0
 // Pin 13 has the LED on Teensy 3.0
+#ifdef ARDUINO
+int led = 13;
+#else
 int led = PC13;
+#endif
 
 // the setup routine runs once when you press reset:
 void setup()
@@ -35,7 +39,7 @@ void loop()
 	*/
 	blink(500);
 
-	f += 0.1;
+	f += 0.1f;
 	if (f > 12)
 		f = 0;
 

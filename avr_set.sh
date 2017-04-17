@@ -8,4 +8,4 @@ fi
 if [ -e $HOME/arduino-1.6.12 ] ; then
 	export ARDUINO=$HOME/arduino-1.6.12
 fi
-export PLATFORM=arduino
+export PLATFORM=AVR
