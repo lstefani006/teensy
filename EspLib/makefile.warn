@@ -1,0 +1,53 @@
+W?=3
+
+ifeq ($(shell test $(W) -ge 1; echo $$?),0)
+	WCOMMON=
+	WC+=$(WCOMMON)
+	WCXX+=$(WCOMMON)
+endif
+
+ifeq ($(shell test $(W) -ge 2; echo $$?),0)
+	WCOMMON= -Wall \
+			 -Wdouble-promotion \
+			 -Wformat \
+			 -Winit-self \
+			 -Wmissing-include-dirs \
+			 -Wparentheses \
+			 -Wswitch-enum \
+			 -Wuninitialized \
+			 -Wmaybe-uninitialized \
+			 -Wstrict-overflow \
+			 -Wshadow \
+			 -Wcast-qual \
+			 -Wwrite-strings \
+			 -Wconversion \
+			 -Wlogical-op \
+			 -Waggregate-return \
+			 -Wwrite-strings \
+			 -Wcast-align \
+			 -Wcast-qual \
+			 -Wpointer-arith \
+			 -Wstrict-aliasing \
+			 -Wformat \
+			 -Wmissing-include-dirs \
+			 -Wno-unused-parameter \
+			 -Wuninitialized 
+	WC+= $(WCOMMON) \
+		 -Wstrict-prototypes 
+	WCXX+= $(WCOMMON) \
+		 -Wuseless-cast \
+		 -Wzero-as-null-pointer-constant
+endif
+
+ifeq ($(shell test $(W) -ge 3; echo $$?),0)
+	WCOMMON= -Wextra \
+			 -Wempty-body
+	WC+=$(WCOMMON)
+	WCXX+=$(WCOMMON)
+endif
+
+ifeq ($(shell test $(W) -ge 4; echo $$?),0)
+	WCOMMON= -Wpedantic
+	WC+=$(WCOMMON)
+	WCXX+=$(WCOMMON)
+endif
