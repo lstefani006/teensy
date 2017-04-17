@@ -1,3 +1,6 @@
 [submodule "blackmagic"]
 	path = blackmagic
 	url = https://github.com/blacksphere/blackmagic.git
+[submodule "stm32loader"]
+	path = stm32loader
+	url = https://github.com/jsnyder/stm32loader.git
