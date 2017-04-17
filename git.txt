@@ -5,3 +5,12 @@ git submodule add https://github.com/blacksphere/blackmagic.git
 
 # per nizializzare e tirare giu' i sorgenti
 git submodule update --init --recursive
+
+#####################################################################
+
+git tag "1.0"     <-- crea il tag con il valore "1.0"
+
+
+git push origin --tags    <-- i tags non sono esportati in remoto... cosi si esportano
+
+git reset --hard "1.0"    <-- butta via tutte le modifiche e riporta il tutto alla versione 1.0
