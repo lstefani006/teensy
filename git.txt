@@ -1,3 +1,7 @@
+Help per il GIT
+https://backlogtool.com/git-guide/en/intro/intro1_1.html
+
+#####################################################################
 
 # per creare un sottomodulo partendo dal suo indirizzo
 # nel progetto corrente
@@ -12,5 +16,7 @@ git tag "1.0"     <-- crea il tag con il valore "1.0"
 
 
 git push origin --tags    <-- i tags non sono esportati in remoto... cosi si esportano
+
+git tag                   <-- fa vedere i tag disponibili
 
 git reset --hard "1.0"    <-- butta via tutte le modifiche e riporta il tutto alla versione 1.0

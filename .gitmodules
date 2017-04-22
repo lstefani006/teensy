@@ -4,3 +4,9 @@
 [submodule "stm32loader"]
 	path = stm32loader
 	url = https://github.com/jsnyder/stm32loader.git
+[submodule "LibStm/libopencm3"]
+	path = LibStm/libopencm3
+	url = https://github.com/libopencm3/libopencm3.git
+[submodule "LibStm/libopencm3-examples"]
+	path = LibStm/libopencm3-examples
+	url = https://github.com/libopencm3/libopencm3-examples.git
