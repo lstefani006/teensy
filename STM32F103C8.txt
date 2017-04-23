@@ -1,0 +1,2 @@
+
+Il modello dei blue pill è STM32F103C8
