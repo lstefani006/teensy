@@ -262,7 +262,8 @@ int main()
 
 		if (true)
 		{
-			usart_write("Leo ", 4);
+			const char *pp = "12345678901234567890 ";
+			usart_write(pp, strlen(pp));
 			char b[10];
 			sprintf(b, "%5d\n\r", n);
 			usart_write(b, strlen(b));

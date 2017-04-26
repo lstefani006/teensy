@@ -11,57 +11,60 @@ struct ring
 {
 	uint8_t *data;
 	ring_size_t size;
-	uint32_t begin;
+	uint32_t beg;
 	uint32_t end;
 };
 
 #define RING_SIZE(RING)  ((RING)->size - 1)
 #define RING_DATA(RING)  (RING)->data
-#define RING_EMPTY(RING) ((RING)->begin == (RING)->end)
+#define RING_EMPTY(RING) ((RING)->beg == (RING)->end)
 
-static void ring_init(struct ring *ring, uint8_t *buf, ring_size_t size)
+static void ring_init(volatile ring *ring, uint8_t *buf, ring_size_t size)
 {
 	ring->data = buf;
 	ring->size = size;
-	ring->begin = 0;
+	ring->beg = 0;
 	ring->end = 0;
 }
 
-static int32_t ring_write_ch(struct ring *ring, uint8_t ch)
+static int32_t ring_write_ch(volatile ring *ring, uint8_t ch)
 {
-	if (((ring->end + 1) % ring->size) != ring->begin) {
-		ring->data[ring->end++] = ch;
-		ring->end %= ring->size;
-		return (uint32_t)ch;
+	// aspetto che il buffer si svuoti almeno parzialmente
+	if (((ring->end + 1) % ring->size) == ring->beg)
+		USART_CR1(USART1) |= USART_CR1_TXEIE;
+	while (((ring->end + 1) % ring->size) == ring->beg) {}
+
+	if (((ring->end + 1) % ring->size) != ring->beg) 
+	{
+		ring->data[ring->end] = ch;
+		ring->end = (ring->end + 1) % ring->size;
+		return (int32_t)ch;
 	}
+
 	return -1;
 }
 
-
-static int32_t ring_write(struct ring *ring, const uint8_t *data, ring_size_t size)
+static void ring_write(volatile ring *ring, const uint8_t *data, ring_size_t size)
 {
-	int32_t i;
-	for (i = 0; i < size; i++)
-		if (ring_write_ch(ring, data[i]) < 0)
-			return -i;
-	return i;
+	for (int32_t i = 0; i < size; i++)
+		ring_write_ch(ring, data[i]);
 }
 
-static int32_t ring_read_ch(struct ring *ring)
+static int32_t ring_read_ch(volatile ring *ring)
 {
 	int32_t ret = -1;
 
-	if (ring->begin != ring->end) 
+	if (ring->beg != ring->end) 
 	{
-		ret = ring->data[ring->begin++];
-		ring->begin %= ring->size;
+		ret = ring->data[ring->beg];
+		ring->beg = (ring->beg + 1) % ring->size;
 	}
 
 	return ret;
 }
 
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 8
 
 static struct ring output_ring;
 static uint8_t output_ring_buffer[BUFFER_SIZE];
@@ -73,7 +76,7 @@ extern "C" void usart1_isr(void)
 			((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
 
 		/*
-		 LEO commentato perchè servirezze un buffer in uscita
+		 LEO commentato perchè servirebbe un buffer in uscita
 
 		// Retrieve the data from the peripheral.
 		ring_write_ch(&output_ring, usart_recv(USART1));
@@ -100,12 +103,9 @@ extern "C" void usart1_isr(void)
 
 int usart_write(const char *ptr, int len)
 {
-	int ret = ring_write(&output_ring, (const uint8_t *)ptr, len);
-	if (ret < 0)
-		ret = -ret;
-
+	ring_write(&output_ring, (const uint8_t *)ptr, len);
 	USART_CR1(USART1) |= USART_CR1_TXEIE;
-	return ret;
+	return len;
 }
 
 
