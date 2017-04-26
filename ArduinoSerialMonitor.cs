@@ -16,17 +16,11 @@ namespace ArduionoSerialMonitor
 		const int cPort = 53557;
 
 		char Cmd {
-			get {
-				lock (this)
-					return __cmd;
-			}
-			set {
-				lock (this)
-					__cmd = value;
-			}
+			get { lock (this) return __cmd; }
+			set { lock (this) __cmd = value; }
 		}
 
-		void begin() {
+		void begin(string tty) {
 
 			this.Cmd = 'R';
 
@@ -59,10 +53,17 @@ namespace ArduionoSerialMonitor
 						lock (this) {
 
 							var pp = new List<string>();
+
+							if (tty == null)
+							{
+							pp.Add(string.Format("/dev/ttyBmpTarg"));
 							for (int p = 0; p < 10; ++p)
-								pp.Add(string.Format("/dev/ttyACM{0}", p));
+							pp.Add(string.Format("/dev/ttyACM{0}", p));
 							for (int p = 0; p < 10; ++p)
-								pp.Add(string.Format("/dev/ttyUSB{0}", p));
+							pp.Add(string.Format("/dev/ttyUSB{0}", p));
+							}
+							else
+							pp.Add(tty);
 
 							bool ok = false;
 							do 
@@ -166,8 +167,12 @@ namespace ArduionoSerialMonitor
 				sendCmd('S');
 			else if (args.Length == 1 && args[0] == "-run")
 				sendCmd('R');
+			else if (args.Length == 1 && args[0].StartsWith("/dev"))
+				new MainClass().begin(args[0]);
+			else if (args.Length == 1 && args[0].StartsWith("tty"))
+				new MainClass().begin(args[0]);
 			else
-				new MainClass().begin();
+				new MainClass().begin(null);
 		}
 	}
 }

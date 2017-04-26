@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# run_make        --> build
-# run_make clean  --> clean
-# run_make flash  --> flash
-
-
-V=1 BMP_PORT=/dev/ttyBmpGdb OPENCM3_DIR=/home/leo/teensy/LibStm/libopencm3 make $*
