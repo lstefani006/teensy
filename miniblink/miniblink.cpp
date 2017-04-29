@@ -17,7 +17,6 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "usart_irq.hpp"
 #include <stdio.h>
 #include <string.h>
 
@@ -28,6 +27,8 @@
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/usart.h>
 
+#include "usart_irq.hpp"
+#include "systick_setup.hpp"
 
 static void gpio_setup(void)
 {
@@ -168,7 +169,7 @@ extern "C" void tim2_isr(void)
 		timer_set_oc_value(TIM2, TIM_OC1, new_time);
 
 		/* Toggle LED to indicate compare event. */
-		gpio_toggle(GPIOC, GPIO13);	/* LED on/off */
+		//gpio_toggle(GPIOC, GPIO13);	/* LED on/off */
 
 		//putstr(G_usart, "Ciao\n\r");
 	}
@@ -238,6 +239,7 @@ int main()
 	gpio_setup();
 	tim_setup();
 	usart_setup();
+	systick_setup();
 
 	//usart_setup();
 	//SerialClass Serial1(USART1); Serial1.begin();
@@ -251,8 +253,8 @@ int main()
 	{
 		/* Using API function gpio_toggle(): */
 		//gpio_toggle(GPIOC, GPIO13);	/* LED on/off */
-		for (auto i = 0; i < 500000; i++)	/* Wait a bit. */
-			__asm__("nop");
+		//for (auto i = 0; i < 500000; i++)	/* Wait a bit. */
+		//	__asm__("nop");
 
 		//Serial1.write(n);
 		//Serial3.write(n);
@@ -268,6 +270,10 @@ int main()
 			sprintf(b, "%5d\n\r", n);
 			usart_write(b, strlen(b));
 		}
+
+		delay(1000);
+		gpio_toggle(GPIOC, GPIO13);	/* LED on/off */
+
 	}
 
 	return 0;
