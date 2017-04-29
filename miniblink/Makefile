@@ -5,7 +5,7 @@
 #
 BINARY = miniblink
 OBJS = usart_irq.o
-OPT = -O0
+CPPFLAGS = -O0
 
 LDSCRIPT = stm32-h103.ld
 
