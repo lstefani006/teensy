@@ -1,0 +1,8 @@
+
+
+Metodo un po' strano per far funzionare il tutto....
+
+lo startup è preso da libopencm3
+	in questo modo lo start è tutto in C e partono i costruttori C++ 
+
+poi si link la libstm32.a ---> e questa è la standard peripheral library
