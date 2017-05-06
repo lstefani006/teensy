@@ -71,7 +71,7 @@ static uint8_t output_ring_buffer[BUFFER_SIZE];
 
 extern "C" void usart1_isr(void)
 {
-	/* Check if we were called because of RXNE. */
+	// Check if we were called because of RXNE. 
 	if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
 			((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
 
@@ -115,19 +115,19 @@ void usart_setup(void)
 	rcc_periph_clock_enable(RCC_AFIO);
 	rcc_periph_clock_enable(RCC_USART1);
 
-	/* Initialize output ring buffer. */
+	// Initialize output ring buffer. 
 	ring_init(&output_ring, output_ring_buffer, BUFFER_SIZE);
 
-	/* Enable the USART1 interrupt. */
+	// Enable the USART1 interrupt. 
 	nvic_enable_irq(NVIC_USART1_IRQ);
 
-	/* Setup GPIO pin GPIO_USART1_RE_TX on GPIO port B for transmit. */
+	// Setup GPIO pin GPIO_USART1_RE_TX on GPIO port B for transmit. 
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
 
-	/* Setup GPIO pin GPIO_USART1_RE_RX on GPIO port B for receive. */
+	// Setup GPIO pin GPIO_USART1_RE_RX on GPIO port B for receive. 
 	gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO_USART1_RX);
 
-	/* Setup UART parameters. */
+	// Setup UART parameters. 
 	usart_set_baudrate(USART1, 38400);
 	usart_set_databits(USART1, 8);
 	usart_set_stopbits(USART1, USART_STOPBITS_1);
@@ -135,9 +135,9 @@ void usart_setup(void)
 	usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
 	usart_set_mode(USART1, USART_MODE_TX_RX);
 
-	/* Enable USART1 Receive interrupt. */
+	// Enable USART1 Receive interrupt. 
 	USART_CR1(USART1) |= USART_CR1_RXNEIE;
 
-	/* Finally enable the USART. */
+	// Finally enable the USART. 
 	usart_enable(USART1);
 }

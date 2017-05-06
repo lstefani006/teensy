@@ -4,8 +4,8 @@
 # make flash
 #
 BINARY = miniblink
-OBJS = usart_irq.o systick_setup.o
-CPPFLAGS = -O0
+OBJS = usart_irq.o systick_setup.o rtc_setup.o
+CPPFLAGS = -O0 -Wall
 
 LDSCRIPT = stm32-h103.ld
 
