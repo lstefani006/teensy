@@ -52,14 +52,11 @@ static void ring_write(volatile ring *ring, const uint8_t *data, ring_size_t siz
 
 static int32_t ring_read_ch(volatile ring *ring)
 {
-	int32_t ret = -1;
+	if (ring->beg == ring->end) 
+		return -1;
 
-	if (ring->beg != ring->end) 
-	{
-		ret = ring->data[ring->beg];
-		ring->beg = (ring->beg + 1) % ring->size;
-	}
-
+	int32_t ret = ring->data[ring->beg];
+	ring->beg = (ring->beg + 1) % ring->size;
 	return ret;
 }
 

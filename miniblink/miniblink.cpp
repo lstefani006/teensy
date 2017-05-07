@@ -46,8 +46,6 @@ static void gpio_setup(void)
 	// GPIOC_CRH |= (GPIO_MODE_OUTPUT_2_MHZ << ((13 - 8) * 4));
 	// Using API functions: 
 	gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-
-	gpio_set(GPIOC, GPIO13);
 }
 
 
@@ -99,15 +97,13 @@ static void tim_setup(void)
 
 extern "C" void tim2_isr(void)
 {
-	if (timer_get_flag(TIM2, TIM_SR_CC1IF)) {
-
+	if (timer_get_flag(TIM2, TIM_SR_CC1IF)) 
+	{
 		// Clear compare interrupt flag. 
 		timer_clear_flag(TIM2, TIM_SR_CC1IF);
 
-		/*
-		 * Get current timer value to calculate next
-		 * compare register value.
-		 */
+		// Get current timer value to calculate next
+		// compare register value.
 		uint16_t compare_time = timer_get_counter(TIM2);
 
 		// Calculate and set the next compare value. 
@@ -152,6 +148,11 @@ public:
 		usart_enable(_usart);
 	}
 
+	void write(const char *p, int sz) {
+		const char *e = p + sz;
+		while (p != e)
+			usart_send_blocking(_usart, *p++);
+	}
 	void write(const char *p) {
 		while (*p)
 			usart_send_blocking(_usart, *p++);
@@ -192,8 +193,18 @@ int main()
 	{
 		delay(1000);
 
-		char b[10];
+		char b[16];
 		sprintf(b, "%5d\n\r", int(rtc_counter));
+		usart_write(b, strlen(b));
+
+		int h,m,s;
+		rtc_get_hms(h, m, s);
+		sprintf(b, "%02d:%02d:%02d\n\r", h, m, s);
+		usart_write(b, strlen(b));
+
+		int D,M,Y;
+		rtc_get_dmy(D, M, Y);
+		sprintf(b, "%02d-%02d-%04d\n\r", D, M, Y);
 		usart_write(b, strlen(b));
 	}
 
