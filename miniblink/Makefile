@@ -5,7 +5,7 @@
 #
 BINARY = miniblink
 OBJS = usart_irq.o systick_setup.o rtc_setup.o
-CPPFLAGS = -O0 -Wall
+CPPFLAGS = -O0 -Wall -std=c++17
 
 LDSCRIPT = stm32-h103.ld
 

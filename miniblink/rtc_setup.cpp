@@ -4,6 +4,8 @@
 
 #include "rtc_setup.hpp"
 
+void rtc_set_ts(int Y, int M, int D, int h, int m, int s, int state);
+
 void rtc_setup()
 {
 	rtc_auto_awake(RCC_LSE, 0x7fff);
@@ -16,11 +18,8 @@ void rtc_setup()
 	rtc_interrupt_enable(RTC_SEC);
 }
 
-static bool leapYear(int year)
-{
-	if (((year % 4 == 0) && (year % 100!= 0)) || (year%400 == 0)) return true;
-	return false;
-}
+static bool leapYear(int year) { return ((year % 4 == 0) && (year % 100!= 0)) || (year%400 == 0); }
+
 // Dom=0 Lun=1 ecc
 static int dayofweek(int y, int m, int d)	// 1 <= m <= 12,  y > 1752 (in the U.K.) 
 {
@@ -29,13 +28,30 @@ static int dayofweek(int y, int m, int d)	// 1 <= m <= 12,  y > 1752 (in the U.K
 	return (y + y / 4 - y / 100 + y / 400 + t[m - 1] + d) % 7;
 }
 
-static void getDaySaveLigthDays(int Y, int &mD, int &oD)
+static void getDaySaveLigthDays(int Y, int &D03, int &D10)
 {
 	int lastMar = dayofweek(Y, 3, 31);
 	int lastOct = dayofweek(Y, 10, 31);
 
-	mD = 31 - lastMar;
-	oD = 31 - lastOct;
+	D03 = 31 - lastMar;
+	D10 = 31 - lastOct;
+}
+
+static int getDaySaveState(int Y, int M, int D, int h)
+{
+	int D03, D10;
+	getDaySaveLigthDays(Y, D03, D10);
+
+	if (M < 3) return 1;
+	if (M == 3 && D < D03) return 1;
+	if (M == 3 && D == D03 && h < 2) return 1;
+
+	if (M < 10) return 2;
+	if (M == 10 && D < D10) return 2;
+	if (M == 10 && D == D10 && h < 2) return 2;
+	if (M == 10 && D == D10 && h < 3) return 3;
+
+	return 1;
 }
 
 volatile uint32_t rtc_counter = 0;
@@ -47,23 +63,18 @@ extern "C" void rtc_isr(void)
 	// get value
 	rtc_counter = rtc_get_counter_val();
 
-Again:
-
 	// partendo da rtc_counter calcola la data e l'ora.
 	int h, m, s;
 	int cnt = rtc_get_hms(h,m,s);
-
-
 	int D = BKP_DR1;
 	int M = BKP_DR2;
 	int Y = BKP_DR3;
-
+	int state = BKP_DR4; // 1=inverno 2=estate 3=cambio estate/inverno
 
 	// ora in cnt ho il numero di giorni dalla partenza
 	if (cnt > 0)
 	{
 		static const int8_t months[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
-
 		while (cnt > 0)
 		{
 			D += 1;
@@ -82,43 +93,62 @@ Again:
 				}
 			}
 		}
-		pwr_disable_backup_domain_write_protect();
-		BKP_DR1 = D;
-		BKP_DR2 = M;
-		BKP_DR3 = Y;
-		pwr_enable_backup_domain_write_protect();
-
-		rtc_set_ts(Y, M, D, h, m, s);
+		// aggiorno la data MA preservo lo stato Estate/Inverno
+		rtc_set_ts(Y, M, D, h, m, s, state);
 	}
 
-	int mD, oD;
-	getDaySaveLigthDays(Y, mD, oD);
+	// calcolo il nuovo stato
+	int newState = getDaySaveState(Y, M, D, h);
 
-	bool oraLegaleS = (M ==  3 && D == mD && h >= 2) || (M ==  3 && D > mD) || M > 3;
-	bool oraLegaleE = (M == 10 && D == oD && h <  3) || (M == 10 && D < mD) || M < 10;
-	bool oraLegale = oraLegaleS && oraLegaleE;
-
-	bool oraLegaleApplicata = BKP_DR4 != 0;
-
-	if (oraLegale == true && oraLegaleApplicata == false)
+	switch (state)
 	{
-		rtc_counter += 3600;
-		pwr_disable_backup_domain_write_protect();
-		BKP_DR3 = 1;
-		pwr_enable_backup_domain_write_protect();
+	case 1: // da inverno
+		switch (newState) // sono inverno
+		{
+		case 1:
+			// rimango in inverno
+			break;
 
-		goto Again;
+		case 2: // a estate .... aggiorno il clock
+			rtc_set_counter_val(rtc_get_counter_val() + 3600);
+		case 3: // a estate/inverno .... vuole andare in inverno e c'è già
+			pwr_disable_backup_domain_write_protect();
+			BKP_DR4 = newState;
+			pwr_enable_backup_domain_write_protect();
+			break;
+		}
+		break;
+
+	case 2: // sono estate
+		switch (newState)
+		{
+		case 2:
+			break;
+		case 3: // vuole andare tra estate e inverno
+		case 1: // vuole andate in inverno
+			rtc_set_counter_val(rtc_get_counter_val() - 3600);
+			pwr_disable_backup_domain_write_protect();
+			BKP_DR4 = newState;
+			pwr_enable_backup_domain_write_protect();
+			break;
+		}
+		break;
+
+	case 3: // da estate/inverno
+		switch (newState)
+		{
+		case 2: // a estate.... metto in inverno per poi transitare in estato
+		case 1: // a inverno... vado in inverno
+			pwr_disable_backup_domain_write_protect();
+			BKP_DR4 = newState;
+			pwr_enable_backup_domain_write_protect();
+			break;
+
+		case 3: // a estate/inverno
+			break;
+		}
+		break;
 	}
-	if (oraLegale == false && oraLegaleApplicata == true)
-	{
-		rtc_counter -= 3600;
-		pwr_disable_backup_domain_write_protect();
-		BKP_DR3 = 0;
-		pwr_enable_backup_domain_write_protect();
-
-		goto Again;
-	}
-
 }
 
 int rtc_get_hms(int &h, int &m, int &s)
@@ -138,13 +168,20 @@ void rtc_get_dmy(int &d, int &m, int &y)
 	y = BKP_DR3;
 }
 
-void rtc_set_ts(int Y, int M, int D, int h, int m, int s)
+void rtc_set_ts(int Y, int M, int D, int h, int m, int s, int state)
 {
 	int cnt = s + m * 60 + h * 60 * 60;
 	pwr_disable_backup_domain_write_protect();
 	BKP_DR1 = D;
 	BKP_DR2 = M;
 	BKP_DR3 = Y;
+	BKP_DR4 = state;
 	pwr_enable_backup_domain_write_protect();
 	rtc_set_counter_val(cnt);
+}
+
+void rtc_set_ts(int Y, int M, int D, int h, int m, int s)
+{
+	int state = getDaySaveState(Y, M, D, h);
+	rtc_set_ts(Y, M, D, h, m, s, state);
 }
