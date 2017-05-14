@@ -27,6 +27,7 @@
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/rtc.h>
+#include <libopencm3/stm32/spi.h>
 
 #include "usart_setup.hpp"
 #include "systick_setup.hpp"
@@ -154,10 +155,6 @@ int main()
 	rtc_setup();
 	Serial.begin();
 
-	//usart_setup();
-	//SerialClass Serial1(USART1); Serial1.begin();
-	//SerialClass Serial3(USART3); Serial3.begin();
-
 	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
 	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
 
@@ -179,24 +176,53 @@ int main()
 		Serial << b;
 	}
 
-
-	if (false)
-	{
-		// Blink the LED (PC13) on the board. 
-		for (int n = 0; n < 1024*1024; ++n)
-		{
-			if (true)
-			{
-				Serial << "12345678901234567890 ";
-				char b[10];
-				sprintf(b, "%5d\n\r", n);
-				Serial << b;
-			}
-			delay(1000);
-			// gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-
-		}
-	}
-
 	return 0;
 }
+
+
+class SPI
+{
+public:
+	SPI(int spi) : _spi(spi) {}
+	void begin(int speed = SPI_CR1_BR_FPCLK_DIV_64, bool enable16bits = false)
+	{
+		switch (_spi)
+		{
+		case SPI1: rcc_periph_clock_enable(RCC_SPI1); spi_reset(SPI1_BASE); break;
+		case SPI2: rcc_periph_clock_enable(RCC_SPI2); spi_reset(SPI2_BASE); break;
+		default: return;
+		}
+
+		// In arduino
+		// Mode 0 (the default) 
+		// - clock is normally low (CPOL = 0), 
+		// - and the data is sampled on the transition from low to high (leading edge) (CPHA = 0)
+		// - The default is most-significant bit first,
+		spi_init_master(_spi,
+				speed,
+				SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+				SPI_CR1_CPHA_CLK_TRANSITION_1,
+				enable16bits ? SPI_CR1_DFF_16BIT : SPI_CR1_DFF_8BIT,
+				SPI_CR1_MSBFIRST);
+
+		// Set NSS management to software.
+		// Note:
+		// Setting nss high is very important, even if we are controlling the GPIO
+		// ourselves this bit needs to be at least set to 1, otherwise the spi
+		// peripheral will not send any data out.
+		spi_enable_software_slave_management(_spi);
+		spi_set_nss_high(_spi);
+
+		/* Enable SPI1 periph. */
+		spi_enable(_spi);
+	}
+
+	void write(uint8_t n) { spi_write(_spi, n); }
+	void write(uint16_t n) { spi_write(_spi, n); }
+
+	uint8_t  read8()  { return spi_read(_spi); }
+	uint16_t read16() { return spi_read(_spi); }
+
+public:
+	uint32_t _spi;
+};

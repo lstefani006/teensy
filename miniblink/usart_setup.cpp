@@ -184,8 +184,9 @@ void USART::write(const char *p) {
 		usart_send_blocking(_usart, *p++);
 }
 
-void USART::write(int n) {
-	char b[10];
-	sprintf(b, "%5d", n);
+void USART::write(int n) 
+{
+	char b[16];
+	sprintf(b, "%d", n);
 	write(b);
 }
