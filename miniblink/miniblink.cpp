@@ -49,7 +49,7 @@ static void gpio_setup(void)
 }
 
 
-static void tim_setup(void)
+static void timer_setup(void)
 {
 	// Enable TIM2 clock. 
 	rcc_periph_clock_enable(RCC_TIM2);
@@ -59,6 +59,9 @@ static void tim_setup(void)
 
 	// Reset TIM2 peripheral to defaults. 
 	rcc_periph_reset_pulse(RST_TIM2);
+
+	// reset del timer
+	timer_reset(TIM2);
 
 	/* Timer global mode:
 	 * - No divider
@@ -76,13 +79,32 @@ static void tim_setup(void)
 	 * In our case, TIM2 on APB1 is running at double frequency, so this
 	 * sets the prescaler to have the timer run at 5kHz
 	 */
-	timer_set_prescaler(TIM2, ((rcc_apb1_frequency * 2) / 5000));
+	timer_set_prescaler(TIM2, ((rcc_apb1_frequency * 2) / 5000 - 1)); 
 
+	// imposta il valore nell'auto--reload register
+	// 1/2 secondo
+	timer_set_period(TIM2, 5000);
+
+	// Set the initual output compare value for OC1. 
+	timer_set_oc_value(TIM2, TIM_OC1, 100);
+
+	// Counter enable. 
+	timer_enable_counter(TIM2);
+
+	// sul update event il counter si carica dal suo auto-reload register
+	timer_enable_preload(TIM2);
+
+	// Enable Channel 1 compare interrupt to recalculate compare values 
+	// Abilito IRQ sul compare e sul raggiungimento del period
+	timer_enable_irq(TIM2, TIM_DIER_CC1IE | TIM_DIER_UIE);
+
+	/* OLD
 	// Disable preload. 
 	timer_disable_preload(TIM2);
 	timer_continuous_mode(TIM2);
 
 	// count full range, as we'll update compare value continuously 
+	// imposta il valore nell'auto--reload register
 	timer_set_period(TIM2, 65535);
 
 	// Set the initual output compare value for OC1. 
@@ -93,6 +115,7 @@ static void tim_setup(void)
 
 	// Enable Channel 1 compare interrupt to recalculate compare values 
 	timer_enable_irq(TIM2, TIM_DIER_CC1IE);
+	*/
 }
 
 extern "C" void tim2_isr(void)
@@ -102,71 +125,19 @@ extern "C" void tim2_isr(void)
 		// Clear compare interrupt flag. 
 		timer_clear_flag(TIM2, TIM_SR_CC1IF);
 
-		// Get current timer value to calculate next
-		// compare register value.
-		uint16_t compare_time = timer_get_counter(TIM2);
+		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+	}
+	if (timer_get_flag(TIM2, TIM_SR_UIF)) 
+	{
+		// Clear compare interrupt flag. 
+		timer_clear_flag(TIM2, TIM_SR_UIF);
 
-		// Calculate and set the next compare value. 
-		uint16_t frequency = 1000;
-		uint16_t new_time = compare_time + frequency;
-
-		timer_set_oc_value(TIM2, TIM_OC1, new_time);
+		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
 	}
 }
 
+USART Serial(USART1);
 
-class SerialClass
-{
-public:
-	SerialClass(int usart) : _usart(usart) {}
-
-	void begin()
-	{
-		rcc_periph_clken ckgpio, ckusart;
-		uint32_t gpioport;
-		uint16_t gpios_tx, gpios_rx;
-		switch (_usart)
-		{
-		case USART1: ckgpio = RCC_GPIOA; ckusart = RCC_USART1; gpioport = GPIOA; gpios_tx = GPIO_USART1_TX; gpios_rx = GPIO_USART1_RX; break;
-		case USART2: ckgpio = RCC_GPIOA; ckusart = RCC_USART2; gpioport = GPIOA; gpios_tx = GPIO_USART2_TX; gpios_rx = GPIO_USART2_RX; break;
-		case USART3: ckgpio = RCC_GPIOB; ckusart = RCC_USART3; gpioport = GPIOB; gpios_tx = GPIO_USART3_TX; gpios_rx = GPIO_USART3_RX; break;
-		default: return;
-		}
-		rcc_periph_clock_enable(ckgpio);
-		rcc_periph_clock_enable(ckusart);
-		gpio_set_mode(gpioport, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, gpios_tx);
-		gpio_set_mode(gpioport, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT,           gpios_rx);
-
-		// Setup UART parameters.
-		usart_set_baudrate(_usart, 38400);
-		usart_set_databits(_usart, 8);
-		usart_set_stopbits(_usart, USART_STOPBITS_1);
-		usart_set_mode(_usart, USART_MODE_TX);
-		usart_set_parity(_usart, USART_PARITY_NONE);
-		usart_set_flow_control(_usart, USART_FLOWCONTROL_NONE);
-
-		usart_enable(_usart);
-	}
-
-	void write(const char *p, int sz) {
-		const char *e = p + sz;
-		while (p != e)
-			usart_send_blocking(_usart, *p++);
-	}
-	void write(const char *p) {
-		while (*p)
-			usart_send_blocking(_usart, *p++);
-	}
-
-	void write(int n) {
-		char b[10];
-		sprintf(b, "%5d", n);
-		write(b);
-	}
-
-private:
-	int _usart;
-};
 
 
 int main()
@@ -177,10 +148,11 @@ int main()
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
 	gpio_setup();
-	tim_setup();
+	timer_setup();
 	usart_setup();
 	systick_setup();
 	rtc_setup();
+	Serial.begin();
 
 	//usart_setup();
 	//SerialClass Serial1(USART1); Serial1.begin();
@@ -193,19 +165,18 @@ int main()
 	{
 		delay(1000);
 
-		char b[16];
-		sprintf(b, "%5d\n\r", int(rtc_counter));
-		usart_write(b, strlen(b));
+		Serial << rtc_counter << "\n\r";
 
+		char b[20];
 		int h,m,s;
 		rtc_get_hms(h, m, s);
 		sprintf(b, "%02d:%02d:%02d\n\r", h, m, s);
-		usart_write(b, strlen(b));
+		Serial << b;
 
 		int D,M,Y;
 		rtc_get_dmy(D, M, Y);
 		sprintf(b, "%02d-%02d-%04d\n\r", D, M, Y);
-		usart_write(b, strlen(b));
+		Serial << b;
 	}
 
 
@@ -214,27 +185,15 @@ int main()
 		// Blink the LED (PC13) on the board. 
 		for (int n = 0; n < 1024*1024; ++n)
 		{
-			// Using API function gpio_toggle(): 
-			//gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-			//for (auto i = 0; i < 500000; i++)	// Wait a bit. 
-			//	__asm__("nop");
-
-			//Serial1.write(n);
-			//Serial3.write(n);
-
-			//Serial1.write(" TX1\n\r");
-			//Serial3.write(" TX3\n\r");
-
 			if (true)
 			{
-				const char *pp = "12345678901234567890 ";
-				usart_write(pp, strlen(pp));
+				Serial << "12345678901234567890 ";
 				char b[10];
 				sprintf(b, "%5d\n\r", n);
-				usart_write(b, strlen(b));
+				Serial << b;
 			}
 			delay(1000);
-			gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+			// gpio_toggle(GPIOC, GPIO13);	// LED on/off 
 
 		}
 	}
