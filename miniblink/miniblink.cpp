@@ -28,7 +28,7 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/rtc.h>
 
-#include "usart_irq.hpp"
+#include "usart_setup.hpp"
 #include "systick_setup.hpp"
 #include "rtc_setup.hpp"
 
