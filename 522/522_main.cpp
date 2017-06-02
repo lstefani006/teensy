@@ -40,7 +40,7 @@
 MFRC522 pdc(SS_PIN, RST_PIN);	// Create MFRC522 instance.
 
 
-
+#ifndef ARDUINO
 void kk()
 {
 	if (true)
@@ -79,6 +79,7 @@ void kk()
 	{
 	}
 }
+#endif
 
 bool swr(char ch) {
 	Serial.write(ch); return true;
@@ -106,7 +107,9 @@ void setup()
 		while(1);
 	}
 
+#ifndef ARDUINO
 	kk();
+#endif
 
 
 	Serial.println("Scan PICC to see UID and type...");

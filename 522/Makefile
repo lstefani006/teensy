@@ -18,9 +18,11 @@ else ifdef STM32F103
 	CXXFLAGS+=-I../util
 	CXXFLAGS+=-I$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
 else
-	CXXFLAGS=-I../AvrLib -I.
-	CXXFLAGS= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
-	VPATH=../AvrLib
+	CXXFLAGS=-I../AvrLib -I. -I../util
+	CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
+	VPATH+=../AvrLib
+	VPATH+=../util
+	VPATH+=$(ARDUINO)/hardware/arduino/avr/libraries/SPI/src
 endif
 
 
@@ -29,8 +31,11 @@ SRC+=\
 	MFRC522.cpp \
 	522_main.cpp \
 	SPI.cpp \
-	des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp \
-	uprintf.cpp
+	uprintf.cpp 
+
+ifndef ARDUINO
+SRC += des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp
+endif
 
 include ../util/makefile.mk
 

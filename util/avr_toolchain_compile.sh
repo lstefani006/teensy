@@ -3,8 +3,8 @@
 set -e
 set -x
 
-export V=6.2.0
-export B=2.27
+export V=7.1.0
+export B=2.28
 export N=2.0.0
 export AVR_DUDE=6.3
 

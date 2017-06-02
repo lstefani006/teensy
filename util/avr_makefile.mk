@@ -1,6 +1,5 @@
 include ../util/base_makefile.mk
 
-
 ##################################################
 CCOMMON= \
 		 -g \
@@ -16,29 +15,36 @@ CFLAGS+=$(CCOMMON) $(WC)
 CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++14 -fno-threadsafe-statics \
 		  -fno-exceptions
 
+
+ifndef ECHO
+	ECHO=@
+endif
+
+
+
 .obj/%.o : %.cpp | .obj
 	@echo $<
-	@avr-g++ -c $(CXXFLAGS) $< -o $@
+	$(ECHO)avr-g++ -c $(CXXFLAGS) $< -o $@
 
 .obj/%.o : %.c | .obj
 	@echo $<
-	@avr-gcc -c $(CFLAGS) $< -o $@
+	$(ECHO)avr-gcc -c $(CFLAGS) $< -o $@
 
 .lib/%.o : %.cpp | .lib
 	@echo $<
-	@avr-g++ -c $(CXXFLAGS) $< -o $@
+	$(ECHO)avr-g++ -c $(CXXFLAGS) $< -o $@
 
 .lib/%.o : %.c | .lib
 	@echo $<
-	@avr-gcc -c $(CFLAGS) $< -o $@
+	$(ECHO)avr-gcc -c $(CFLAGS) $< -o $@
 
 %.s : %.cpp
 	@echo $<
-	@avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
+	$(ECHO)avr-g++ -g -Wa,-adhls -c $(CXXFLAGS) $< > $@
 
 %.s : %.c
 	@echo $<
-	@avr-gcc -S -c $(CFLAGS) $< -o $@
+	$(ECHO)avr-gcc -S -c $(CFLAGS) $< -o $@
 
 VPATH+=$(ARDUINO)/hardware/arduino/avr/cores/arduino
 
@@ -63,13 +69,13 @@ TARGET:=$(TARGET:.hex=)
 all : $(TARGET).hex
 
 $(TARGET).hex : libArduinoPro.a $(OBJ)
-	@avr-g++ -o$(TARGET).elf -Wl,--gc-sections -mmcu=atmega328p $(OBJ) libArduinoPro.a 
-	@avr-objdump -h -S $(TARGET).elf > $(TARGET).dis
-	@avr-strip -g $(TARGET).elf
-	@avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(TARGET).elf $(TARGET).eep
-	@avr-objcopy -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex
-	@avr-size $(TARGET).elf
-	@avr-size --mcu=atmega328p --format=avr $(TARGET).elf
+	$(ECHO)avr-g++ -o$(TARGET).elf -Wl,--gc-sections -mmcu=atmega328p $(OBJ) libArduinoPro.a 
+	$(ECHO)avr-objdump -h -S $(TARGET).elf > $(TARGET).dis
+	$(ECHO)avr-strip -g $(TARGET).elf
+	$(ECHO)avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $(TARGET).elf $(TARGET).eep
+	$(ECHO)avr-objcopy -O ihex -R .eeprom $(TARGET).elf $(TARGET).hex
+	$(ECHO)avr-size $(TARGET).elf
+	$(ECHO)avr-size --mcu=atmega328p --format=avr $(TARGET).elf
 
 libArduinoPro.a : $(LIB_OBJ)
 	@rm -f $@
@@ -93,9 +99,9 @@ clean:
 #VERBOSE=-v
 VERBOSE=
 upload : $(TARGET).hex
-	@ArduinoSerialMonitor.exe -stop
-	@avrdude -C$(ARDUINO)/hardware/tools/avr/etc/avrdude.conf $(VERBOSE) -patmega328p -carduino \
+	$(ECHO)ArduinoSerialMonitor.exe -stop
+	$(ECHO)avrdude -C$(ARDUINO)/hardware/tools/avr/etc/avrdude.conf $(VERBOSE) -patmega328p -carduino \
 		-P/dev/ttyUSB0 -b57600 -D -Uflash:w:$(TARGET).hex
-	@ArduinoSerialMonitor.exe -run
+	$(ECHO)ArduinoSerialMonitor.exe -run
 
 -include $(OBJ:.o=.d)
