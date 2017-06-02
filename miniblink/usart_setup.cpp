@@ -174,12 +174,14 @@ void USART::begin()
 	usart_enable(_usart);
 }
 
-void USART::write(const char *p, int sz) {
+void USART::write(const char *p, int sz) 
+{
 	const char *e = p + sz;
 	while (p != e)
 		usart_send_blocking(_usart, *p++);
 }
-void USART::write(const char *p) {
+void USART::write(const char *p) 
+{
 	while (*p)
 		usart_send_blocking(_usart, *p++);
 }
