@@ -1056,9 +1056,7 @@ void MFRC522::PICC_DumpToSerial(const Uid *uid)
 	Serial.print("PICC type: ");
 	Serial.println(PICC_GetTypeName(piccType));
 
-	if (true)  // LEO ritorno senza il dump della carta.
-		return;
-	
+	/*
 	// Dump contents
 	switch (piccType) 
 	{
@@ -1095,6 +1093,7 @@ void MFRC522::PICC_DumpToSerial(const Uid *uid)
 
 	Serial.println();
 	PICC_HaltA(); // Already done if it was a MIFARE Classic PICC.
+	*/
 }
 
 /**

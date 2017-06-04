@@ -3,10 +3,33 @@
 set -e
 set -x
 
-export V=7.1.0
-export B=2.28
-export N=2.0.0
-export AVR_DUDE=6.3
+
+function download_latest_version() {
+	a=$(wget -q -O- $1 | egrep -o "$2$3$4" | sort -V | tail -1)
+	wget $1/$a
+}
+
+function get_latest_version() {
+	a=$(wget -q -O- $1 | egrep -o "$2$3$4" | sort -V | tail -1)
+	if [[ "$a" =~ $2($3)$4 ]]; then
+		echo ${BASH_REMATCH[1]}
+	else
+		echo ERROR
+	fi
+}
+
+export V=$(get_latest_version ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/ gcc-       [0-9\.]+     "")
+export B=$(get_latest_version http://ftp.gnu.org/gnu/binutils                     binutils-  [0-9\.]+     .tar.gz)
+export A=$(get_latest_version  http://download.savannah.gnu.org/releases/avrdude  avrdude-   [0-9\.]+     .tar.gz)
+export G=$(get_latest_version http://ftp.gnu.org/gnu/gdb                          gdb-       [0-9\.]+     .tar.gz)
+export N=$(get_latest_version http://download.savannah.gnu.org/releases/avr-libc  avr-libc-  [0-9\.]+     .tar.bz2)
+
+export AVR_DUDE=$A
+
+#export V=7.1.0
+#export B=2.28
+#export N=2.0.0
+#export AVR_DUDE=6.3
 
 export MYTOOLS=$PWD/avr-gcc-$V
 TARGET=""

@@ -1,0 +1,9 @@
+
+Implementazione per le DESFIRE x Arduino
+    https://github.com/JPG-Consulting/rfid-desfire.git 
+
+DES x arduino
+    https://github.com/spaniakos/ArduinoDES/
+    
+Nel https://github.com/spaniakos
+    ci sono molte cose utili....

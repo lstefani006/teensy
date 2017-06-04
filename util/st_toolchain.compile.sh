@@ -2,15 +2,25 @@
 set -e
 set -x
 
-#le versioni del compilatore, delle binutils della newlib
-#V=6.2.0
-#B=2.27
-#N=2.4.0
+function download_latest_version() {
+	a=$(wget -q -O- $1 | egrep -o "$2$3$4" | sort -V | tail -1)
+	wget $1/$a
+}
 
-V=6.3.0
-B=2.28
-N=2.5.0
-G=7.9.1
+function get_latest_version() {
+	a=$(wget -q -O- $1 | egrep -o "$2$3$4" | sort -V | tail -1)
+	if [[ "$a" =~ $2($3)$4 ]]; then
+		echo ${BASH_REMATCH[1]}
+	else
+		echo ERROR
+	fi
+}
+
+export V=$(get_latest_version ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/ gcc-       [0-9\.]+     "")
+export B=$(get_latest_version http://ftp.gnu.org/gnu/binutils                     binutils-  [0-9\.]+     .tar.gz)
+export N=$(get_latest_version ftp://sourceware.org/pub/newlib/index.html          newlib-    [0-9\.]+     .tar.gz)
+export A=$(get_latest_version  http://download.savannah.gnu.org/releases/avrdude  avrdude-   [0-9\.]+     .tar.gz)
+export G=$(get_latest_version http://ftp.gnu.org/gnu/gdb                          gdb-       [0-9\.]+     .tar.gz)
 
 # qui si imposta la cpu....
 #CPU="cortex-m4"   # teensy
@@ -54,7 +64,8 @@ if [ ! -e binutils-$B.tar.gz ] ; then
 	wget ftp://ftp.gnu.org/gnu/binutils/binutils-$B.tar.gz
 fi
 if [ ! -e newlib-$N.tar.gz ] ; then
-	wget  ftp://sources.redhat.com/pub/newlib/newlib-$N.tar.gz
+	#wget  ftp://sources.redhat.com/pub/newlib/newlib-$N.tar.gz
+	wget ftp://sourceware.org/pub/newlib/newlib-2.5.0.20170519.tar.gz
 fi
 if [ ! -e gdb-$G.tar.gz ] ; then
 	wget  ftp://ftp.gnu.org/gnu/gdb/gdb-$G.tar.gz
@@ -208,6 +219,7 @@ if [ ! -e gdb.ok ] ; then
 		--with-gnu-ld          \
 		--with-gnu-as          \
 		--disable-shared       \
+		--with-guile=no        \
 		$CONFIGURE
 	make all
 	make install

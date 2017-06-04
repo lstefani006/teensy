@@ -24,7 +24,7 @@
  * SPI MISO   12               50                MISO
  * SPI SCK    13               52                SCK
  *
- * The reader can be found on eBay for around 5 dollars. Search for "mf-rc522" on ebay.com. 
+ * The reader can be found on eBay for around 5 dollars. Search for F("mf-rc522") on ebay.com. 
  */
 
 #include <MFRC522.h>
@@ -46,7 +46,7 @@ void kk()
 	if (true)
 	{
 		DesContext dc;
-		desInit(&dc, (const uint8_t *)"ww", 2);
+		desInit(&dc, (const uint8_t *)F("ww"), 2);
 
 		const uint8_t *in = nullptr;
 		uint8_t *out = nullptr;
@@ -58,7 +58,7 @@ void kk()
 	if (true)
 	{
 		Des3Context dc3;
-		des3Init(&dc3, (const uint8_t *)"ww", 2);
+		des3Init(&dc3, (const uint8_t *)F("ww"), 2);
 
 		const uint8_t *in = nullptr;
 		uint8_t *out = nullptr;
@@ -68,7 +68,7 @@ void kk()
 	if (true)
 	{
 		AesContext dc3;
-		aesInit(&dc3, (const uint8_t *)"ww", 2);
+		aesInit(&dc3, (const uint8_t *)F("ww"), 2);
 
 		const uint8_t *in = nullptr;
 		uint8_t *out = nullptr;
@@ -90,7 +90,7 @@ void setup()
 	delay(1000*2);
 	Serial.begin(38400);	// Initialize serial communications with the PC
 	while (!Serial);
-	Serial.println("Start");
+	Serial.println(F("Start"));
 
 	uprintf_cb = swr; // [] (char ch) { Serial.write(ch); return true; };
 
@@ -98,11 +98,11 @@ void setup()
 	pdc.PCD_Init();	// Init MFRC522 card
 
 	int v = pdc.PCD_GetVersion();
-	Serial.print("Version = ");
+	Serial.print(F("Version = "));
 	Serial.println(v, HEX);
 	if (!(v == 0x91 || v == 0x92))
 	{
-		Serial.println("522 not found");
+		Serial.println(F("522 not found"));
 		delay(1000*10);
 		while(1);
 	}
@@ -112,7 +112,7 @@ void setup()
 #endif
 
 
-	Serial.println("Scan PICC to see UID and type...");
+	Serial.println(F("Scan PICC to see UID and type..."));
 }
 
 void dumpUL()
@@ -127,16 +127,16 @@ void dumpUL()
 			if (bsz == 18)
 			{
 				Serial.print(page);
-				Serial.print(" ");
+				Serial.print(F(" "));
 				for (int i = 0; i < 4; ++i)
-					uprintf(" %02x", bb[i]);
-				uprintf("\n");
+					uprintf(F(" %02x"), bb[i]);
+				uprintf(F("\n"));
 			}
 			else
-				uprintf("Ritorna %d\n", bsz);
+				uprintf(F("Ritorna %d\n"), bsz);
 		}
 		else
-			uprintf("Errore\n");
+			uprintf(F("Errore\n"));
 
 		if (page == 3) {
 			LB1 = bb[2];
@@ -146,38 +146,38 @@ void dumpUL()
 
 	if (true)
 	{
-		uprintf("LOCK BITS\n");
-		uprintf("Lock Bit - se settato la pagina e' a sola lettura\n");
+		uprintf(F("LOCK BITS\n"));
+		uprintf(F("Lock Bit - se settato la pagina e' a sola lettura\n"));
 		uint8_t m = 0b10000000;
 		for (int i = 7; i >= 3; i--)
 		{
 			if (i == 3)
-				uprintf("L%01x OTP", i);
+				uprintf(F("L%01x OTP"), i);
 			else
-				uprintf("L%01x    ", i);
-			if (LB1 & m) uprintf(" LOCKED"); else uprintf(" unlocked");
-			uprintf("\n");
+				uprintf(F("L%01x    "), i);
+			if (LB1 & m) uprintf(F(" LOCKED")); else uprintf(F(" unlocked"));
+			uprintf(F("\n"));
 			m>>=1;
 		}
 		m = 0b10000000;
 		for (int i = 7; i >= 0; i--)
 		{
-			uprintf("L%01x    ", i+8);
-			if (LB2 & m) uprintf(" LOCKED"); else uprintf(" unlocked");
-			uprintf("\n");
+			uprintf(F("L%01x    "), i+8);
+			if (LB2 & m) uprintf(F(" LOCKED")); else uprintf(F(" unlocked"));
+			uprintf(F("\n"));
 			m>>=1;
 		}
-		uprintf("BLOCK BITS\n");
-		uprintf("Block Bits - se settato blocca la modifica ai LOCK BITS\n");
+		uprintf(F("BLOCK BITS\n"));
+		uprintf(F("Block Bits - se settato blocca la modifica ai LOCK BITS\n"));
 		
-		uprintf("\nLB for 0xf to 0xa pages %s", ((LB1 & 0b100) ? "FROZEN" : "free"));
-		uprintf("\nLB for 0x9 to 0x4 pages %s", ((LB1 & 0b010) ? "FROZEN" : "free"));
-		uprintf("\nLB for 0x3 (OTP)        %s", ((LB1 & 0b001) ? "FROZEN" : "free"));
+		uprintf(F("\nLB for 0xf to 0xa pages %s"), ((LB1 & 0b100) ? "FROZEN" : "free"));
+		uprintf(F("\nLB for 0x9 to 0x4 pages %s"), ((LB1 & 0b010) ? "FROZEN" : "free"));
+		uprintf(F("\nLB for 0x3 (OTP)        %s"), ((LB1 & 0b001) ? "FROZEN" : "free"));
 
-		uprintf("\nOTP\n");
-		uprintf("Sono bit settati a ZERO in fabbrica\n");
-		uprintf("se scritti a UNO rimangono a UNO");
-		uprintf("se si fa write con un ZERO su di un UNO rimane uno\n");
+		uprintf(F("\nOTP\n"));
+		uprintf(F("Sono bit settati a ZERO in fabbrica\n"));
+		uprintf(F("se scritti a UNO rimangono a UNO"));
+		uprintf(F("se si fa write con un ZERO su di un UNO rimane uno\n"));
 	}
 }
 
@@ -194,14 +194,42 @@ void loop() {
 		return;
 
 	// Dump debug info about the card. PICC_HaltA() is automatically called.
-	uprintf("\n\n");
+	uprintf(F("\n\n"));
 	pdc.PICC_DumpToSerial(&(pdc.uid));
 
-	if (pdc.PICC_GetType(pdc.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL)
+	if (pdc.PICC_GetType(pdc.uid.sak) == MFRC522::PICC_TYPE_MIFARE_DESFIRE)
 	{
-		Serial.println("Ci provo");
-		dumpUL();
+		Serial.println(F("Desfire"));
 
+
+		byte selectApdu[] = { 
+			0x00, /* CLA */
+			0xA4, /* INS */
+			0x04, /* P1  */
+			0x00, /* P2  */
+			0x05, /* Length of AID  */
+			0xF2, 0x22, 0x22, 0x22, 0x22,
+		};
+		byte * backData = (byte *)malloc(16*sizeof(byte));
+		byte * dataLen = (byte *)16;
+
+		auto st = pdc.PCD_TransceiveData(selectApdu,10,backData,dataLen,NULL,0,false);
+		if (st != MFRC522::STATUS_OK) 
+		{
+			Serial.print(F("PCD_TransceiveData() failed: "));
+			Serial.println(pdc.GetStatusCodeName(st));
+		}
+		else
+		{
+			Serial.println(F("PICC_TransceiveData() success "));
+		}
+
+
+	}
+	else if (pdc.PICC_GetType(pdc.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL)
+	{
+		Serial.println(F("Ci provo"));
+		dumpUL();
 
 		byte bb[18];
 		byte bbsz = sizeof(bb);
@@ -210,20 +238,20 @@ void loop() {
 		auto st = pdc.MIFARE_Read(addr, bb, &bbsz);
 		if (st == MFRC522::STATUS_OK)
 		{
-			uprintf("Leggo pagina=%02x ==> %02x\n", addr, bb[0]);
+			uprintf(F("Leggo pagina=%02x ==> %02x\n"), addr, bb[0]);
 
 			bb[0] += 1;
 			st = pdc.MIFARE_Ultralight_Write(addr, bb, 4);
 			if (st == MFRC522::STATUS_OK)
 			{
-				uprintf("OK\n");
+				uprintf(F("OK\n"));
 				delay(1000*3);
 			}
 			else
-				uprintf("error %s\n", pdc.GetStatusCodeName(st));
+				uprintf(F("error %s\n"), pdc.GetStatusCodeName(st));
 		}
 		else
-			uprintf("error %s\n", pdc.GetStatusCodeName(st));
+			uprintf(F("error %s\n"), pdc.GetStatusCodeName(st));
 	}
 }
 
