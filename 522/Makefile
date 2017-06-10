@@ -33,9 +33,9 @@ SRC+=\
 	SPI.cpp \
 	uprintf.cpp 
 
-ifndef ARDUINO
+#ifndef ARDUINO
 SRC += des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp
-endif
+#endif
 
 include ../util/makefile.mk
 
