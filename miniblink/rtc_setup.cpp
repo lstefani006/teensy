@@ -111,7 +111,10 @@ extern "C" void rtc_isr(void)
 
 		case 2: // a estate .... aggiorno il clock
 			rtc_set_counter_val(rtc_get_counter_val() + 3600);
+			break;
+
 		case 3: // a estate/inverno .... vuole andare in inverno e c'è già
+			rtc_set_counter_val(rtc_get_counter_val() + 3600);
 			pwr_disable_backup_domain_write_protect();
 			BKP_DR4 = newState;
 			pwr_enable_backup_domain_write_protect();

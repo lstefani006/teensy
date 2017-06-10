@@ -10,3 +10,6 @@
 [submodule "LibStm/libopencm3-examples"]
 	path = LibStm/libopencm3-examples
 	url = https://github.com/libopencm3/libopencm3-examples.git
+[submodule "rfid"]
+	path = rfid
+	url = https://github.com/miguelbalboa/rfid.git

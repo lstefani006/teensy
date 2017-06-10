@@ -165,7 +165,7 @@ public:
 	{
 		int8_t ret = 0;
 		while (NumToBin())
-			ret += 1;
+			++ret;
 		return ret;
 	}
 	char Next()

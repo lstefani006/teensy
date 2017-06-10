@@ -97,6 +97,8 @@ void setup()
 	SPI.begin();		// Init SPI bus
 	pdc.PCD_Init();	// Init MFRC522 card
 
+	pdc.PCD_DumpVersionToSerial();
+	/*
 	int v = pdc.PCD_GetVersion();
 	Serial.print(F("Version = "));
 	Serial.println(v, HEX);
@@ -106,6 +108,7 @@ void setup()
 		delay(1000*10);
 		while(1);
 	}
+	*/
 
 #ifndef ARDUINO
 	kk();

@@ -18,17 +18,19 @@ else ifdef STM32F103
 	CXXFLAGS+=-I../util
 	CXXFLAGS+=-I$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
 else
-	CXXFLAGS=-I../AvrLib -I. -I../util
+	CXXFLAGS=-I. -I../util -I../rfid/src
 	CXXFLAGS+= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
 	VPATH+=../AvrLib
 	VPATH+=../util
 	VPATH+=$(ARDUINO)/hardware/arduino/avr/libraries/SPI/src
+	VPATH+=../rfid/src
 endif
 
 
 TARGET=522.hex
 SRC+=\
 	MFRC522.cpp \
+	MFRC522Debug.cpp \
 	522_main.cpp \
 	SPI.cpp \
 	uprintf.cpp 
