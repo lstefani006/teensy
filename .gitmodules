@@ -13,3 +13,9 @@
 [submodule "rfid"]
 	path = rfid
 	url = https://github.com/miguelbalboa/rfid.git
+[submodule "ArduinoDES"]
+	path = ArduinoDES
+	url = https://github.com/spaniakos/ArduinoDES/
+[submodule "rfid-desfire"]
+	path = rfid-desfire
+	url = https://github.com/JPG-Consulting/rfid-desfire.git
