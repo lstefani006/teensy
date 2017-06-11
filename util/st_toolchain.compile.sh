@@ -65,7 +65,7 @@ if [ ! -e binutils-$B.tar.gz ] ; then
 fi
 if [ ! -e newlib-$N.tar.gz ] ; then
 	#wget  ftp://sources.redhat.com/pub/newlib/newlib-$N.tar.gz
-	wget ftp://sourceware.org/pub/newlib/newlib-2.5.0.20170519.tar.gz
+	wget ftp://sourceware.org/pub/newlib/newlib-$N.tar.gz
 fi
 if [ ! -e gdb-$G.tar.gz ] ; then
 	wget  ftp://ftp.gnu.org/gnu/gdb/gdb-$G.tar.gz
