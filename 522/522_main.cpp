@@ -81,10 +81,6 @@ void kk()
 }
 #endif
 
-bool swr(char ch) {
-	Serial.write(ch); return true;
-}
-
 void setup() 
 {
 	delay(1000*2);
@@ -92,23 +88,12 @@ void setup()
 	while (!Serial);
 	Serial.println(F("Start"));
 
-	uprintf_cb = swr; // [] (char ch) { Serial.write(ch); return true; };
+	uprintf_cb = [] (char ch) { Serial.write(ch); return true; };
 
 	SPI.begin();		// Init SPI bus
 	pdc.PCD_Init();	// Init MFRC522 card
 
 	pdc.PCD_DumpVersionToSerial();
-	/*
-	int v = pdc.PCD_GetVersion();
-	Serial.print(F("Version = "));
-	Serial.println(v, HEX);
-	if (!(v == 0x91 || v == 0x92))
-	{
-		Serial.println(F("522 not found"));
-		delay(1000*10);
-		while(1);
-	}
-	*/
 
 #ifndef ARDUINO
 	kk();
@@ -184,13 +169,17 @@ void dumpUL()
 	}
 }
 
+static int G_n = 0;
 
 void loop() {
 	delay(100);
 
+	uprintf("Card Present %d\n", G_n++);
 	// Look for new cards
 	if (! pdc.PICC_IsNewCardPresent())
 		return;
+
+	uprintf("Card Present\n");
 
 	// Select one of the cards
 	if (! pdc.PICC_ReadCardSerial())

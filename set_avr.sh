@@ -13,6 +13,8 @@ if [ -e $HOME/arduino-1.6.11 ] ; then
 	echo arduino 1.6.11
 fi
 
+# per lanciare e stoppare ArduinoSerialMonitor.exe
+export PATH=$PATH:$HOME/teensy
 
 ########################################
 

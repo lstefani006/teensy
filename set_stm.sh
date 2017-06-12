@@ -9,4 +9,4 @@ export STM32F103=1
 
 export BMP_PORT=/dev/ttyBmpGdb
 export OPENCM3_DIR=$HOME/teensy/LibStm/libopencm3 
-#export V=1
+export V=1
