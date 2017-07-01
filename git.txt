@@ -13,6 +13,9 @@ git submodule update --init --recursive
 # per rinfrescare i submodule
 git submodule foreach --recursive git pull origin master
 
+# o forse meglio per aggiornare i submoduli
+git submodule update --remote --merge
+
 
 #####################################################################
 
