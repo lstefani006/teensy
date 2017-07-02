@@ -88,7 +88,7 @@ void setup()
 	while (!Serial);
 	Serial.println(F("Start"));
 
-	uprintf_cb = [] (char ch) { Serial.write(ch); return true; };
+	uprintf_cb = [] (char ch) -> bool { Serial.write(ch); return true; };
 
 	SPI.begin();		// Init SPI bus
 	pdc.PCD_Init();	// Init MFRC522 card

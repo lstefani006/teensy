@@ -8,107 +8,16 @@
 
 #include <stdio.h>
 #include <string.h>
-
-typedef int32_t ring_size_t;
-
-struct ring 
-{
-	uint8_t *data;
-	ring_size_t size;
-	uint32_t beg;
-	uint32_t end;
-};
-
-#define RING_SIZE(RING)  ((RING)->size - 1)
-#define RING_DATA(RING)  (RING)->data
-#define RING_EMPTY(RING) ((RING)->beg == (RING)->end)
-
-static void ring_init(volatile ring *ring, uint8_t *buf, ring_size_t size)
-{
-	ring->data = buf;
-	ring->size = size;
-	ring->beg = 0;
-	ring->end = 0;
-}
-
-static int32_t ring_write_ch(volatile ring *ring, uint8_t ch)
-{
-	// aspetto che il buffer si svuoti almeno parzialmente
-	if (((ring->end + 1) % ring->size) == ring->beg)
-		USART_CR1(USART1) |= USART_CR1_TXEIE;
-	while (((ring->end + 1) % ring->size) == ring->beg) {}
-
-	if (((ring->end + 1) % ring->size) != ring->beg) 
-	{
-		ring->data[ring->end] = ch;
-		ring->end = (ring->end + 1) % ring->size;
-		return (int32_t)ch;
-	}
-
-	return -1;
-}
-
-static void ring_write(volatile ring *ring, const uint8_t *data, ring_size_t size)
-{
-	for (int32_t i = 0; i < size; i++)
-		ring_write_ch(ring, data[i]);
-}
-
-static int32_t ring_read_ch(volatile ring *ring)
-{
-	if (ring->beg == ring->end) 
-		return -1;
-
-	int32_t ret = ring->data[ring->beg];
-	ring->beg = (ring->beg + 1) % ring->size;
-	return ret;
-}
+#include <ring.hpp>
+#include <errno.h>
 
 
 #define BUFFER_SIZE 8
+static uint8_t _output_ring_buffer[BUFFER_SIZE];
+static uint8_t _input_ring_buffer[BUFFER_SIZE];
 
-static struct ring output_ring;
-static uint8_t output_ring_buffer[BUFFER_SIZE];
-
-extern "C" void usart1_isr(void)
-{
-	// Check if we were called because of RXNE. 
-	if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
-			((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
-
-		/*
-		 LEO commentato perchè servirebbe un buffer in uscita
-
-		// Retrieve the data from the peripheral.
-		ring_write_ch(&output_ring, usart_recv(USART1));
-
-		// Enable transmit interrupt so it sends back the data.
-		USART_CR1(USART1) |= USART_CR1_TXEIE;
-		*/
-	}
-
-	// Check if we were called because of TXE.
-	if (((USART_CR1(USART1) & USART_CR1_TXEIE) != 0) &&
-			((USART_SR(USART1) & USART_SR_TXE) != 0)) {
-
-		int32_t data = ring_read_ch(&output_ring);
-		if (data == -1) {
-			// Disable the TXE interrupt, it's no longer needed.
-			USART_CR1(USART1) &= ~USART_CR1_TXEIE;
-		} else {
-			// Put data into the transmit register.
-			usart_send(USART1, data);
-		}
-	}
-}
-
-int usart_write(const char *ptr, int len)
-{
-	ring_write(&output_ring, (const uint8_t *)ptr, len);
-	USART_CR1(USART1) |= USART_CR1_TXEIE;
-	return len;
-}
-
+static Ring output_ring(_output_ring_buffer, BUFFER_SIZE);
+static Ring input_ring(_input_ring_buffer, BUFFER_SIZE);
 
 void usart_setup(void)
 {
@@ -116,17 +25,11 @@ void usart_setup(void)
 	rcc_periph_clock_enable(RCC_AFIO);
 	rcc_periph_clock_enable(RCC_USART1);
 
-	// Initialize output ring buffer. 
-	ring_init(&output_ring, output_ring_buffer, BUFFER_SIZE);
-
 	// Enable the USART1 interrupt. 
 	nvic_enable_irq(NVIC_USART1_IRQ);
 
-	// Setup GPIO pin GPIO_USART1_RE_TX on GPIO port B for transmit. 
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
-
-	// Setup GPIO pin GPIO_USART1_RE_RX on GPIO port B for receive. 
-	gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO_USART1_RX);
+	gpio_set_mode(GPIOA, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT,           GPIO_USART1_RX);
 
 	// Setup UART parameters. 
 	usart_set_baudrate(USART1, 38400);
@@ -142,6 +45,66 @@ void usart_setup(void)
 	// Finally enable the USART. 
 	usart_enable(USART1);
 }
+
+extern "C" void usart1_isr(void) 
+{
+	// Check if we were called because of RXNE.
+	if ((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0 && (USART_SR(USART1) & USART_SR_RXNE) != 0) 
+	{
+		// Retrieve the data from the peripheral.
+		input_ring.WriteCh(usart_recv(USART1));
+	}
+
+	// Check if we were called because of TXE.
+	if ((USART_CR1(USART1) & USART_CR1_TXEIE) != 0 && (USART_SR(USART1) & USART_SR_TXE) != 0)
+	{
+		int32_t data = output_ring.ReadCh();
+		if (data < 0)
+		{
+			// Disable the TXE interrupt, it's no longer needed.
+			USART_CR1(USART1) &= ~USART_CR1_TXEIE;
+		} 
+		else 
+		{
+			// Put data into the transmit register.
+			usart_send(USART1, data);
+		}
+	}
+}
+
+int usart_write(const char *ptr, int len)
+{
+	int ret = output_ring.Write((uint8_t *)ptr, len);
+	if (ret < 0)
+		ret = -ret;
+
+	// Abilitra TXE interrupt perchè c'è qualcosa da inviare ... ed è già nella coda.
+	USART_CR1(USART1) |= USART_CR1_TXEIE;
+	return ret;
+}
+
+void usart_write(const char *ptr)
+{
+	while (*ptr)
+	{
+		int r;
+		do { r = usart_write(ptr, 1); } while (r < 0);
+		ptr++;
+	}
+}
+
+int usart_read(char *ptr, int len)
+{
+	int n;
+	for (n = 0; n < len; ++n)
+	{
+		int r = input_ring.ReadCh();
+		if (r < 0) break;
+		*ptr++ = (char)(uint8_t)r;
+	}
+	return n;
+}
+
 
 /////////////////////////////////////////////////////////////
 

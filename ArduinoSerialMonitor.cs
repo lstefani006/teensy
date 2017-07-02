@@ -127,6 +127,9 @@ namespace ArduionoSerialMonitor
 						}
 					}
 				}
+				catch (ThreadAbortException ex)
+				{
+				}
 				catch (Exception ex)
 				{
 					Console.WriteLine("Task.Run error. {0}", ex);

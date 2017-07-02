@@ -3,27 +3,31 @@ V=1
 VPATH+=./crypto
 
 ifdef TEENSY
-	CXXFLAGS=-I../TeensyLib  -I.
+	CXXFLAGS=-I../TeensyLib
 	CXXFLAGS= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
 	VPATH=../TeensyLib
 	VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 else  ifdef ESP8266
-	CXXFLAGS=-I../EspLib -I.
+	CXXFLAGS=-I../EspLib
 	VPATH=../EspLib
 else ifdef STM32F103
-	CXXFLAGS=-I../StLib -I.
+	CXXFLAGS=-I../StLib
 	VPATH+=../StLib
-	VPATH+=../util
 	VPATH+=$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
-	CXXFLAGS+=-I../util
 	CXXFLAGS+=-I$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
 else
-	CXXFLAGS=-I. -I../util -I../rfid/src
 	CXXFLAGS+=-I$(ARDUINO)/hardware/arduino/avr/libraries/SPI/src -I.
-	VPATH+=../util
 	VPATH+=$(ARDUINO)/hardware/arduino/avr/libraries/SPI/src
 	VPATH+=../rfid/src
 endif
+
+VPATH+=../util
+VPATH+=../rfid/src
+CXXFLAGS+=-I../util
+CXXFLAGS+=-I. -I../rfid/src
+
+CXXFLAGS+=-g -O0
+
 
 TARGET=522.hex
 SRC+=\

@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////
 
 // Global state:
-volatile uint32_t systick_millis = 0;  // Millisecond counter.
+volatile systick_t systick_millis = 0;  // Millisecond counter.
 
 
 // Delay for the specified number of milliseconds.
@@ -18,7 +18,7 @@ volatile uint32_t systick_millis = 0;  // Millisecond counter.
 // every millisecond and then busy waiting in a loop.
 void delay(uint32_t milliseconds) 
 {
-	uint32_t target = systick_millis + milliseconds;
+	systick_t target = systick_millis + milliseconds;
 	while (target > systick_millis);
 }
 

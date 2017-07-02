@@ -137,7 +137,8 @@ extern "C" void tim2_isr(void)
 	}
 }
 
-USART Serial(USART1);
+USART Serial(USART3);
+
 
 
 
@@ -153,6 +154,7 @@ int main()
 	usart_setup();
 	systick_setup();
 	rtc_setup();
+	usart_setup();
 	Serial.begin();
 
 	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
@@ -162,67 +164,23 @@ int main()
 	{
 		delay(1000);
 
-		Serial << rtc_counter << "\n\r";
+		//Serial << rtc_counter << "\n\r";
 
 		char b[20];
 		int h,m,s;
 		rtc_get_hms(h, m, s);
 		sprintf(b, "%02d:%02d:%02d\n\r", h, m, s);
-		Serial << b;
+		Serial << "leo - " << b;
+		usart_write(b);
 
 		int D,M,Y;
 		rtc_get_dmy(D, M, Y);
 		sprintf(b, "%02d-%02d-%04d\n\r", D, M, Y);
-		Serial << b;
+		//Serial << b;
+		usart_write(b);
 	}
 
 	return 0;
 }
 
 
-class SPI
-{
-public:
-	SPI(int spi) : _spi(spi) {}
-	void begin(int speed = SPI_CR1_BR_FPCLK_DIV_64, bool enable16bits = false)
-	{
-		switch (_spi)
-		{
-		case SPI1: rcc_periph_clock_enable(RCC_SPI1); spi_reset(SPI1_BASE); break;
-		case SPI2: rcc_periph_clock_enable(RCC_SPI2); spi_reset(SPI2_BASE); break;
-		default: return;
-		}
-
-		// In arduino
-		// Mode 0 (the default) 
-		// - clock is normally low (CPOL = 0), 
-		// - and the data is sampled on the transition from low to high (leading edge) (CPHA = 0)
-		// - The default is most-significant bit first,
-		spi_init_master(_spi,
-				speed,
-				SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-				SPI_CR1_CPHA_CLK_TRANSITION_1,
-				enable16bits ? SPI_CR1_DFF_16BIT : SPI_CR1_DFF_8BIT,
-				SPI_CR1_MSBFIRST);
-
-		// Set NSS management to software.
-		// Note:
-		// Setting nss high is very important, even if we are controlling the GPIO
-		// ourselves this bit needs to be at least set to 1, otherwise the spi
-		// peripheral will not send any data out.
-		spi_enable_software_slave_management(_spi);
-		spi_set_nss_high(_spi);
-
-		/* Enable SPI1 periph. */
-		spi_enable(_spi);
-	}
-
-	void write(uint8_t n) { spi_write(_spi, n); }
-	void write(uint16_t n) { spi_write(_spi, n); }
-
-	uint8_t  read8()  { return spi_read(_spi); }
-	uint16_t read16() { return spi_read(_spi); }
-
-public:
-	uint32_t _spi;
-};

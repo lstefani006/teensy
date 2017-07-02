@@ -19,3 +19,12 @@
 [submodule "rfid-desfire"]
 	path = rfid-desfire
 	url = https://github.com/JPG-Consulting/rfid-desfire.git
+[submodule "PN532/PN532"]
+	path = PN532/PN532
+	url = https://github.com/elechouse/PN532.git
+[submodule "PN532/NDEF"]
+	path = PN532/NDEF
+	url = https://github.com/don/NDEF.git
+[submodule "PN532/Adafruit-PN532"]
+	path = PN532/Adafruit-PN532
+	url = https://github.com/adafruit/Adafruit-PN532.git
