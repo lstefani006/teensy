@@ -35,92 +35,69 @@ static void gpio_setup(void)
 	gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 }
 
-struct gp
-{
-	uint32_t gpioport;
-	uint16_t gpios;
-};
-gp GP[] = {
-	GPIOA, GPIO0,
-	GPIOA, GPIO1,
-	GPIOA, GPIO2,
-	GPIOA, GPIO3,
-	GPIOA, GPIO4,
-	GPIOA, GPIO5,
-	GPIOA, GPIO6,
-	GPIOA, GPIO7,
-	GPIOA, GPIO8,
-	GPIOA, GPIO9,
-	GPIOA, GPIO10,
-	GPIOA, GPIO11,
-	GPIOA, GPIO12,
-	GPIOA, GPIO13,
-	GPIOA, GPIO14,
-	GPIOA, GPIO15,
 
-	GPIOB, GPIO0,
-	GPIOB, GPIO1,
-	GPIOB, GPIO2,
-	GPIOB, GPIO3,
-	GPIOB, GPIO4,
-	GPIOB, GPIO5,
-	GPIOB, GPIO6,
-	GPIOA, GPIO7,
-	GPIOB, GPIO8,
-	GPIOB, GPIO9,
-	GPIOB, GPIO10,
-	GPIOB, GPIO11,
-	GPIOB, GPIO12,
-	GPIOB, GPIO13,
-	GPIOB, GPIO14,
-	GPIOB, GPIO15,
-
-	GPIOC, GPIO0,
-	GPIOC, GPIO1,
-	GPIOC, GPIO2,
-	GPIOC, GPIO3,
-	GPIOC, GPIO4,
-	GPIOC, GPIO5,
-	GPIOC, GPIO6,
-	GPIOC, GPIO7,
-	GPIOC, GPIO8,
-	GPIOC, GPIO9,
-	GPIOC, GPIO10,
-	GPIOC, GPIO11,
-	GPIOC, GPIO12,
-	GPIOC, GPIO13,
-	GPIOC, GPIO14,
-	GPIOC, GPIO15,
-};
-
-
+/*
+GPIO_CNF_INPUT_ANALOG            0x00 // Analog Input
+GPIO_CNF_INPUT_FLOAT             0x01 // Digital Input Floating
+GPIO_CNF_INPUT_PULL_UPDOWN       0x02 // Digital Input Pull Up and Down.
+GPIO_CNF_OUTPUT_PUSHPULL         0x00 // Digital Output Pushpull. 
+GPIO_CNF_OUTPUT_OPENDRAIN        0x01 // Digital Output Open Drain.
+GPIO_CNF_OUTPUT_ALTFN_PUSHPULL   0x02 // Alternate Function Output Pushpull. 
+GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN  0x03 // Alternate Function Output Open Drain.
+*/
 void pinMode(int pin, int mode) 
 {
+	rcc_periph_clken ro;
+	uint32_t gpioport;
+	switch (pin >> 16)
+	{
+	case 0: ro = RCC_GPIOA; gpioport = GPIOA; break;
+	case 1: ro = RCC_GPIOB; gpioport = GPIOB; break;
+	case 2: ro = RCC_GPIOC; gpioport = GPIOC; break;
+	default: return;
+	}
+	rcc_periph_clock_enable(ro);
+	uint16_t gpios = (uint16_t)(pin & 0xffffu);
+
 	switch (mode)
 	{
-	case INPUT:
-		gpio_set_mode( GP[pin].gpioport, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GP[pin].gpios);  
-		break;
-	case OUTPUT:
-		gpio_set_mode( GP[pin].gpioport, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GP[pin].gpios);
-		break;
-	case INPUT_PULLUP:
-		gpio_set_mode( GP[pin].gpioport, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GP[pin].gpios);
-		break;
+	case INPUT:        gpio_set_mode(gpioport, GPIO_MODE_INPUT,        GPIO_CNF_INPUT_FLOAT,     gpios); break;
+	case OUTPUT:       gpio_set_mode(gpioport, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, gpios); break;
+	case INPUT_PULLUP: gpio_set_mode(gpioport, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, gpios); break;
 	}
 }
 
 void digitalWrite(int pin, int v) 
 {
+	uint32_t gpioport;
+	switch (pin >> 16)
+	{
+	case 0: gpioport = GPIOA; break;
+	case 1: gpioport = GPIOB; break;
+	case 2: gpioport = GPIOC; break;
+	default: return;
+	}
+	uint16_t gpios = (uint16_t)(pin & 0xffffu);
+
 	if (v)
-		gpio_set(GP[pin].gpioport, GP[pin].gpios);
+		gpio_set(gpioport, gpios);
 	else
-		gpio_clear(GP[pin].gpioport, GP[pin].gpios);
+		gpio_clear(gpioport, gpios);
 }
 
 int digitalRead(int pin) 
 {
-	return gpio_get(GP[pin].gpioport, GP[pin].gpios);
+	uint32_t gpioport;
+	switch (pin >> 16)
+	{
+	case 0: gpioport = GPIOA; break;
+	case 1: gpioport = GPIOB; break;
+	case 2: gpioport = GPIOC; break;
+	default: return -1;
+	}
+	uint16_t gpios = (uint16_t)(pin & 0xffffu);
+
+	return gpio_get(gpioport, gpios) != 0 ? HIGH : LOW;
 }
 
 uint8_t rx[4];
@@ -141,14 +118,14 @@ int main()
 
 	gpio_setup();
 	systick_setup();
-	rtc_setup();
+	// rtc_setup();
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
 
 	gpio_set(GPIOC, GPIO13);
 	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-		delay(1000);
+	delay(1000);
 	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-		delay(1000);
+	delay(1000);
 	gpio_set(GPIOC, GPIO13);
 
 	setup();

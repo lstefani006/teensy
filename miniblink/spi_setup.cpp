@@ -1,4 +1,5 @@
 #include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/spi.h>
 
@@ -9,14 +10,36 @@
 
 #include <spi_setup.hpp>
 
+/*
+ * SPI1 ==> SS=PA4  SCK=PA5  MISO=PA6  MOSI=PA7
+ * SPI1 ==> SS=PA15 SCK=PB3  MISO=PB4  MOSI=PB5
+ *
+ * SPI2 ==> SS=PB12 SCK=PB13 MISO=PB14 MOSI=PB15
+ */
 void SPIClass::begin(int speed, bool enable16bits)
 {
 	switch (_spi)
 	{
-	case SPI1: rcc_periph_clock_enable(RCC_SPI1); spi_reset(SPI1_BASE); break;
-	case SPI2: rcc_periph_clock_enable(RCC_SPI2); spi_reset(SPI2_BASE); break;
-	default: return;
+	case SPI1: 
+		rcc_periph_clock_enable(RCC_GPIOA);
+		gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO4 | GPIO5 | GPIO7);
+		gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO6);
+		rcc_periph_clock_enable(RCC_SPI1); 
+		spi_reset(SPI1_BASE);
+		break;
+
+	case SPI2: 
+		rcc_periph_clock_enable(RCC_GPIOB);
+		gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO12 | GPIO13 | GPIO15);
+		gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO14);
+		rcc_periph_clock_enable(RCC_SPI2); 
+		spi_reset(SPI2_BASE);
+		break;
+
+	default: 
+		return;
 	}
+
 
 	// In arduino
 	// Mode 0 (the default) 

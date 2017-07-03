@@ -153,18 +153,11 @@ int main()
 
 	gpio_setup();
 	timer_setup();
-	//usart_setup();
 	systick_setup();
-	rtc_setup();
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
+	rtc_setup();
 
-	gpio_set(GPIOC, GPIO13);
-	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-		delay(1000);
-	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-		delay(1000);
-	gpio_set(GPIOC, GPIO13);
-
+	int bb = 0;
 	for (;;)
 	{
 		delay(1000);
@@ -180,14 +173,15 @@ int main()
 		int D,M,Y;
 		rtc_get_dmy(D, M, Y);
 		sprintf(b, "%02d-%02d-%04d\n\r", D, M, Y);
-		Serial << "leo2 - " << b;
+		Serial << bb++ <<  " leo2 - " << b;
 
+		/*
 		{
 			int ch = Serial.getch();
 			if (ch >= 0)
-				Serial << "Leggo " << ch << "\n\r";
+				Serial << bb++ << " Leggo " << ch << "\n\r";
 			else
-				Serial << "NON Leggo\n\r";
+				Serial << bb++ << " NON Leggo\n\r";
 		}
 
 		if (Serial.rxError())
@@ -195,6 +189,7 @@ int main()
 			Serial << "ERRORRE !!!!!\n\r";
 			Serial.clearError();
 		}
+		*/
 	}
 
 	return 0;

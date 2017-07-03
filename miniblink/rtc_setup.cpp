@@ -1,6 +1,9 @@
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rtc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/f1/bkp.h>
+
 
 #include "rtc_setup.hpp"
 
@@ -9,6 +12,7 @@ void rtc_set_ts(int Y, int M, int D, int h, int m, int s, int state);
 void rtc_setup()
 {
 	rtc_auto_awake(RCC_LSE, 0x7fff);
+
 
 	// Without this the RTC interrupt routine will never be called.
 	nvic_enable_irq(NVIC_RTC_IRQ);
@@ -62,6 +66,9 @@ extern "C" void rtc_isr(void)
 
 	// get value
 	rtc_counter = rtc_get_counter_val();
+
+	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+	return;
 
 	// partendo da rtc_counter calcola la data e l'ora.
 	int h, m, s;
@@ -152,6 +159,7 @@ extern "C" void rtc_isr(void)
 		}
 		break;
 	}
+
 }
 
 int rtc_get_hms(int &h, int &m, int &s)

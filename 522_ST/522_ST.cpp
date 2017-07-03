@@ -27,6 +27,12 @@
  * The reader can be found on eBay for around 5 dollars. Search for F("mf-rc522") on ebay.com. 
  */
 
+/*
+ * SPI1 ==> SS=PA4  SCK=PA5  MISO=PA6  MOSI=PA7
+ * SPI1 ==> SS=PA15 SCK=PB3  MISO=PB4  MOSI=PB5
+ *
+ * SPI2 ==> SS=PB12 SCK=PB13 MISO=PB14 MOSI=PB15
+ */
 #include <MFRC522.h>
 
 #define SS_PIN 10
