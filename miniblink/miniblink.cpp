@@ -126,20 +126,22 @@ extern "C" void tim2_isr(void)
 		// Clear compare interrupt flag. 
 		timer_clear_flag(TIM2, TIM_SR_CC1IF);
 
-		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+//		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
 	}
 	if (timer_get_flag(TIM2, TIM_SR_UIF)) 
 	{
 		// Clear compare interrupt flag. 
 		timer_clear_flag(TIM2, TIM_SR_UIF);
 
-		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+//		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
 	}
 }
 
-USART Serial(USART3);
+USARTIRQ Serial(USART1);
 
 
+uint8_t rx[4];
+uint8_t tx[4];
 
 
 int main()
@@ -151,33 +153,48 @@ int main()
 
 	gpio_setup();
 	timer_setup();
-	usart_setup();
+	//usart_setup();
 	systick_setup();
 	rtc_setup();
-	usart_setup();
-	Serial.begin();
+	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
 
+	gpio_set(GPIOC, GPIO13);
 	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+		delay(1000);
 	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+		delay(1000);
+	gpio_set(GPIOC, GPIO13);
 
 	for (;;)
 	{
 		delay(1000);
 
-		//Serial << rtc_counter << "\n\r";
+		Serial << rtc_counter << "\n\r";
 
 		char b[20];
 		int h,m,s;
 		rtc_get_hms(h, m, s);
 		sprintf(b, "%02d:%02d:%02d\n\r", h, m, s);
-		Serial << "leo - " << b;
-		usart_write(b);
+		Serial << "leo1 - " << b;
 
 		int D,M,Y;
 		rtc_get_dmy(D, M, Y);
 		sprintf(b, "%02d-%02d-%04d\n\r", D, M, Y);
-		//Serial << b;
-		usart_write(b);
+		Serial << "leo2 - " << b;
+
+		{
+			int ch = Serial.getch();
+			if (ch >= 0)
+				Serial << "Leggo " << ch << "\n\r";
+			else
+				Serial << "NON Leggo\n\r";
+		}
+
+		if (Serial.rxError())
+		{
+			Serial << "ERRORRE !!!!!\n\r";
+			Serial.clearError();
+		}
 	}
 
 	return 0;

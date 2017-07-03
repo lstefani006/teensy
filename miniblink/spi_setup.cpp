@@ -9,7 +9,7 @@
 
 #include <spi_setup.hpp>
 
-void SPI::begin(int speed, bool enable16bits)
+void SPIClass::begin(int speed, bool enable16bits)
 {
 	switch (_spi)
 	{

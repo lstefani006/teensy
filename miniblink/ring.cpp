@@ -1,13 +1,27 @@
 #include <ring.hpp>
 
+Ring::Ring()
+	: _data(nullptr), _size(0), _begin(0), _end(0)
+{
+}
+
 Ring::Ring(uint8_t *buf, int32_t size) 
 	: _data(buf), _size(size), _begin(0), _end(0)
 {
 }
 
+void Ring::begin(uint8_t *buf, int32_t size) 
+{
+	_data = buf;
+	_size = size;
+	_begin = 0;
+	_end = 0;
+}
+
 int32_t Ring::WriteCh(uint8_t ch)
 {
-	if (this->Full()) return -1;
+	if (this->Full()) 
+		return -1;
 
 	this->_data[this->_end] = ch;
 	this->_end = (this->_end + 1) % this->_size;

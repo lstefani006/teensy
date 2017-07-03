@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #else
 inline uint8_t pgm_read_byte(const char *s) { return *s; }
+inline uint8_t pgm_read_byte(const uint8_t *s) { return *s; }
 inline unsigned long pgm_read_dword(const unsigned long *s) { return *s; }
 inline size_t strlen_P(const char *s) { return strlen(s); }
 #define PROGMEM
@@ -464,6 +465,7 @@ int uprintf(const __FlashStringHelper *fmt, ...)
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 #ifndef ARDUINO
+#ifdef TEST
 
 #include <stdio.h>
 
@@ -570,4 +572,5 @@ int main()
 	return 0;
 }
 
+#endif
 #endif

@@ -1,18 +1,14 @@
 #ifndef __ring_hpp__
 #define __ring_hpp__
 
-/******************************************************************************
- *  Simple ringbuffer implementation from open-bldc's libgovernor that
- *  you can find at:
- *  https://github.com/open-bldc/open-bldc/tree/master/source/libgovernor
- ******************************************************************************/
-
 #include <stdint.h>
 
 class Ring
 {
 public:
+	Ring();
 	Ring(uint8_t *buf, int32_t size);
+	void begin(uint8_t *buf, int32_t size);
 
 	int32_t WriteCh(uint8_t ch);
 	int32_t Write(const uint8_t *data, int32_t size);
