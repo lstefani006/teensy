@@ -157,11 +157,18 @@ int main()
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
 	rtc_setup();
 
+	for (int i = 0; i < 10; ++i)
+	{
+		delay(200);
+		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+	}
+
 	int bb = 0;
 	for (;;)
 	{
 		delay(1000);
 
+		Serial << bb++ <<  " " ;
 		Serial << rtc_counter << "\n\r";
 
 		char b[20];
@@ -170,10 +177,12 @@ int main()
 		sprintf(b, "%02d:%02d:%02d\n\r", h, m, s);
 		Serial << "leo1 - " << b;
 
+		/*
 		int D,M,Y;
 		rtc_get_dmy(D, M, Y);
 		sprintf(b, "%02d-%02d-%04d\n\r", D, M, Y);
 		Serial << bb++ <<  " leo2 - " << b;
+		*/
 
 		/*
 		{

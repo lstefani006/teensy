@@ -157,6 +157,7 @@ class binFormatter : public Yield<char>
 {
 	typedef Yield<char> base;
 public:
+	binFormatter() : v(0), k(0) {}
 	void Init(unsigned long _v)
 	{
 		base::Init();

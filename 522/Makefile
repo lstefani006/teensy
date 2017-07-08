@@ -26,7 +26,13 @@ VPATH+=../rfid/src
 CXXFLAGS+=-I../util
 CXXFLAGS+=-I. -I../rfid/src
 
-CXXFLAGS+=-g -O0
+ifdef STM32F103
+	CXXFLAGS+=-DSTM32F1 -I/home/leo/teensy/LibStm/libopencm3/include
+endif
+
+G=-g
+O=-O0
+E=
 
 
 TARGET=522.hex

@@ -7,17 +7,37 @@ class SPIClass
 {
 public:
 	SPIClass(int spi) : _spi(spi) {}
-	void begin(int speed = SPI_CR1_BR_FPCLK_DIV_64, bool enable16bits = false);
+	void begin(int speed = SPI_CR1_BAUDRATE_FPCLK_DIV_16, bool enable16bits = false);
 
-	void write(uint8_t n) { spi_write(_spi, n); }
-	void write(uint16_t n) { spi_write(_spi, n); }
+//	void write(uint8_t n) { spi_xfer(_spi, n); }
+//	void write(uint16_t n) { spi_xfer(_spi, n); }
+
 	uint8_t transfer(uint8_t v) { return spi_xfer(_spi, v); }
+#if 0
+	uint8_t transfer(uint8_t v) { 
+		/* Wait for transfer finished. */
+		while (!(SPI_SR(_spi) & SPI_SR_TXE));
 
-	uint8_t  read8()  { return spi_read(_spi); }
-	uint16_t read16() { return spi_read(_spi); }
+		/* Write data (8 or 16 bits, depending on DFF) into DR. */
+		SPI_DR(_spi) = v;
+
+		/* Wait for transfer finished. */
+		while (!(SPI_SR(_spi) & SPI_SR_RXNE));
+
+		/* Read the data (8 or 16 bits, depending on DFF bit) from DR. */
+		return SPI_DR(_spi);
+	}
+#endif
+
+//	uint8_t  read8()  { return spi_read(_spi); }
+//	uint16_t read16() { return spi_read(_spi); }
 
 	void beginTransaction(...) {}
 	void endTransaction() {}
+
+	uint32_t SR() const { return SPI_SR(_spi) ; }
+	uint32_t CR1() const { return SPI_CR1(_spi) ; }
+	uint32_t CR2() const { return SPI_CR2(_spi) ; }
 
 public:
 	uint32_t _spi;

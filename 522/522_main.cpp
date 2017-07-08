@@ -35,8 +35,27 @@
 #include "crypto/aes.h"
 #include "crypto/rsa.h"
 
-#define SS_PIN 10
+#ifdef MCU_STM32F103CB
+namespace CM3
+{
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/timer.h>
+#include <libopencm3/cm3/systick.h>
+#include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/rtc.h>
+#include <libopencm3/stm32/spi.h>
+}
+#endif
+
+#ifdef MCU_STM32F103CB
+#define SS_PIN  PA4
+#define RST_PIN PC13
+#else
+#define SS_PIN  10
 #define RST_PIN 9
+#endif
 MFRC522 pdc(SS_PIN, RST_PIN);	// Create MFRC522 instance.
 
 
@@ -81,8 +100,12 @@ void kk()
 }
 #endif
 
+uint32_t SR() { return SPI_SR(SPI1) ; }
+uint32_t CR1() { return SPI_CR1(SPI1) ; }
 void setup() 
 {
+	delayMicroseconds(10);
+
 	delay(1000*2);
 	Serial.begin(38400);	// Initialize serial communications with the PC
 	while (!Serial);
@@ -94,6 +117,10 @@ void setup()
 	pdc.PCD_Init();	// Init MFRC522 card
 
 	pdc.PCD_DumpVersionToSerial();
+
+	Serial.print("SR="); Serial.println(SR(), HEX);
+	Serial.print("CR1="); Serial.println(CR1(), HEX);
+	delay(1000*2);
 
 #ifndef ARDUINO
 	kk();
@@ -157,7 +184,7 @@ void dumpUL()
 		}
 		uprintf(F("BLOCK BITS\n"));
 		uprintf(F("Block Bits - se settato blocca la modifica ai LOCK BITS\n"));
-		
+
 		uprintf(F("\nLB for 0xf to 0xa pages %s"), ((LB1 & 0b100) ? "FROZEN" : "free"));
 		uprintf(F("\nLB for 0x9 to 0x4 pages %s"), ((LB1 & 0b010) ? "FROZEN" : "free"));
 		uprintf(F("\nLB for 0x3 (OTP)        %s"), ((LB1 & 0b001) ? "FROZEN" : "free"));

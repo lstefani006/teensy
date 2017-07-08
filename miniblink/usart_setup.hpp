@@ -22,6 +22,7 @@ int usart_read(char *ptr, int len);
 */
 
 ////////////////////////////////////////////////////////////////////
+enum Format { HEX, DEC };
 ////////////////////////////////////////////////////////////////////
 // Sola scrittura a POLLING
 class USART
@@ -30,6 +31,7 @@ public:
 	USART(int usart) : _usart(usart) {}
 
 	void begin();
+	void begin(int /*speed*/) {} // per compatibilità
 	void write(const char *p, int sz);
 	void write(const char *p);
 	void write(int n);
@@ -37,11 +39,20 @@ public:
 	USART & operator << (int n) { write(n); return *this; }
 	USART & operator << (const char *n) { write(n); return *this; }
 
+	void println() { write("\r\n"); }
+	void print(const char *p) { write(p); }
+	void println(const char *p) { write(p); println(); }
+
+	void print(int n) { write(n); }
+	void println(int n) { print(n); write("\r\n"); }
+
+	void print(int n, Format f) { char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); print(b); }
+	void println(int n, Format f){ char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); println(b); }
+
 private:
 	int _usart;
 };
 
-enum Format { HEX, DEC };
 
 ////////////////////////////////////////////////////////////////////
 // Scrittura/LEttura ad INTERRUPT
@@ -53,6 +64,7 @@ public:
 	void begin(uint8_t *brx, int szrx, uint8_t *btx, int sztx);
 	void begin(int /*speed*/) {} // per compatibilità
 
+	int write(const char *tx, int sz) { return write((const uint8_t *)tx, sz); }
 	int write(const uint8_t *tx, int sz);
 	int read(uint8_t *rx, int sz);
 
@@ -66,8 +78,8 @@ public:
 	void print(int n) { write(n); }
 	void println(int n) { print(n); write("\r\n"); }
 
-	void print(int n, Format) { print(n); }
-	void println(int n, Format) { println(n); }
+	void print(int n, Format f) { char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); print(b); }
+	void println(int n, Format f){ char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); println(b); }
 
 	int getch();
 

@@ -19,37 +19,81 @@
 #include <../rfid/src/MFRC522.cpp>
 #include <../rfid/src/MFRC522Debug.cpp>
 
-static void gpio_setup(void)
+static uint16_t getGPIO(int pin)
 {
-	// Enable GPIOC clock. 
-	// Manually: 
-	// RCC_APB2ENR |= RCC_APB2ENR_IOPCEN;
-	// Using API functions: 
-	rcc_periph_clock_enable(RCC_GPIOC);
+	switch (pin)
+	{
+	case PA0:  return GPIO0;
+	case PA1:  return GPIO1;
+	case PA2:  return GPIO2;
+	case PA3:  return GPIO3;
+	case PA4:  return GPIO4;
+	case PA5:  return GPIO5;
+	case PA6:  return GPIO6;
+	case PA7:  return GPIO7;
+	case PA8:  return GPIO8;
+	case PA9:  return GPIO9;
+	case PA10: return GPIO10;
+	case PA11: return GPIO11;
+	case PA12: return GPIO12;
+	case PA13: return GPIO13;
+	case PA14: return GPIO14;
+	case PA15: return GPIO15;
 
-	// Set GPIO12 (in GPIO port C) to 'output push-pull'. 
-	// Manually: 
-	// GPIOC_CRH = (GPIO_CNF_OUTPUT_PUSHPULL << (((13 - 8) * 4) + 2));
-	// GPIOC_CRH |= (GPIO_MODE_OUTPUT_2_MHZ << ((13 - 8) * 4));
-	// Using API functions: 
-	gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+	case PB0:  return GPIO0;
+	case PB1:  return GPIO1;
+	case PB2:  return GPIO2;
+	case PB3:  return GPIO3;
+	case PB4:  return GPIO4;
+	case PB5:  return GPIO5;
+	case PB6:  return GPIO6;
+	case PB7:  return GPIO7;
+	case PB8:  return GPIO8;
+	case PB9:  return GPIO9;
+	case PB10: return GPIO10;
+	case PB11: return GPIO11;
+	case PB12: return GPIO12;
+	case PB13: return GPIO13;
+	case PB14: return GPIO14;
+	case PB15: return GPIO15;
+
+	case PC0:  return GPIO0;
+	case PC1:  return GPIO1;
+	case PC2:  return GPIO2;
+	case PC3:  return GPIO3;
+	case PC4:  return GPIO4;
+	case PC5:  return GPIO5;
+	case PC6:  return GPIO6;
+	case PC7:  return GPIO7;
+	case PC8:  return GPIO8;
+	case PC9:  return GPIO9;
+	case PC10: return GPIO10;
+	case PC11: return GPIO11;
+	case PC12: return GPIO12;
+	case PC13: return GPIO13;
+	case PC14: return GPIO14;
+	case PC15: return GPIO15;
+
+
+	default: return 0;
+	}
 }
 
 
 /*
-GPIO_CNF_INPUT_ANALOG            0x00 // Analog Input
-GPIO_CNF_INPUT_FLOAT             0x01 // Digital Input Floating
-GPIO_CNF_INPUT_PULL_UPDOWN       0x02 // Digital Input Pull Up and Down.
-GPIO_CNF_OUTPUT_PUSHPULL         0x00 // Digital Output Pushpull. 
-GPIO_CNF_OUTPUT_OPENDRAIN        0x01 // Digital Output Open Drain.
-GPIO_CNF_OUTPUT_ALTFN_PUSHPULL   0x02 // Alternate Function Output Pushpull. 
-GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN  0x03 // Alternate Function Output Open Drain.
+   GPIO_CNF_INPUT_ANALOG            0x00 // Analog Input
+   GPIO_CNF_INPUT_FLOAT             0x01 // Digital Input Floating
+   GPIO_CNF_INPUT_PULL_UPDOWN       0x02 // Digital Input Pull Up and Down.
+   GPIO_CNF_OUTPUT_PUSHPULL         0x00 // Digital Output Pushpull. 
+   GPIO_CNF_OUTPUT_OPENDRAIN        0x01 // Digital Output Open Drain.
+   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL   0x02 // Alternate Function Output Pushpull. 
+   GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN  0x03 // Alternate Function Output Open Drain.
 */
 void pinMode(int pin, int mode) 
 {
 	rcc_periph_clken ro;
 	uint32_t gpioport;
-	switch (pin >> 16)
+	switch (pin >> 4)
 	{
 	case 0: ro = RCC_GPIOA; gpioport = GPIOA; break;
 	case 1: ro = RCC_GPIOB; gpioport = GPIOB; break;
@@ -57,27 +101,27 @@ void pinMode(int pin, int mode)
 	default: return;
 	}
 	rcc_periph_clock_enable(ro);
-	uint16_t gpios = (uint16_t)(pin & 0xffffu);
+	uint16_t gpios = getGPIO(pin);
 
 	switch (mode)
 	{
-	case INPUT:        gpio_set_mode(gpioport, GPIO_MODE_INPUT,        GPIO_CNF_INPUT_FLOAT,     gpios); break;
-	case OUTPUT:       gpio_set_mode(gpioport, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, gpios); break;
-	case INPUT_PULLUP: gpio_set_mode(gpioport, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, gpios); break;
+	case INPUT:        gpio_set_mode(gpioport, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT,       gpios); break;
+	case OUTPUT:       gpio_set_mode(gpioport, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,   gpios); break;
+	case INPUT_PULLUP: gpio_set_mode(gpioport, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_PULL_UPDOWN, gpios); gpio_set(gpioport, gpios); break;
 	}
 }
 
 void digitalWrite(int pin, int v) 
 {
 	uint32_t gpioport;
-	switch (pin >> 16)
+	switch (pin >> 4)
 	{
 	case 0: gpioport = GPIOA; break;
 	case 1: gpioport = GPIOB; break;
 	case 2: gpioport = GPIOC; break;
 	default: return;
 	}
-	uint16_t gpios = (uint16_t)(pin & 0xffffu);
+	uint16_t gpios = getGPIO(pin);
 
 	if (v)
 		gpio_set(gpioport, gpios);
@@ -88,20 +132,20 @@ void digitalWrite(int pin, int v)
 int digitalRead(int pin) 
 {
 	uint32_t gpioport;
-	switch (pin >> 16)
+	switch (pin >> 4)
 	{
 	case 0: gpioport = GPIOA; break;
 	case 1: gpioport = GPIOB; break;
 	case 2: gpioport = GPIOC; break;
 	default: return -1;
 	}
-	uint16_t gpios = (uint16_t)(pin & 0xffffu);
+	uint16_t gpios = getGPIO(pin);
 
 	return gpio_get(gpioport, gpios) != 0 ? HIGH : LOW;
 }
 
-uint8_t rx[4];
-uint8_t tx[4];
+uint8_t rx[16];
+uint8_t tx[256];
 USARTIRQ Serial(USART1);
 
 void setup();
@@ -116,17 +160,24 @@ int main()
 	// lse => 32768Khz external clock
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
-	gpio_setup();
 	systick_setup();
-	// rtc_setup();
+	rtc_setup();
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
+	//Serial.begin();
 
-	gpio_set(GPIOC, GPIO13);
-	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-	delay(1000);
-	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-	delay(1000);
-	gpio_set(GPIOC, GPIO13);
+	if (false)
+	{
+		pinMode(PC13, OUTPUT);
+		digitalWrite(PC13, HIGH);
+		for (int i = 0; i < 20; ++i)
+		{
+			if (digitalRead(PC13) == HIGH)
+				digitalWrite(PC13, LOW);
+			else
+				digitalWrite(PC13, HIGH);
+			delay(500);
+		}
+	}
 
 	setup();
 	while(1)

@@ -37,5 +37,5 @@ void systick_setup(void)
 extern "C" void sys_tick_handler() 
 {
 	// Increment the global millisecond count.
-	systick_millis++;
+	systick_millis += 1;
 }

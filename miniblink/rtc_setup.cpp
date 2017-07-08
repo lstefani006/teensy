@@ -67,9 +67,6 @@ extern "C" void rtc_isr(void)
 	// get value
 	rtc_counter = rtc_get_counter_val();
 
-	gpio_toggle(GPIOC, GPIO13);	// LED on/off 
-	return;
-
 	// partendo da rtc_counter calcola la data e l'ora.
 	int h, m, s;
 	int cnt = rtc_get_hms(h,m,s);

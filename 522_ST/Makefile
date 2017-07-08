@@ -5,8 +5,8 @@
 #
 BINARY = 522_ST
 OBJS = main.o
-CPPFLAGS = -O0 -std=c++17 -I.# -Wall- -Wextra
-#CPPFLAGS = -Os -Wall -std=c++17
+#CPPFLAGS = -O0 -std=c++17 -I.
+CPPFLAGS = -Os -std=c++17 -I.
 
 VPATH+=../miniblink
 VPATH+=../util

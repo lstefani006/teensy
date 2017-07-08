@@ -14,7 +14,7 @@ public:
 };
 template<> class Yield<void> {
 protected:
-	Yield() { Init(); }
+	Yield() : __line__(0) {}
 	void Init() { __line__ = 0; }
 	unsigned short __line__; 
 };
@@ -26,7 +26,7 @@ protected:
 #else
 template<typename T> class Yield {
 protected:
-	Yield() { Init(); }
+	Yield() : __line__(nullptr), __ret__(T()) {}
 	void Init() { __line__ = nullptr; }
 	void *__line__; 
 	T __ret__;
@@ -36,7 +36,7 @@ public:
 };
 template<> class Yield<void> {
 protected:
-	Yield() { Init(); }
+	Yield() : __line__(nullptr) {}
 	void Init() { __line__ = nullptr; }
 	void *__line__; 
 };

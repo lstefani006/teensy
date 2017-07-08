@@ -35,8 +35,11 @@
  */
 #include <MFRC522.h>
 
-#define SS_PIN 10
-#define RST_PIN 9
+#define SS_PIN  PA4
+#define RST_PIN PC13
+
+//#define SS_PIN  PC15
+//#define RST_PIN PC13
 MFRC522 pdc(SS_PIN, RST_PIN);	// Create MFRC522 instance.
 
 
@@ -44,14 +47,21 @@ void setup()
 {
 	delay(1000*2);
 	Serial.begin(38400);	// Initialize serial communications with the PC
+	Serial.println();
 	Serial.println(F("Start"));
+	delay(1000*2);
 
-	uprintf_cb = [] (char ch) -> bool { Serial.write(ch); return true; };
+	uprintf_cb = [] (char ch) -> bool { Serial.write(&ch, 1); return true; };
 
 	SPI.begin();		// Init SPI bus
 	pdc.PCD_Init();	// Init MFRC522 card
 
 	pdc.PCD_DumpVersionToSerial();
+	delay(1000*4);
+
+	Serial.print("SR="); Serial.println(SPI.SR(), HEX);
+	Serial.print("CR1="); Serial.println(SPI.CR1(), HEX);
+	delay(1000*2);
 
 	Serial.println(F("Scan PICC to see UID and type..."));
 }
