@@ -28,4 +28,3 @@
 [submodule "PN532/Adafruit-PN532"]
 	path = PN532/Adafruit-PN532
 	url = https://github.com/adafruit/Adafruit-PN532.git
-
