@@ -66,6 +66,7 @@ void SPIClass::begin(int speed, bool enable16bits)
 			SPI_CR1_CPHA_CLK_TRANSITION_1,
 			enable16bits ? SPI_CR1_DFF_16BIT : SPI_CR1_DFF_8BIT,
 			SPI_CR1_MSBFIRST);
+	/*
 
 	 spi_set_standard_mode(_spi,  0);
 
@@ -83,6 +84,7 @@ void SPIClass::begin(int speed, bool enable16bits)
 //	spi_disable_tx_buffer_empty_interrupt(_spi);
 //	spi_set_full_duplex_mode(_spi);
 //	spi_set_unidirectional_mode(_spi);
+//	*/
 
 	/* Enable SPI1 periph. */
 	spi_enable(_spi);

@@ -2,6 +2,7 @@
 #define __usart_irq_hpp__
 
 #include <ring.hpp>
+#include <stdio.h>
 /*
 
 // Lettura/scrttura della USART1

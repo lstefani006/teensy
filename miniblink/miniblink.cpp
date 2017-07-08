@@ -167,6 +167,7 @@ int main()
 	for (;;)
 	{
 		delay(1000);
+		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
 
 		Serial << bb++ <<  " " ;
 		Serial << rtc_counter << "\n\r";

@@ -7,17 +7,17 @@
 #include <libopencm3/stm32/rtc.h>
 #include <libopencm3/stm32/spi.h>
 
-#include <../miniblink/rtc_setup.cpp>
-#include <../miniblink/spi_setup.cpp>
-#include <../miniblink/systick_setup.cpp>
-#include <../miniblink/usart_setup.cpp>
-#include <../miniblink/ring.cpp>
-#include <../util/uprintf.cpp>
+#include <rtc_setup.hpp>
+#include <spi_setup.hpp>
+#include <systick_setup.hpp>
+#include <usart_setup.hpp>
+#include <ring.hpp>
+#include <uprintf.hpp>
 
 #include <Arduino.h>
 
-#include <../rfid/src/MFRC522.cpp>
-#include <../rfid/src/MFRC522Debug.cpp>
+#include <MFRC522.h>
+#include <MFRC522Debug.h>
 
 static uint16_t getGPIO(int pin)
 {
@@ -73,7 +73,6 @@ static uint16_t getGPIO(int pin)
 	case PC13: return GPIO13;
 	case PC14: return GPIO14;
 	case PC15: return GPIO15;
-
 
 	default: return 0;
 	}
@@ -164,8 +163,11 @@ int main()
 	rtc_setup();
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
 	//Serial.begin();
+	
+	ST::digitalWrite(PC13, HIGH);
+	ST::digitalWrite(PC13, LOW);
 
-	if (false)
+	if (ST::digitalRead(PC13))
 	{
 		pinMode(PC13, OUTPUT);
 		digitalWrite(PC13, HIGH);

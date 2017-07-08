@@ -2,6 +2,17 @@
 #ifndef __Arduino_h__
 #define __Arduino_h__
 
+
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/timer.h>
+#include <libopencm3/cm3/systick.h>
+#include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/rtc.h>
+#include <libopencm3/stm32/spi.h>
+
+
 typedef uint8_t byte;
 #define PROGMEM
 #define __FlashStringHelper char
@@ -19,10 +30,13 @@ struct SPISettings
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <usart_setup.hpp>
 #include <systick_setup.hpp>
 #include <uprintf.hpp>
+
+#define pgm_read_byte(s) (*(s))
 
 
 extern USARTIRQ Serial;
@@ -47,7 +61,107 @@ int digitalRead(int pin);
 void pinMode(int pin, int mode);
 //////////////////////////////////////////
 
+namespace ST
+{
+	inline uint16_t getGPIO(int pin)
+	{
+		switch (pin)
+		{
+		case PA0:  return GPIO0;
+		case PA1:  return GPIO1;
+		case PA2:  return GPIO2;
+		case PA3:  return GPIO3;
+		case PA4:  return GPIO4;
+		case PA5:  return GPIO5;
+		case PA6:  return GPIO6;
+		case PA7:  return GPIO7;
+		case PA8:  return GPIO8;
+		case PA9:  return GPIO9;
+		case PA10: return GPIO10;
+		case PA11: return GPIO11;
+		case PA12: return GPIO12;
+		case PA13: return GPIO13;
+		case PA14: return GPIO14;
+		case PA15: return GPIO15;
 
+		case PB0:  return GPIO0;
+		case PB1:  return GPIO1;
+		case PB2:  return GPIO2;
+		case PB3:  return GPIO3;
+		case PB4:  return GPIO4;
+		case PB5:  return GPIO5;
+		case PB6:  return GPIO6;
+		case PB7:  return GPIO7;
+		case PB8:  return GPIO8;
+		case PB9:  return GPIO9;
+		case PB10: return GPIO10;
+		case PB11: return GPIO11;
+		case PB12: return GPIO12;
+		case PB13: return GPIO13;
+		case PB14: return GPIO14;
+		case PB15: return GPIO15;
+
+		case PC0:  return GPIO0;
+		case PC1:  return GPIO1;
+		case PC2:  return GPIO2;
+		case PC3:  return GPIO3;
+		case PC4:  return GPIO4;
+		case PC5:  return GPIO5;
+		case PC6:  return GPIO6;
+		case PC7:  return GPIO7;
+		case PC8:  return GPIO8;
+		case PC9:  return GPIO9;
+		case PC10: return GPIO10;
+		case PC11: return GPIO11;
+		case PC12: return GPIO12;
+		case PC13: return GPIO13;
+		case PC14: return GPIO14;
+		case PC15: return GPIO15;
+
+		default: return 0;
+		}
+	}
+
+	inline void gpio_set(uint32_t gpioport, uint16_t gpios) { GPIO_BSRR(gpioport) = gpios; }
+	inline void gpio_clear(uint32_t gpioport, uint16_t gpios) { GPIO_BSRR(gpioport) = (gpios << 16); }
+	inline uint16_t gpio_get(uint32_t gpioport, uint16_t gpios) { return gpio_port_read(gpioport) & gpios; }
+
+
+	inline void digitalWrite(int pin, int v)
+	{
+		uint32_t gpioport;
+		switch (pin >> 4)
+		{
+		case 0: gpioport = GPIOA; break;
+		case 1: gpioport = GPIOB; break;
+		case 2: gpioport = GPIOC; break;
+		default: return;
+		}
+		uint16_t gpios = getGPIO(pin);
+
+		if (v)
+			gpio_set(gpioport, gpios);
+		else
+			gpio_clear(gpioport, gpios);
+	}
+
+	inline bool digitalRead(int pin)
+	{
+		uint32_t gpioport;
+		switch (pin >> 4)
+		{
+		case 0: gpioport = GPIOA; break;
+		case 1: gpioport = GPIOB; break;
+		case 2: gpioport = GPIOC; break;
+		return false;
+		}
+		uint16_t gpios = getGPIO(pin);
+
+		return gpio_get(gpioport, gpios) != 0;
+	}
+
+
+}
 
 
 #endif

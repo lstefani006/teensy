@@ -1,0 +1,40 @@
+#
+# make 
+# make clean
+# make flash
+#
+BINARY = 522_ST
+OBJS = main.o
+#CPPFLAGS = -O0 -std=c++17 -I.
+CPPFLAGS = -Os -std=c++17 -I.
+
+VPATH+=../miniblink
+VPATH+=../util
+
+CPPFLAGS += -I../rfid/src -I../miniblink -I../util -fno-rtti
+LDSCRIPT = stm32-h103.ld
+
+include ./Makefile.cm3.include
+
+.PHONY: compile_commands.json
+
+compile_commands.json :
+	make clean
+	bear make
+	cat $(OPENCM3_DIR)/compile_commands.json >> compile_commands.json
+
+$(BINARY).map:
+	arm-none-eabi-objdump -S -d $(BINARY).elf > $(BINARY).map
+
+.PHONY: lib.debug lib.clean lib.os debug map
+
+lib.debug:
+	make -C ../LibStm/libopencm3 V=1 "DEBUG_FLAGS=-O0 -ggdb3"
+lib.os:
+	make -C ../LibStm/libopencm3 V=1
+lib.clean:
+	make -C ../LibStm/libopencm3 V=1 clean
+
+debug:
+	arm-none-eabi-gdb -tui -x leo.gdbinit miniblink.elf
+

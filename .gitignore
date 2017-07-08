@@ -13,3 +13,4 @@
 *.pyc
 */obj
 teensy_loader_cli
+.obj
