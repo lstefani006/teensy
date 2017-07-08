@@ -13,6 +13,7 @@ CPPFLAGS+=-I../miniblink
 CPPFLAGS+=-I../util
 
 CPPFLAGS+=-I.
+E=
 ############################################
 E?=@
 O?=-Os -g
