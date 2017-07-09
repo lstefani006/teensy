@@ -164,6 +164,7 @@ int main()
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
 	//Serial.begin();
 	
+	/*
 	ST::digitalWrite(PC13, HIGH);
 	ST::digitalWrite(PC13, LOW);
 
@@ -180,6 +181,9 @@ int main()
 			delay(500);
 		}
 	}
+	*/
+
+	Serial.printf("ciao");
 
 	setup();
 	while(1)

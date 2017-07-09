@@ -3,6 +3,7 @@
 
 #include <ring.hpp>
 #include <stdio.h>
+#include <uprintf.hpp>
 /*
 
 // Lettura/scrttura della USART1
@@ -34,21 +35,20 @@ public:
 	void begin();
 	void begin(int /*speed*/) {} // per compatibilità
 	void write(const char *p, int sz);
-	void write(const char *p);
-	void write(int n);
 
-	USART & operator << (int n) { write(n); return *this; }
-	USART & operator << (const char *n) { write(n); return *this; }
+	USART & operator << (int n) { return print(n); }
+	USART & operator << (const char *n) { return print(n); }
 
-	void println() { write("\r\n"); }
-	void print(const char *p) { write(p); }
-	void println(const char *p) { write(p); println(); }
+	USART& println();
+	USART& print(const char *p);
+	USART& println(const char *p);
 
-	void print(int n) { write(n); }
-	void println(int n) { print(n); write("\r\n"); }
+	USART& print(char ch);
+	USART& print(int n);
+	USART& println(int n);
 
-	void print(int n, Format f) { char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); print(b); }
-	void println(int n, Format f){ char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); println(b); }
+	USART& print(int n, Format f);
+	USART& println(int n, Format f);
 
 private:
 	int _usart;
@@ -67,25 +67,26 @@ public:
 
 	int write(const char *tx, int sz) { return write((const uint8_t *)tx, sz); }
 	int write(const uint8_t *tx, int sz);
+
 	int read(uint8_t *rx, int sz);
 
-	void write(const char *);
-	void write(int n);
+	USARTIRQ & println();
+	USARTIRQ & print(const char *p);
+	USARTIRQ & println(const char *p);
 
-	void println() { write("\r\n"); }
-	void print(const char *p) { write(p); }
-	void println(const char *p) { write(p); println(); }
+	USARTIRQ & print(char ch);
+	USARTIRQ & print(int n);
+	USARTIRQ & println(int n);
 
-	void print(int n) { write(n); }
-	void println(int n) { print(n); write("\r\n"); }
+	USARTIRQ & print(int n, Format f);
+	USARTIRQ & println(int n, Format f);
 
-	void print(int n, Format f) { char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); print(b); }
-	void println(int n, Format f){ char b[12]; sprintf(b, f == HEX ? "%x" : "%d", n); println(b); }
+	USARTIRQ & printf(const char *fmt, ...);
 
 	int getch();
 
-	USARTIRQ & operator << (int n) { write(n); return *this; }
-	USARTIRQ & operator << (const char *n) { write(n); return *this; }
+	USARTIRQ & operator << (int n) { print(n); return *this; }
+	USARTIRQ & operator << (const char *n) { print(n); return *this; }
 
 	bool rxError() const { return (_error & 1) > 0; }
 	void clearError() { _error = 0; }

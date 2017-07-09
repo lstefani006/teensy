@@ -29,7 +29,7 @@ ifeq ($(shell test $(W) -ge 2; echo $$?),0)
 			 -Wformat \
 			 -Wmissing-include-dirs \
 			 -Wno-unused-parameter \
-			 -Wuninitialized 
+			 -Wuninitialized -Wredundant-decls
 	WC+= $(WCOMMON_2) \
 		 -Wstrict-prototypes 
 	WCXX+= $(WCOMMON_2) \
@@ -50,5 +50,5 @@ ifeq ($(shell test $(W) -ge 4; echo $$?),0)
 			   -Waggregate-return \
 			   -Wconversion
 	WC+=$(WCOMMON_4)
-	WCXX+=$(WCOMMON_4)
+	WCXX+=$(WCOMMON_4) -Weffc++
 endif

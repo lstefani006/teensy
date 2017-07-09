@@ -9,13 +9,15 @@
 inline uint8_t pgm_read_byte(const char *s) { return *s; }
 inline uint8_t pgm_read_byte(const uint8_t *s) { return *s; }
 inline unsigned long pgm_read_dword(const unsigned long *s) { return *s; }
-inline size_t strlen_P(const char *s) { return strlen(s); }
+//inline size_t strlen_P(const char *s) { return strlen(s); }
+#define strlen_P(s) strlen(s)
 #define PROGMEM
 #endif
 
 #include "uprintf.hpp"
 
 #ifndef ARDUINO
+#if 0
 static unsigned divu10(uint32_t n) {
 	uint32_t q, r;
 
@@ -76,6 +78,7 @@ int ulong_to_10a(unsigned long v, char *b, bool neg)
 	*p = 0;
 	return p-b;
 }
+#endif
 #endif
 
 static inline int ulong_to_a(unsigned long v, uint8_t base, char *p, bool neg)
@@ -208,22 +211,19 @@ private:
 
 /////////////////////////////////////////
 
-typedef bool (*pfp)(char);
-
-static inline bool align(pfp pf, char ch, int n)
+static inline bool align(upf_t cb, char ch, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		if (!pf(ch))
+		if (!cb.pf(ch, cb.ag))
 			return false;
 	}
 	return true;
 }
 
-static inline bool pf_dummy(char) { return true; }
+static inline bool pf_dummy(char, void *) { return true; }
 
-
-int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
+int uvprintf(upf_t cb, bool fmtFlash, const char *ffmt, va_list vargs)
 {
 	char b[20];
 	va_list args;
@@ -231,7 +231,7 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 
 	int ret = 0;
 
-	if (!pf) pf = pf_dummy;
+	if (cb.pf == nullptr) cb.pf = pf_dummy;
 
 
 	for (;;)
@@ -372,7 +372,7 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 			case 'S':
 				{
 					f = va_arg(args, const char *);
-					n = (int)strlen_P(s);
+					n = (int)strlen_P(f);
 				}
 				break;
 
@@ -389,7 +389,7 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 			}
 
 			int a = opz_wr-n;
-			if (a > 0) { if (!align(pf, opz_align_char, a)) return -1; else ret += a; }
+			if (a > 0) { if (!align(cb, opz_align_char, a)) return -1; else ret += a; }
 			for (;;)
 			{
 				char cc;
@@ -398,15 +398,15 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 				else cc = bf.Next();
 
 				if (!cc) break;
-				if (!pf(cc)) return -1;
+				if (!cb.pf(cc, cb.ag)) return -1;
 			}
 			ret += n;
 			a = opz_wl-n;
-			if (a > 0) { if (!align(pf, opz_align_char, a)) return -1; else ret += a; }
+			if (a > 0) { if (!align(cb, opz_align_char, a)) return -1; else ret += a; }
 		}
 		else
 		{
-			if (!pf(fmt)) return -1;
+			if (!cb.pf(fmt, cb.ag)) return -1;
 			ret += 1;
 		}
 	}
@@ -415,11 +415,11 @@ int uvprintf(pfp pf, bool fmtFlash, const char *ffmt, va_list vargs)
 	return ret;
 }
 
-int uprintf(pfp pf, const char *fmt, ...)
+int uprintf(upf_t cb, const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	int rc = uvprintf(pf, false, fmt, args);
+	int rc = uvprintf(cb, false, fmt, args);
 	va_end (args);
 	return rc;
 }
@@ -428,17 +428,17 @@ int uprintf(pfp pf, const char *fmt, ...)
 /////////////////////////////////////////////////////////////////////////////////
 
 #ifdef ARDUINO
-int uprintf(pfp pf, const __FlashStringHelper *fmt, ...)
+int uprintf(upf_t cb, const __FlashStringHelper *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	int rc = uvprintf(pf, true, (const char *)fmt, args);
+	int rc = uvprintf(cb, true, (const char *)fmt, args);
 	va_end (args);
 	return rc;
 }
 #endif
 /////////////////////////////////////////////////////////////////////////////////
-bool (*uprintf_cb)(char) = nullptr;
+upf_t uprintf_cb { .pf = nullptr, .ag = nullptr };
 
 int uprintf(const char *fmt, ...)
 {

@@ -53,8 +53,6 @@ void SPIClass::begin(int speed, bool enable16bits)
 		return;
 	}
 
-
-
 	// In arduino
 	// Mode 0 (the default) 
 	// - clock is normally low (CPOL = 0), 
@@ -66,25 +64,6 @@ void SPIClass::begin(int speed, bool enable16bits)
 			SPI_CR1_CPHA_CLK_TRANSITION_1,
 			enable16bits ? SPI_CR1_DFF_16BIT : SPI_CR1_DFF_8BIT,
 			SPI_CR1_MSBFIRST);
-	/*
-
-	 spi_set_standard_mode(_spi,  0);
-
-	// Set NSS management to software.
-	// Note:
-	// Setting nss high is very important, even if we are controlling the GPIO
-	// ourselves this bit needs to be at least set to 1, otherwise the spi
-	// peripheral will not send any data out.
-	spi_enable_software_slave_management(_spi);
-	spi_set_nss_high(_spi);
-
-	spi_disable_crc(_spi);
-	spi_disable_error_interrupt(_spi);
-//	spi_disable_rx_buffer_not_empty_interrupt(_spi);
-//	spi_disable_tx_buffer_empty_interrupt(_spi);
-//	spi_set_full_duplex_mode(_spi);
-//	spi_set_unidirectional_mode(_spi);
-//	*/
 
 	/* Enable SPI1 periph. */
 	spi_enable(_spi);

@@ -13,7 +13,6 @@ void rtc_setup()
 {
 	rtc_auto_awake(RCC_LSE, 0x7fff);
 
-
 	// Without this the RTC interrupt routine will never be called.
 	nvic_enable_irq(NVIC_RTC_IRQ);
 	nvic_set_priority(NVIC_RTC_IRQ, 1);

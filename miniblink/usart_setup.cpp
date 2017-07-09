@@ -148,18 +148,29 @@ void USART::write(const char *p, int sz)
 	while (p != e)
 		usart_send_blocking(_usart, *p++);
 }
-void USART::write(const char *p) 
+USART& USART::print(const char *p) 
 {
 	while (*p)
 		usart_send_blocking(_usart, *p++);
+	return *this;
 }
-
-void USART::write(int n) 
+USART& USART::println()
 {
-	char b[16];
-	sprintf(b, "%d", n);
-	write(b);
+	print("\r\n");
+	return *this;
 }
+USART& USART::println(const char *s)
+{
+	print(s);
+	return println();
+}
+USART & USART::print  (int n, Format f) { printf(f == HEX ? "%x" : "%d", n); return *this; }
+USART & USART::println(int n, Format f) { printf(f == HEX ? "%x" : "%d", n); return println(); }
+
+USART& USART::print(char ch) { char b[] = {ch, 0}; return print(b); }
+USART& USART::print(int n) { return print(n, DEC); }
+USART& USART::println(int n) { return println(n, DEC); }
+
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -264,7 +275,11 @@ int USARTIRQ::read(uint8_t *ptr, int len)
 	return n;
 }
 
-void USARTIRQ::write(const char *str)
+USARTIRQ & USARTIRQ::println()
+{
+	return print("\r\n");
+}
+USARTIRQ & USARTIRQ::print(const char *str)
 {
 	int sz = strlen(str);
 	while (sz > 0)
@@ -273,14 +288,30 @@ void USARTIRQ::write(const char *str)
 		sz -= n;
 		str += n;
 	}
+	return *this;
 }
-void USARTIRQ::write(int n)
+USARTIRQ & USARTIRQ::println(const char *str)
 {
-	char b[12];
-	sprintf(b, "%d", n);
-	write(b);
+	print(str);
+	return println();
 }
+USARTIRQ & USARTIRQ::print(char ch) { char b[] = {ch, 0}; return print(b); }
+USARTIRQ & USARTIRQ::print  (int n) { return print(n, DEC); }
+USARTIRQ & USARTIRQ::println(int n) { return println(n, DEC); }
 
+USARTIRQ & USARTIRQ::print  (int n, Format f) { printf(f == HEX ? "%x" : "%d", n); return *this; }
+USARTIRQ & USARTIRQ::println(int n, Format f) { printf(f == HEX ? "%x" : "%d", n); return println(); }
+
+USARTIRQ & USARTIRQ::printf(const char *fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	upf_t cb;
+	cb.ag = this;
+	cb.pf = [] (char ch, void *ag) -> bool { char b[] = { ch, 0 }; ((USARTIRQ*)ag)->print(b); return true; };
+	uvprintf(cb, false, fmt, args);
+	va_end (args);
+	return *this;
+}
 int USARTIRQ::getch()
 {
 	uint8_t c;

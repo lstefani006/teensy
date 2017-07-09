@@ -1,7 +1,5 @@
-
 #ifndef __Arduino_h__
 #define __Arduino_h__
-
 
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
@@ -11,7 +9,6 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/rtc.h>
 #include <libopencm3/stm32/spi.h>
-
 
 typedef uint8_t byte;
 #define PROGMEM

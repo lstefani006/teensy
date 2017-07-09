@@ -51,7 +51,10 @@ void setup()
 	Serial.println(F("Start"));
 	delay(1000*2);
 
-	uprintf_cb = [] (char ch) -> bool { Serial.write(&ch, 1); return true; };
+	uprintf_cb =  {
+		.pf = [] (char ch, void *ag) -> bool { ((USARTIRQ*)ag)->print(ch); return true; },
+		.ag = &Serial
+	};
 
 	SPI.begin();		// Init SPI bus
 	pdc.PCD_Init();	// Init MFRC522 card
@@ -99,7 +102,7 @@ void dumpUL()
 	{
 		uprintf(F("LOCK BITS\n"));
 		uprintf(F("Lock Bit - se settato la pagina e' a sola lettura\n"));
-		uint8_t m = 0b10000000;
+		int m = 0b10000000;
 		for (int i = 7; i >= 3; i--)
 		{
 			if (i == 3)
@@ -168,7 +171,7 @@ void loop() {
 		byte * backData = (byte *)malloc(16*sizeof(byte));
 		byte * dataLen = (byte *)16;
 
-		auto st = pdc.PCD_TransceiveData(selectApdu,10,backData,dataLen,NULL,0,false);
+		auto st = pdc.PCD_TransceiveData(selectApdu,10,backData,dataLen,nullptr,0,false);
 		if (st != MFRC522::STATUS_OK) 
 		{
 			Serial.print(F("PCD_TransceiveData() failed: "));

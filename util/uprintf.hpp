@@ -3,16 +3,21 @@
 
 #include <stdarg.h>
 
-int uprintf(bool (*)(char), const char *fmt, ...);
 
+struct upf_t
+{
+	bool (*pf)(char ch, void *ag);
+	void *ag;
+};
+
+int uvprintf(upf_t cb, bool fmtFlash, const char *fmt, va_list vargs);
+int uprintf(upf_t cb, const char *fmt, ...);
 #ifdef ARDUINO
-int uprintf(bool (*)(char), const __FlashStringHelper *fmt, ...);
+int uprintf(upf_t cb, const __FlashStringHelper *fmt, ...);
 #endif
 
-int uvprintf(bool (*)(char), bool fmtFlash, const char *fmt, va_list vargs);
-
 /////////////////////////////////////////
-extern bool (*uprintf_cb)(char);
+extern upf_t uprintf_cb;
 
 int uprintf(const char *fmt, ...);
 
@@ -20,6 +25,6 @@ int uprintf(const char *fmt, ...);
 int uprintf(const __FlashStringHelper *fmt, ...);
 #endif
 
-int uvprintf(bool fmtFlash, const char *fmt, va_list vargs);
+//int uvprintf(bool fmtFlash, const char *fmt, va_list vargs);
 
 #endif
