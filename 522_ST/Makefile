@@ -1,6 +1,6 @@
 
-SRC=522_ST.cpp Arduino.cpp rtc_setup.cpp usart_setup.cpp uprintf.cpp spi_setup.cpp ring.cpp systick_setup.cpp MFRC522.cpp MFRC522Debug.cpp
 TARGET=522_ST
+SRC=522_ST.cpp Arduino.cpp rtc_setup.cpp usart_setup.cpp uprintf.cpp spi_setup.cpp ring.cpp systick_setup.cpp MFRC522.cpp MFRC522Debug.cpp leo.c
 OBJ_DIR=.obj
 
 
@@ -14,13 +14,16 @@ CPPFLAGS+=-I../util
 
 CPPFLAGS+=-I.
 E=
+
 ############################################
 E?=@
 O?=-Os -g
 W?=-Wextra -Wshadow -Wredundant-decls -Weffc++ -Wall
+OBJ_DIR?=.obj
+
 CPPFLAGS+=$(O)
-CPPFLAGS+=-mthumb -mcpu=cortex-m3 -msoft-float -mfix-cortex-m3-ldrd
 CPPFLAGS+=$(W)
+CPPFLAGS+=-mthumb -mcpu=cortex-m3 -msoft-float -mfix-cortex-m3-ldrd
 CPPFLAGS+=-fno-common -ffunction-sections -fdata-sections -fno-rtti -fno-exceptions
 CPPFLAGS+=-MD -Wundef
 CPPFLAGS+=-DSTM32F1
