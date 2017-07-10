@@ -11,7 +11,7 @@
 
 // Global state:
 volatile systick_t systick_millis = 0;  // Millisecond counter.
-
+void (*volatile systick_cb)() = nullptr;
 
 // Delay for the specified number of milliseconds.
 // This is implemented by configuring the systick timer to increment a count
@@ -38,4 +38,5 @@ extern "C" void sys_tick_handler()
 {
 	// Increment the global millisecond count.
 	systick_millis += 1;
+	if (systick_cb) systick_cb();
 }

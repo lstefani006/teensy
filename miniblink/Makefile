@@ -10,7 +10,7 @@ CPPFLAGS+=-I.
 
 E=
 W=3
-O=-O0 -g
+O=-Os -g
 ############################################
 
 include ../LibStm/makefile.cm3

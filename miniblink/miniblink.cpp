@@ -88,11 +88,14 @@ void Timer::begin(int freq)
 	case TIM2: 
 	case TIM3: 
 	case TIM4: 
+		break;
+		/*
 	case TIM5: 
 	case TIM6: 
 	case TIM7: 
 	case TIM8: 
 		break;
+		*/
 
 	default: 
 		halt(fn, __LINE__);
@@ -144,7 +147,7 @@ void Timer::begin(int freq)
 	switch (_tm)
 	{
 	case TIM1: 
-		timer_set_prescaler(_tm, (rcc_apb2_frequency * 2) / freq - 1);  // imposta il registro PSC
+		timer_set_prescaler(_tm, (rcc_apb2_frequency * 1) / freq - 1);  // imposta il registro PSC
 		break;
 	case TIM2: 
 	case TIM3: 
@@ -330,11 +333,19 @@ protected:
 	}
 	void CompareInterrupt()
 	{
-		if (start) gpio_toggle(GPIOB, GPIO12);	// LED on/off 
+		//if (start) gpio_toggle(GPIOB, GPIO12);	// LED on/off 
 	}
 };
 
-Timer2 tm2(TIM1);
+Timer2 tm2(TIM4);
+
+void cb()
+{
+	gpio_toggle(GPIOB, GPIO12);	// LED on/off 
+	static int nn = 0;
+	Serial.println(nn++);
+	Serial.println(rtc_counter);
+}
 
 int main()
 {
@@ -344,22 +355,27 @@ int main()
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
 	gpio_setup();
-	//timer_setup();
 	tm2.begin(5000);
-	systick_setup();
-	//Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
-	//rtc_setup();
 
-	for (int i = 0; i < 10; ++i)
+	systick_setup();
+	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
+	rtc_setup();
+
+	if (true)
 	{
-		delay(200);
-		gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+		for (int i = 0; i < 10; ++i)
+		{
+			delay(200);
+			gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+		}
+		for (int i = 0; i < 10; ++i)
+		{
+			delay(200);
+			gpio_toggle(GPIOB, GPIO12);	// LED on/off 
+		}
 	}
-	for (int i = 0; i < 10; ++i)
-	{
-		delay(200);
-		gpio_toggle(GPIOB, GPIO12);	// LED on/off 
-	}
+
+	rtc_cb = cb;
 
 	start = true;
 	for (;;);

@@ -12,6 +12,7 @@
 typedef uint64_t systick_t; 
 
 extern volatile systick_t systick_millis;  // Millisecond counter.
+extern void (*volatile systick_cb)();
 
 // Delay for the specified number of milliseconds.
 // This is implemented by configuring the systick timer to increment a count

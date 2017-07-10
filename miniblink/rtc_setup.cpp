@@ -58,6 +58,8 @@ static int getDaySaveState(int Y, int M, int D, int h)
 }
 
 volatile uint32_t rtc_counter = 0;
+void (* volatile rtc_cb)() = nullptr;
+
 extern "C" void rtc_isr(void)
 {
 	// The interrupt flag isn't cleared by hardware, we have to do it.
@@ -65,6 +67,9 @@ extern "C" void rtc_isr(void)
 
 	// get value
 	rtc_counter = rtc_get_counter_val();
+
+	if (rtc_cb) rtc_cb();
+
 
 	// partendo da rtc_counter calcola la data e l'ora.
 	int h, m, s;
