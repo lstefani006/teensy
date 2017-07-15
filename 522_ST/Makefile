@@ -1,6 +1,6 @@
 
 TARGET=522_ST
-SRC=522_ST.cpp Arduino.cpp rtc_setup.cpp usart_setup.cpp uprintf.cpp spi_setup.cpp ring.cpp systick_setup.cpp MFRC522.cpp MFRC522Debug.cpp leo.c
+SRC=522_ST.cpp MFRC522.cpp MFRC522Debug.cpp
 OBJ_DIR=.obj
 
 VPATH+=../util
@@ -18,4 +18,5 @@ E=
 W=3
 
 ############################################
+include ../LibStm/LeoStm/Makefile
 include ../LibStm/makefile.cm3
