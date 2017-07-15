@@ -18,6 +18,20 @@
  */
 void SPIClass::begin(int speed, bool enable16bits)
 {
+	switch (speed)
+	{
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_2:
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_4:
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_8:
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_16:
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_32:
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_64:
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_128:
+	case SPI_CR1_BAUDRATE_FPCLK_DIV_256:
+		break;
+	default:
+		break;
+	}
 	//rcc_periph_clock_enable(RCC_AFIO);
 
 	switch (_spi)
@@ -67,4 +81,33 @@ void SPIClass::begin(int speed, bool enable16bits)
 
 	/* Enable SPI1 periph. */
 	spi_enable(_spi);
+}
+/////////////////////////////////////////////////////////
+
+void SPIClass::setBitOrder(int order)
+{
+	switch (order)
+	{
+	case MSBFIRST: spi_send_lsb_first(_spi); break;
+	case LSBFIRST: spi_send_msb_first(_spi); break;
+	default: break;
+	}
+}
+void SPIClass::setDataMode(int)
+{
+}
+void SPIClass::setClockDivider(int ck)
+{
+	int f = 16 * 1024*1024;
+	switch (ck)
+	{
+	case SPI_CLOCK_DIV2:
+	case SPI_CLOCK_DIV4:
+	case SPI_CLOCK_DIV8:
+	case SPI_CLOCK_DIV16:
+	case SPI_CLOCK_DIV32:
+	case SPI_CLOCK_DIV64:
+	case SPI_CLOCK_DIV128:
+		break;
+	}
 }
