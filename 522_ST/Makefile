@@ -5,8 +5,10 @@ OBJ_DIR=.obj
 
 VPATH+=../util
 VPATH+=../rfid/src
+VPATH+=../LibStm/LeoStm
 
-CPPFLAGS+=-I../rfid/src 
+CPPFLAGS+=-I../rfid/src
+CPPFLAGS+=-I../LibStm/LeoStm 
 CPPFLAGS+=-I../miniblink 
 CPPFLAGS+=-I../util
 

@@ -49,6 +49,11 @@ struct SPISettings
 extern USARTIRQ Serial;
 
 //////////////////////////////////////////
+extern const char *halt_fn;
+extern int halt_ln;
+void halt(const char *fn, int ln);
+
+//////////////////////////////////////////
 enum Pins
 {
 	PA0=00, PA1, PA2, PA3, PA4, PA5, PA6, PA7, PA8, PA9, PA10, PA11, PA12, PA13, PA14, PA15,

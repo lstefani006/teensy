@@ -19,6 +19,15 @@
 #include <MFRC522.h>
 #include <MFRC522Debug.h>
 
+const char *halt_fn = nullptr;
+int halt_ln = 0;
+void halt(const char *fn, int ln) { 
+	halt_fn = fn;
+	halt_ln = ln;
+	for(;;); 
+}
+//////////////////////////////////7
+
 static uint16_t getGPIO(int pin)
 {
 	switch (pin)
