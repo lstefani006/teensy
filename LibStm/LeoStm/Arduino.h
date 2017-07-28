@@ -1,6 +1,9 @@
 #ifndef __Arduino_h__
 #define __Arduino_h__
 
+#include <stdint.h>
+
+/*
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
@@ -9,29 +12,13 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/rtc.h>
 #include <libopencm3/stm32/spi.h>
+*/
 
 typedef uint8_t byte;
 typedef bool    boolean;
 #define PROGMEM
 #define __FlashStringHelper char
 
-struct SPISettings
-{
-	SPISettings(int , int , int ) {}
-};
-
-#define SPI_CLOCK_DIV2   1
-#define SPI_CLOCK_DIV4   2
-#define SPI_CLOCK_DIV8   3
-#define SPI_CLOCK_DIV16  4
-#define SPI_CLOCK_DIV32  5
-#define SPI_CLOCK_DIV64  6
-#define SPI_CLOCK_DIV128 7
-
-#define MSBFIRST 1
-#define LSBFIRST 2
-
-#define SPI_MODE0 0
 
 #define F(a) (a)
 
@@ -51,7 +38,8 @@ extern USARTIRQ Serial;
 //////////////////////////////////////////
 extern const char *halt_fn;
 extern int halt_ln;
-void halt(const char *fn, int ln);
+void halt(const char *fn, int ln) __attribute__((noreturn));
+#define HALT halt(__func__, __LINE__)
 
 //////////////////////////////////////////
 enum Pins
@@ -73,6 +61,7 @@ int digitalRead(int pin);
 void pinMode(int pin, int mode);
 //////////////////////////////////////////
 
+#if 0
 namespace ST
 {
 	inline uint16_t getGPIO(int pin)
@@ -174,6 +163,8 @@ namespace ST
 
 
 }
+#endif
+
 
 
 #endif

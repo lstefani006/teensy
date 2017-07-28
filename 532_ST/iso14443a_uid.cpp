@@ -19,7 +19,13 @@
 #include <PN532_SPI.h>
 #include "PN532.h"
 
-PN532_SPI pn532spi(SPI, 10);
+#ifdef STM32F1
+#define SS_PIN  PA4
+#else
+#define SS_PIN  10
+#endif
+
+PN532_SPI pn532spi(SPI, SS_PIN);
 PN532 nfc(pn532spi);
 
 /* When the number after #elif set as 1, it will be switch to HSU Mode*/

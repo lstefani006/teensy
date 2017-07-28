@@ -117,7 +117,10 @@ disable_write_protection:
 	~/Arduino/hardware/Arduino_STM32/tools/linux64/stm32flash/stm32flash -k /dev/ttyUSB0
 
 tags: $(SRC)
-	ctags *.cpp *.hpp $(OPENCM3_DIR)/lib/stm32/common/*.c $(OPENCM3_DIR)/lib/stm32/f1/*.c \
+	ctags -R . \
+		$(TAGS) \
+		$(OPENCM3_DIR)/lib/stm32/common/*.c \
+		$(OPENCM3_DIR)/lib/stm32/f1/*.c \
 		/home/leo/teensy/LibStm/libopencm3/include/libopencm3/stm32/*.h \
 		/home/leo/teensy/LibStm/libopencm3/include/libopencm3/stm32/f1/*.h \
 		/home/leo/teensy/LibStm/libopencm3/include/libopencm3/stm32/common/*.h \

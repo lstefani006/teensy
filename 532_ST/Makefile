@@ -6,17 +6,17 @@ SRC+=iso14443a_uid.cpp
 SRC+=emulatetag.cpp llcp.cpp mac_link.cpp PN532.cpp snep.cpp
 SRC+=PN532_SPI.cpp
 
-#VPATH+=../util
 VPATH+=../PN532/PN532/PN532
 VPATH+=../PN532/PN532/PN532_SPI
 
-#CPPFLAGS+=-I../LibStm/LeoStm
-#CPPFLAGS+=-I../util
-CPPFLAGS+=-I../rfid/src 
+#CPPFLAGS+=-I../rfid/src 
 
 CPPFLAGS+=-I.
 CPPFLAGS+=-I../PN532/PN532/PN532_SPI
 CPPFLAGS+=-I../PN532/PN532/PN532
+
+TAGS+=$(HOME)/teensy/PN532/PN532/PN532_SPI
+TAGS+=$(HOME)/teensy/PN532/PN532/PN532
 
 E=@
 W=3

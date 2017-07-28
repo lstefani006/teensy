@@ -4,7 +4,6 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/f1/bkp.h>
 
-
 #include "rtc_setup.hpp"
 
 void rtc_set_ts(int Y, int M, int D, int h, int m, int s, int state);

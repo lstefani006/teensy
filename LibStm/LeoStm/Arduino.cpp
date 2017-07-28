@@ -16,9 +16,6 @@
 
 #include <Arduino.h>
 
-#include <MFRC522.h>
-#include <MFRC522Debug.h>
-
 const char *halt_fn = nullptr;
 int halt_ln = 0;
 void halt(const char *fn, int ln) { 
@@ -106,7 +103,7 @@ void pinMode(int pin, int mode)
 	case 0: ro = RCC_GPIOA; gpioport = GPIOA; break;
 	case 1: ro = RCC_GPIOB; gpioport = GPIOB; break;
 	case 2: ro = RCC_GPIOC; gpioport = GPIOC; break;
-	default: return;
+	default: HALT;
 	}
 	rcc_periph_clock_enable(ro);
 	uint16_t gpios = getGPIO(pin);
@@ -116,6 +113,7 @@ void pinMode(int pin, int mode)
 	case INPUT:        gpio_set_mode(gpioport, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_FLOAT,       gpios); break;
 	case OUTPUT:       gpio_set_mode(gpioport, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,   gpios); break;
 	case INPUT_PULLUP: gpio_set_mode(gpioport, GPIO_MODE_INPUT,         GPIO_CNF_INPUT_PULL_UPDOWN, gpios); gpio_set(gpioport, gpios); break;
+	default: HALT;
 	}
 }
 
@@ -127,7 +125,7 @@ void digitalWrite(int pin, int v)
 	case 0: gpioport = GPIOA; break;
 	case 1: gpioport = GPIOB; break;
 	case 2: gpioport = GPIOC; break;
-	default: return;
+	default: HALT;
 	}
 	uint16_t gpios = getGPIO(pin);
 
@@ -145,7 +143,7 @@ int digitalRead(int pin)
 	case 0: gpioport = GPIOA; break;
 	case 1: gpioport = GPIOB; break;
 	case 2: gpioport = GPIOC; break;
-	default: return -1;
+	default: HALT;
 	}
 	uint16_t gpios = getGPIO(pin);
 
