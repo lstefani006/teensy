@@ -15,8 +15,6 @@ uint8_t SPIClass::transfer(uint8_t v) { return (uint8_t)spi_xfer(_spi, v); }
 //	uint8_t  read8()  { return spi_read(_spi); }
 //	uint16_t read16() { return spi_read(_spi); }
 
-void SPIClass::beginTransaction(...) {}
-void SPIClass::endTransaction() {}
 
 uint32_t SPIClass::SR()  const { return SPI_SR(_spi) ; }
 uint32_t SPIClass::CR1() const { return SPI_CR1(_spi) ; }
@@ -63,6 +61,7 @@ void SPIClass::begin(bool enable16bits)
 	default: 
 		return;
 	}
+
 	spi_reset(_spi);
 
 
@@ -85,41 +84,30 @@ void SPIClass::begin(bool enable16bits)
 }
 /////////////////////////////////////////////////////////
 
-void SPIClass::setBitOrder(int order)
+void SPIClass::setBitOrder(BIT_ORDER order)
 {
 	switch (order)
 	{
 	case MSBFIRST: spi_send_lsb_first(_spi); break;
 	case LSBFIRST: spi_send_msb_first(_spi); break;
-	default: break;
-	}
-}
-void SPIClass::setDataMode(int)
-{
-}
-
-/* SPI1 ==> e' attaccato al bus clock APB2 */
-/* SPI2 ==> e' attaccato al bus clock APB1 */
-/*
-uint32_t rcc_apb1_frequency = 8000000;
-uint32_t rcc_apb2_frequency = 8000000;
-uint32_t rcc_ahb_frequency = 8000000;
-*/
-void SPIClass::setClockDivider(int ck)
-{
-	int f = 16 * 1024*1024;
-	switch (ck)
-	{
-	case SPI_CLOCK_DIV2: f = f / 2; break;
-	case SPI_CLOCK_DIV4: f = f / 4; break;
-	case SPI_CLOCK_DIV8: f = f / 8; break;
-	case SPI_CLOCK_DIV16: f = f / 16; break;
-	case SPI_CLOCK_DIV32: f = f / 32; break;
-	case SPI_CLOCK_DIV64: f = f / 64; break;
-	case SPI_CLOCK_DIV128: f = f / 128; break;
 	default: HALT;
 	}
+}
+void SPIClass::setDataMode(SPI_MODE mode)
+{
+	switch(mode)
+	{
+	case SPI_MODE0: spi_set_standard_mode(_spi, 0); break;
+	case SPI_MODE1: spi_set_standard_mode(_spi, 1); break;
+	case SPI_MODE2: spi_set_standard_mode(_spi, 2); break;
+	case SPI_MODE3: spi_set_standard_mode(_spi, 3); break;
+	default: HALT;
+	}
+}
 
+void SPIClass::setSpeedMaximum(int f)
+{
+	// la frequenza del clock sul SPI
 	int hz;
 	switch (_spi)
 	{
@@ -129,15 +117,98 @@ void SPIClass::setClockDivider(int ck)
 	}
 
 	int baudrate;
-	if (hz / 2 <= ck) baudrate = SPI_CR1_BAUDRATE_FPCLK_DIV_2;
-	else if (hz / 4 <= ck) baudrate = SPI_CR1_BR_FPCLK_DIV_4;
-	else if (hz / 8 <= ck) baudrate = SPI_CR1_BR_FPCLK_DIV_8;
-	else if (hz / 16 <= ck) baudrate = SPI_CR1_BR_FPCLK_DIV_16;
-	else if (hz / 32 <= ck) baudrate = SPI_CR1_BR_FPCLK_DIV_32;
-	else if (hz / 64 <= ck) baudrate = SPI_CR1_BR_FPCLK_DIV_64;
-	else if (hz / 128 <= ck) baudrate = SPI_CR1_BR_FPCLK_DIV_128;
-	else if (hz / 256 <= ck) baudrate = SPI_CR1_BR_FPCLK_DIV_256;
+	/***/if (hz / 2 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_2;
+	else if (hz / 4 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_4;
+	else if (hz / 8 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_8;
+	else if (hz / 16 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_16;
+	else if (hz / 32 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_32;
+	else if (hz / 64 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_64;
+	else if (hz / 128 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_128;
+	else if (hz / 256 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_256;
 	else  baudrate = SPI_CR1_BR_FPCLK_DIV_256;
 
 	spi_set_baudrate_prescaler(_spi, baudrate);
+}
+
+/* SPI1 ==> e' attaccato al bus clock APB2 */
+/* SPI2 ==> e' attaccato al bus clock APB1 */
+/*
+uint32_t rcc_apb1_frequency = 8000000;
+uint32_t rcc_apb2_frequency = 8000000;
+uint32_t rcc_ahb_frequency = 8000000;
+*/
+void SPIClass::setClockDivider(SPI_CLOCK_DIV divider)
+{
+	int f = 16 * 1000*1000; // La frequenza di arduino 16Mhz
+	switch (divider)
+	{
+	case SPI_CLOCK_DIV2:   f /= 2; break;
+	case SPI_CLOCK_DIV4:   f /= 4; break;
+	case SPI_CLOCK_DIV8:   f /= 8; break;
+	case SPI_CLOCK_DIV16:  f /= 16; break;
+	case SPI_CLOCK_DIV32:  f /= 32; break;
+	case SPI_CLOCK_DIV64:  f /= 64; break;
+	case SPI_CLOCK_DIV128: f /= 128; break;
+	default: HALT;
+	}
+
+	// la frequenza del clock sul SPI
+	int hz;
+	switch (_spi)
+	{
+	case SPI1: hz = rcc_apb2_frequency; break;
+	case SPI2: hz = rcc_apb1_frequency; break;
+	default: HALT;
+	}
+
+	int baudrate;
+	/***/if (hz / 2 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_2;
+	else if (hz / 4 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_4;
+	else if (hz / 8 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_8;
+	else if (hz / 16 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_16;
+	else if (hz / 32 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_32;
+	else if (hz / 64 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_64;
+	else if (hz / 128 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_128;
+	else if (hz / 256 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_256;
+	else  baudrate = SPI_CR1_BR_FPCLK_DIV_256;
+
+	spi_set_baudrate_prescaler(_spi, baudrate);
+}
+void SPIClass::beginTransaction(SPISettings tr)
+{
+	spi_disable(_spi);
+	
+	if (true)
+	{
+		// la frequenza del clock sul SPI
+		int hz;
+		switch (_spi)
+		{
+		case SPI1: hz = rcc_apb2_frequency; break;
+		case SPI2: hz = rcc_apb1_frequency; break;
+		default: HALT;
+		}
+
+		int baudrate;
+		int f = tr.SpeedMaximum;
+		/***/if (hz / 2 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_2;
+		else if (hz / 4 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_4;
+		else if (hz / 8 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_8;
+		else if (hz / 16 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_16;
+		else if (hz / 32 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_32;
+		else if (hz / 64 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_64;
+		else if (hz / 128 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_128;
+		else if (hz / 256 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_256;
+		else  baudrate = SPI_CR1_BR_FPCLK_DIV_256;
+
+		spi_set_baudrate_prescaler(_spi, baudrate);
+	}
+
+	this->setDataMode(tr.SpiMode);
+	this->setBitOrder(tr.BitOrder);
+	
+	spi_enable(_spi);
+}
+
+void SPIClass::endTransaction() {
 }

@@ -4,23 +4,41 @@
 #include <Arduino.h>
 // #include <libopencm3/stm32/spi.h>
 
-struct SPISettings
+
+enum SPI_CLOCK_DIV
 {
-	SPISettings(int , int , int ) {}
+	SPI_CLOCK_DIV2   = 1,
+	SPI_CLOCK_DIV4   = 2,
+	SPI_CLOCK_DIV8   = 3,
+	SPI_CLOCK_DIV16  = 4,
+	SPI_CLOCK_DIV32  = 5,
+	SPI_CLOCK_DIV64  = 6,
+	SPI_CLOCK_DIV128 = 7,
 };
 
-#define SPI_CLOCK_DIV2   1
-#define SPI_CLOCK_DIV4   2
-#define SPI_CLOCK_DIV8   3
-#define SPI_CLOCK_DIV16  4
-#define SPI_CLOCK_DIV32  5
-#define SPI_CLOCK_DIV64  6
-#define SPI_CLOCK_DIV128 7
+enum BIT_ORDER
+{
+	MSBFIRST=1,
+	LSBFIRST=2
+};
 
-#define MSBFIRST 1
-#define LSBFIRST 2
+enum SPI_MODE : int
+{
+	SPI_MODE0=0,
+	SPI_MODE1=1,
+	SPI_MODE2=2,
+	SPI_MODE3=3
+};
 
-#define SPI_MODE0 0
+struct SPISettings
+{
+	SPISettings(int speedMaximum , BIT_ORDER bitOrder , SPI_MODE mode) 
+		: SpeedMaximum(speedMaximum), BitOrder(bitOrder), SpiMode(mode) {}
+
+	int SpeedMaximum;
+	BIT_ORDER BitOrder;
+	SPI_MODE SpiMode;
+};
 
 class SPIClass
 {
@@ -36,16 +54,17 @@ public:
 //	uint8_t  read8()  { return spi_read(_spi); }
 //	uint16_t read16() { return spi_read(_spi); }
 
-	void beginTransaction(...);
+	void beginTransaction(SPISettings settings);
 	void endTransaction();
+
+	void setBitOrder(BIT_ORDER dataOrder);
+	void setDataMode(SPI_MODE mode);
+	void setClockDivider(SPI_CLOCK_DIV divider);
+	void setSpeedMaximum(int speed);
 
 	uint32_t SR()  const;
 	uint32_t CR1() const;
 	uint32_t CR2() const;
-
-	void setBitOrder(int dataOrder);
-	void setDataMode(int);
-	void setClockDivider(int);
 
 public:
 	uint32_t _spi;
