@@ -42,7 +42,6 @@ void SPIClass::begin(bool enable16bits)
 
 		gpio_set(GPIOA, GPIO_SPI1_MISO);
 		gpio_set(GPIOA, GPIO_SPI1_NSS);
-
 		break;
 
 	case SPI2: 
@@ -55,11 +54,10 @@ void SPIClass::begin(bool enable16bits)
 
 		gpio_set(GPIOB, GPIO_SPI2_MISO);
 		gpio_set(GPIOB, GPIO_SPI2_NSS);
-
 		break;
 
 	default: 
-		return;
+		HALT;
 	}
 
 	spi_reset(_spi);
