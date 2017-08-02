@@ -19,19 +19,12 @@ uint8_t SPIClass::transfer(uint8_t v) { return (uint8_t)spi_xfer(_spi, v); }
 uint32_t SPIClass::SR()  const { return SPI_SR(_spi) ; }
 uint32_t SPIClass::CR1() const { return SPI_CR1(_spi) ; }
 uint32_t SPIClass::CR2() const { return SPI_CR2(_spi) ; }
-/*
- * SPI1 ==> SS=PA4  SCK=PA5  MISO=PA6  MOSI=PA7
- * SPI1 ==> SS=PA15 SCK=PB3  MISO=PB4  MOSI=PB5
- *
- * SPI2 ==> SS=PB12 SCK=PB13 MISO=PB14 MOSI=PB15
- */
-void SPIClass::begin(bool enable16bits)
-{
-	//rcc_periph_clock_enable(RCC_AFIO);
 
+static void S_spi_init_clock(int spi)
+{
 	/* SPI1 ==> e' attaccato al bus clock APB2 */
 	/* SPI2 ==> e' attaccato al bus clock APB1 */
-	switch (_spi)
+	switch (spi)
 	{
 	case SPI1: 
 		rcc_periph_clock_enable(RCC_GPIOA);
@@ -59,6 +52,19 @@ void SPIClass::begin(bool enable16bits)
 	default: 
 		HALT;
 	}
+}
+
+/*
+ * SPI1 ==> SS=PA4  SCK=PA5  MISO=PA6  MOSI=PA7
+ * SPI1 ==> SS=PA15 SCK=PB3  MISO=PB4  MOSI=PB5
+ *
+ * SPI2 ==> SS=PB12 SCK=PB13 MISO=PB14 MOSI=PB15
+ */
+void SPIClass::begin(bool enable16bits)
+{
+	//rcc_periph_clock_enable(RCC_AFIO);
+
+S_spi_init_clock(_spi);
 
 	spi_reset(_spi);
 
@@ -76,6 +82,37 @@ void SPIClass::begin(bool enable16bits)
 			SPI_CR1_CPHA_CLK_TRANSITION_1,
 			enable16bits ? SPI_CR1_DFF_16BIT : SPI_CR1_DFF_8BIT,
 			SPI_CR1_MSBFIRST);
+
+	/* Enable SPI1 periph. */
+	spi_enable(_spi);
+}
+void SPIClass::begin(SPISettings tr)
+{
+	//rcc_periph_clock_enable(RCC_AFIO);
+
+	S_spi_init_clock(_spi);
+
+	spi_reset(_spi);
+
+
+	int br = SPI_CR1_BAUDRATE_FPCLK_DIV_32;
+
+	// In arduino
+	// Mode 0 (the default) 
+	// - clock is normally low (CPOL = 0), 
+	// - and the data is sampled on the transition from low to high (leading edge) (CPHA = 0)
+	// - The default is most-significant bit first,
+	spi_init_master(_spi,
+			br,
+			SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+			SPI_CR1_CPHA_CLK_TRANSITION_1,
+			SPI_CR1_DFF_8BIT,
+			SPI_CR1_MSBFIRST);
+
+
+	this->setSpeedMaximum(tr.SpeedMaximum);
+	this->setDataMode(tr.SpiMode);
+	this->setBitOrder(tr.BitOrder);
 
 	/* Enable SPI1 periph. */
 	spi_enable(_spi);
@@ -103,6 +140,13 @@ void SPIClass::setDataMode(SPI_MODE mode)
 	}
 }
 
+/* SPI1 ==> e' attaccato al bus clock APB2 */
+/* SPI2 ==> e' attaccato al bus clock APB1 */
+/*
+uint32_t rcc_apb1_frequency = 8000000;
+uint32_t rcc_apb2_frequency = 8000000;
+uint32_t rcc_ahb_frequency = 8000000;
+*/
 void SPIClass::setSpeedMaximum(int f)
 {
 	// la frequenza del clock sul SPI
@@ -128,13 +172,6 @@ void SPIClass::setSpeedMaximum(int f)
 	spi_set_baudrate_prescaler(_spi, baudrate);
 }
 
-/* SPI1 ==> e' attaccato al bus clock APB2 */
-/* SPI2 ==> e' attaccato al bus clock APB1 */
-/*
-uint32_t rcc_apb1_frequency = 8000000;
-uint32_t rcc_apb2_frequency = 8000000;
-uint32_t rcc_ahb_frequency = 8000000;
-*/
 void SPIClass::setClockDivider(SPI_CLOCK_DIV divider)
 {
 	int f = 16 * 1000*1000; // La frequenza di arduino 16Mhz
@@ -150,61 +187,16 @@ void SPIClass::setClockDivider(SPI_CLOCK_DIV divider)
 	default: HALT;
 	}
 
-	// la frequenza del clock sul SPI
-	int hz;
-	switch (_spi)
-	{
-	case SPI1: hz = rcc_apb2_frequency; break;
-	case SPI2: hz = rcc_apb1_frequency; break;
-	default: HALT;
-	}
-
-	int baudrate;
-	/***/if (hz / 2 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_2;
-	else if (hz / 4 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_4;
-	else if (hz / 8 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_8;
-	else if (hz / 16 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_16;
-	else if (hz / 32 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_32;
-	else if (hz / 64 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_64;
-	else if (hz / 128 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_128;
-	else if (hz / 256 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_256;
-	else  baudrate = SPI_CR1_BR_FPCLK_DIV_256;
-
-	spi_set_baudrate_prescaler(_spi, baudrate);
+	this->setSpeedMaximum(f);
 }
 void SPIClass::beginTransaction(SPISettings tr)
 {
 	spi_disable(_spi);
-	
-	if (true)
-	{
-		// la frequenza del clock sul SPI
-		int hz;
-		switch (_spi)
-		{
-		case SPI1: hz = rcc_apb2_frequency; break;
-		case SPI2: hz = rcc_apb1_frequency; break;
-		default: HALT;
-		}
 
-		int baudrate;
-		int f = tr.SpeedMaximum;
-		/***/if (hz / 2 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_2;
-		else if (hz / 4 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_4;
-		else if (hz / 8 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_8;
-		else if (hz / 16 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_16;
-		else if (hz / 32 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_32;
-		else if (hz / 64 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_64;
-		else if (hz / 128 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_128;
-		else if (hz / 256 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_256;
-		else  baudrate = SPI_CR1_BR_FPCLK_DIV_256;
-
-		spi_set_baudrate_prescaler(_spi, baudrate);
-	}
-
+	this->setSpeedMaximum(tr.SpeedMaximum);
 	this->setDataMode(tr.SpiMode);
 	this->setBitOrder(tr.BitOrder);
-	
+
 	spi_enable(_spi);
 }
 

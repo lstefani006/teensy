@@ -45,6 +45,7 @@ class SPIClass
 public:
 	SPIClass(int spi) : _spi(spi) {}
 	void begin(/*int speed = SPI_CR1_BAUDRATE_FPCLK_DIV_16,*/ bool enable16bits = false);
+	void begin(SPISettings tr);
 
 //	void write(uint8_t n) { spi_xfer(_spi, n); }
 //	void write(uint16_t n) { spi_xfer(_spi, n); }
