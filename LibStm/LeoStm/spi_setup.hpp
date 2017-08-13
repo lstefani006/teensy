@@ -67,6 +67,13 @@ public:
 	uint32_t CR1() const;
 	uint32_t CR2() const;
 
+	uint16_t read();
+	void send(uint16_t data);
+	int16_t xfer(uint16_t data);
+	void enable();
+	void disable();
+	uint16_t clean_disable();
+
 public:
 	uint32_t _spi;
 };

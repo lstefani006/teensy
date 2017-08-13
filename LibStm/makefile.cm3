@@ -17,6 +17,8 @@ include ../util/base_makefile.mk
 CXXFLAGS+=$(WCXX)
 CFLAGS+=$(WC)
 
+LIBOPENCM3_LIB?=os
+
 
 OBJ:=$(patsubst %.cpp,%.o,$(SRC))
 OBJ:=$(patsubst %.c,%.o,$(OBJ))
@@ -24,7 +26,7 @@ OBJ:=$(patsubst %.o,$(OBJ_DIR)/%.o,$(notdir $(OBJ)))
 
 all : $(TARGET).elf
 
-$(TARGET).elf : $(OBJ) $(OBJ_DIR)/lib.os
+$(TARGET).elf : $(OBJ_DIR)/lib.$(LIBOPENCM3_LIB) $(OBJ)
 	$(E)arm-none-eabi-gcc --static -nostartfiles -Tstm32-h103.ld -mthumb \
 		-mcpu=cortex-m3 -msoft-float -mfix-cortex-m3-ldrd \
 		-Wl,-Map=$(TARGET).map -Wl,--gc-sections \
@@ -45,16 +47,13 @@ $(OBJ_DIR)/%.o : %.c
 	@mkdir -p $(@D)
 	$(E)arm-none-eabi-gcc $(G) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
 
-$(OBJ_DIR)/%.o : ../miniblink/%.cpp
-	@echo $<
-	@mkdir -p $(@D)
-	$(E)arm-none-eabi-g++ $(G) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
-
 $(OBJ_DIR):
 	@mkdir $(OBJ_DIR)
 
 clean:
-	-rm -rf $(OBJ_DIR)
+	-rm -f $(OBJ_DIR)/*.o
+	-rm -f $(OBJ_DIR)/*.d
+	#-rm -rf $(OBJ_DIR)
 	-rm -f $(TARGET).elf
 	-rm -f $(TARGET).eep
 	-rm -f $(TARGET).bin
@@ -67,7 +66,8 @@ compile_commands.json :
 	bear make
 	cat $(OPENCM3_DIR)/compile_commands.json >> compile_commands.json
 
-.PHONY: lib.debug lib.clean gdb map upload
+.PHONY: lib.clean gdb map upload
+
 
 $(OBJ_DIR)/lib.debug:
 	@mkdir -p $(@D)
@@ -80,9 +80,12 @@ $(OBJ_DIR)/lib.os:
 	make -C ../LibStm/libopencm3 V=1
 
 lib.clean:
-	rm -f $(OBJ_DIR)/lib.debug
 	rm -f $(OBJ_DIR)/lib.os
+	rm -f $(OBJ_DIR)/lib.debug
 	make -C ../LibStm/libopencm3 V=1 clean
+
+libopencm3: $(OBJ_DIR)/lib.os
+	@echo libopencm3 built
 
 gdb: leo.gdbinit
 	arm-none-eabi-gdb -tui -x leo.gdbinit $(TARGET).elf

@@ -12,10 +12,6 @@
 
 uint8_t SPIClass::transfer(uint8_t v) { return (uint8_t)spi_xfer(_spi, v); }
 
-//	uint8_t  read8()  { return spi_read(_spi); }
-//	uint16_t read16() { return spi_read(_spi); }
-
-
 uint32_t SPIClass::SR()  const { return SPI_SR(_spi) ; }
 uint32_t SPIClass::CR1() const { return SPI_CR1(_spi) ; }
 uint32_t SPIClass::CR2() const { return SPI_CR2(_spi) ; }
@@ -64,7 +60,7 @@ void SPIClass::begin(bool enable16bits)
 {
 	//rcc_periph_clock_enable(RCC_AFIO);
 
-S_spi_init_clock(_spi);
+	S_spi_init_clock(_spi);
 
 	spi_reset(_spi);
 
@@ -93,7 +89,6 @@ void SPIClass::begin(SPISettings tr)
 	S_spi_init_clock(_spi);
 
 	spi_reset(_spi);
-
 
 	int br = SPI_CR1_BAUDRATE_FPCLK_DIV_32;
 
@@ -143,10 +138,10 @@ void SPIClass::setDataMode(SPI_MODE mode)
 /* SPI1 ==> e' attaccato al bus clock APB2 */
 /* SPI2 ==> e' attaccato al bus clock APB1 */
 /*
-uint32_t rcc_apb1_frequency = 8000000;
-uint32_t rcc_apb2_frequency = 8000000;
-uint32_t rcc_ahb_frequency = 8000000;
-*/
+   uint32_t rcc_apb1_frequency = 8000000;
+   uint32_t rcc_apb2_frequency = 8000000;
+   uint32_t rcc_ahb_frequency = 8000000;
+   */
 void SPIClass::setSpeedMaximum(int f)
 {
 	// la frequenza del clock sul SPI
@@ -201,4 +196,53 @@ void SPIClass::beginTransaction(SPISettings tr)
 }
 
 void SPIClass::endTransaction() {
+}
+//////////////////////////////////////
+
+uint16_t SPIClass::read() {
+	/* Wait for transfer finished. */
+	while (!(SPI_SR(_spi) & SPI_SR_RXNE));
+
+	/* Read the data (8 or 16 bits, depending on DFF bit) from DR. */
+	return SPI_DR(_spi);
+}
+void SPIClass::send(uint16_t data) {
+	/* Wait for transfer finished. */
+	while (!(SPI_SR(_spi) & SPI_SR_TXE));
+
+	/* Write data (8 or 16 bits, depending on DFF) into DR. */
+	SPI_DR(_spi) = data;
+}
+int16_t SPIClass::xfer(uint16_t data)
+{
+	/* Write data (8 or 16 bits, depending on DFF) into DR. */
+	SPI_DR(_spi) = data;
+
+	/* Wait for transfer finished. */
+	while (!(SPI_SR(_spi) & SPI_SR_RXNE));
+
+	/* Read the data (8 or 16 bits, depending on DFF bit) from DR. */
+	return SPI_DR(_spi);
+}
+
+
+void SPIClass::enable() { SPI_CR1(_spi) |= SPI_CR1_SPE; }
+void SPIClass::disable() { SPI_CR1(_spi) &= ~SPI_CR1_SPE; }
+
+uint16_t SPIClass::clean_disable() 
+{
+	/* Wait to receive last data */ 
+	while (!(SPI_SR(_spi) & SPI_SR_RXNE));
+
+	uint16_t data = SPI_DR(_spi);
+
+	/* Wait to transmit last data */
+	while (!(SPI_SR(_spi) & SPI_SR_TXE));
+
+	/* Wait until not busy */
+	while (SPI_SR(_spi) & SPI_SR_BSY);
+
+	SPI_CR1(_spi) &= ~SPI_CR1_SPE;
+
+	return data;
 }
