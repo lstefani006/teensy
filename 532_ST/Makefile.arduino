@@ -1,0 +1,51 @@
+V=1
+
+VPATH+=./crypto
+
+ifdef TEENSY
+	CXXFLAGS=-I../TeensyLib
+	CXXFLAGS= -I$(ARDUINO)/hardware/teensy/avr/libraries/SPI -I.
+	VPATH=../TeensyLib
+	VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+else  ifdef ESP8266
+	CXXFLAGS=-I../EspLib
+	VPATH=../EspLib
+else ifdef STM32F103
+	CXXFLAGS=-I../StLib
+	VPATH+=../StLib
+	VPATH+=$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
+	CXXFLAGS+=-I$(HOME)/Arduino/hardware/Arduino_STM32/STM32F1/libraries/SPI/src
+	CXXFLAGS+=-I../PN532/PN532_SPI
+	CXXFLAGS+=-I../PN532/PN532
+else
+	CXXFLAGS+=-I$(ARDUINO)/hardware/arduino/avr/libraries/SPI/src -I.
+	VPATH+=$(ARDUINO)/hardware/arduino/avr/libraries/SPI/src
+	VPATH+=../rfid/src
+endif
+
+VPATH+=../util
+VPATH+=../PN532/PN532_SPI
+VPATH+=../PN532/PN532
+CXXFLAGS+=-I../util
+CXXFLAGS+=-I. -I../rfid/src
+
+ifdef STM32F103
+	CXXFLAGS+=-DSTM32F1 -I/home/leo/teensy/LibStm/libopencm3/include
+endif
+
+G=-g
+O=-O0
+E=
+
+
+TARGET=532_SPI.hex
+SRC+=iso14443a_uid.cpp SPI.cpp
+SRC+=emulatetag.cpp llcp.cpp mac_link.cpp PN532.cpp snep.cpp
+SRC+=PN532_SPI.cpp
+
+include ../util/makefile.mk
+
+tags : 
+	hdrtag *.c *.cpp *.h *.hpp \
+		$(TEENSY)/*.cpp $(TEENSY)/*.c \
+		$(TEENSY)/*.hpp $(TEENSY)/*.h
