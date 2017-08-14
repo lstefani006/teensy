@@ -1,7 +1,10 @@
 ############################################
 E?=@
-O?=-Os -ggdb3
+O?=-O0 -ggdb3
 OBJ_DIR?=.obj
+LIBOPENCM3_LIB?=os
+############################################
+
 
 CPPFLAGS+=$(O)
 CPPFLAGS+=-mthumb -mcpu=cortex-m3 -msoft-float -mfix-cortex-m3-ldrd
@@ -16,8 +19,6 @@ include ../util/base_makefile.mk
 
 CXXFLAGS+=$(WCXX)
 CFLAGS+=$(WC)
-
-LIBOPENCM3_LIB?=os
 
 
 OBJ:=$(patsubst %.cpp,%.o,$(SRC))
@@ -34,8 +35,6 @@ $(TARGET).elf : $(OBJ_DIR)/lib.$(LIBOPENCM3_LIB) $(OBJ)
 	$(E)arm-none-eabi-objcopy -O binary  "$(TARGET).elf" "$(TARGET).bin"
 	$(E)arm-none-eabi-objdump -h -S $(TARGET).elf > $(TARGET).dis
 	$(E)arm-none-eabi-size $(TARGET).elf
-
-
 
 $(OBJ_DIR)/%.o : %.cpp
 	@echo $<
@@ -91,15 +90,15 @@ gdb: leo.gdbinit
 	arm-none-eabi-gdb -tui -x leo.gdbinit $(TARGET).elf
 
 leo.gdbinit:
-	echo "target extended-remote /dev/ttyBmpGdb" >  leo.gdbinit
-	echo "mon swdp_scan                          >> leo.gdbinit
-	echo "attach 1                               >> leo.gdbinit
-	echo "set mem inaccessible-by-default off    >> leo.gdbinit
-	echo "monitor vector_catch disable hard      >> leo.gdbinit
-	echo "monitor option erase                   >> leo.gdbinit
-	echo "set print pretty                       >> leo.gdbinit
-	echo "load                                   >> leo.gdbinit
-	echo "b main                                 >> leo.gdbinit
+	echo "target extended-remote /dev/ttyBmpGdb"  >  leo.gdbinit
+	echo "mon swdp_scan"                          >> leo.gdbinit
+	echo "attach 1"                               >> leo.gdbinit
+	echo "set mem inaccessible-by-default off"    >> leo.gdbinit
+	echo "monitor vector_catch disable hard"      >> leo.gdbinit
+	echo "monitor option erase"                   >> leo.gdbinit
+	echo "set print pretty"                       >> leo.gdbinit
+	echo "load"                                   >> leo.gdbinit
+	echo "b main"                                 >> leo.gdbinit
 
 
 upload : all

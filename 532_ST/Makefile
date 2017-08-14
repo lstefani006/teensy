@@ -1,5 +1,4 @@
-
-TARGET=532_SP
+TARGET=532_SPI
 OBJ_DIR=.obj
 SRC+=iso14443a_uid.cpp
 
@@ -16,7 +15,7 @@ CPPFLAGS+=-I../PN532/PN532
 TAGS+=$(HOME)/teensy/PN532/PN532_SPI
 TAGS+=$(HOME)/teensy/PN532/PN532
 
-E=@
+E=
 W=3
 
 include ../LibStm/LeoStm/Makefile

@@ -16,6 +16,10 @@
 
 #include <Arduino.h>
 
+extern "C" void __cxa_pure_virtual() { 
+	HALT;
+}
+
 const char *halt_fn = nullptr;
 int halt_ln = 0;
 void halt(const char *fn, int ln) { 
@@ -167,7 +171,7 @@ int main()
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
 	systick_setup();
-	rtc_setup();
+	//rtc_setup();
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
 	//Serial.begin();
 	

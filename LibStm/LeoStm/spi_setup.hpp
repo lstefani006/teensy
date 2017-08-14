@@ -2,6 +2,7 @@
 #define __spi_hpp__
 
 #include <Arduino.h>
+#include <stdint.h>
 // #include <libopencm3/stm32/spi.h>
 
 

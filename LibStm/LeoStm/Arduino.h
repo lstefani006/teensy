@@ -25,6 +25,7 @@ typedef bool    boolean;
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <usart_setup.hpp>
 #include <systick_setup.hpp>
