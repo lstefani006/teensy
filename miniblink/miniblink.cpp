@@ -48,16 +48,25 @@ static void gpio_setup(void)
 	// GPIOC_CRH |= (GPIO_MODE_OUTPUT_2_MHZ << ((13 - 8) * 4));
 	// Using API functions: 
 	gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+
 	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
+	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO14);
 }
 
 
 const char *halt_fn = nullptr;
 int halt_ln = 0;
+void halt(const char *fn, int ln) __attribute__((noreturn));
 void halt(const char *fn, int ln) { 
 	halt_fn = fn;
 	halt_ln = ln;
 	for(;;); 
+}
+#define HALT halt(__func__, __LINE__)
+
+extern "C" void __cxa_pure_virtual() { 
+	HALT;
 }
 
 class Timer
@@ -65,13 +74,13 @@ class Timer
 public:
 	Timer(uint32_t tm) : _tm(tm) {}
 
-	void begin(int freq);
+	void begin(int freq, int maxCount);
 
 	void irq();
 
 protected:
-	virtual void UpdateInterrupt() {}
-	virtual void CompareInterrupt() {}
+	virtual void UpdateInterrupt() = 0;
+	virtual void CompareInterrupt(int oc) = 0;
 
 private:
 	uint32_t _tm;
@@ -79,9 +88,8 @@ private:
 
 Timer *S_Timer[8+1] = { nullptr, };
 
-void Timer::begin(int freq)
+void Timer::begin(int freq, int maxCount)
 {
-	const char *fn = __func__;
 	switch (_tm)
 	{
 	case TIM1: 
@@ -97,24 +105,21 @@ void Timer::begin(int freq)
 		break;
 		*/
 
-	default: 
-		halt(fn, __LINE__);
-		break;
+	default: HALT;
 	}
 	// Enable TIM2 clock. 
 	switch (_tm)
 	{
-	case TIM1: rcc_periph_clock_enable(RCC_TIM1); nvic_enable_irq(NVIC_TIM1_UP_IRQ); nvic_enable_irq(NVIC_TIM1_CC_IRQ); rcc_periph_reset_pulse(RST_TIM1); break;
-	case TIM2: rcc_periph_clock_enable(RCC_TIM2); nvic_enable_irq(NVIC_TIM2_IRQ); nvic_set_priority(NVIC_TIM2_IRQ, 1); rcc_periph_reset_pulse(RST_TIM2); break;
-	case TIM3: rcc_periph_clock_enable(RCC_TIM3); nvic_enable_irq(NVIC_TIM3_IRQ); nvic_set_priority(NVIC_TIM3_IRQ, 1); rcc_periph_reset_pulse(RST_TIM3); break;
-	case TIM4: rcc_periph_clock_enable(RCC_TIM4); nvic_enable_irq(NVIC_TIM4_IRQ); nvic_set_priority(NVIC_TIM4_IRQ, 1); rcc_periph_reset_pulse(RST_TIM4); break;
+	case TIM1: rcc_periph_clock_enable(RCC_TIM1); nvic_enable_irq(NVIC_TIM1_UP_IRQ); nvic_enable_irq(NVIC_TIM1_CC_IRQ);   rcc_periph_reset_pulse(RST_TIM1); break;
+	case TIM2: rcc_periph_clock_enable(RCC_TIM2); nvic_enable_irq(NVIC_TIM2_IRQ);    nvic_set_priority(NVIC_TIM2_IRQ, 1); rcc_periph_reset_pulse(RST_TIM2); break;
+	case TIM3: rcc_periph_clock_enable(RCC_TIM3); nvic_enable_irq(NVIC_TIM3_IRQ);    nvic_set_priority(NVIC_TIM3_IRQ, 1); rcc_periph_reset_pulse(RST_TIM3); break;
+	case TIM4: rcc_periph_clock_enable(RCC_TIM4); nvic_enable_irq(NVIC_TIM4_IRQ);    nvic_set_priority(NVIC_TIM4_IRQ, 1); rcc_periph_reset_pulse(RST_TIM4); break;
+
 	case TIM5: rcc_periph_clock_enable(RCC_TIM5); nvic_enable_irq(NVIC_TIM5_IRQ); nvic_set_priority(NVIC_TIM5_IRQ, 1); rcc_periph_reset_pulse(RST_TIM5); break;
 	case TIM6: rcc_periph_clock_enable(RCC_TIM6); nvic_enable_irq(NVIC_TIM6_IRQ); /*nvic_set_priority(NVIC_TIM6_IRQ, 1); */rcc_periph_reset_pulse(RST_TIM6); break;
 	case TIM7: rcc_periph_clock_enable(RCC_TIM7); nvic_enable_irq(NVIC_TIM7_IRQ); nvic_set_priority(NVIC_TIM7_IRQ, 1); rcc_periph_reset_pulse(RST_TIM7); break;
 	case TIM8: rcc_periph_clock_enable(RCC_TIM8); nvic_enable_irq(NVIC_TIM8_UP_IRQ); nvic_enable_irq(NVIC_TIM8_CC_IRQ); rcc_periph_reset_pulse(RST_TIM8); break;
-	default: 
-			   halt(fn, __LINE__);
-			   break;
+	default: HALT;
 	}
 
 	// reset del timer
@@ -146,21 +151,23 @@ void Timer::begin(int freq)
 
 	switch (_tm)
 	{
-	case TIM1: 
+	case TIM1:
 		timer_set_prescaler(_tm, (rcc_apb2_frequency * 1) / freq - 1);  // imposta il registro PSC
 		break;
-	case TIM2: 
-	case TIM3: 
-	case TIM4: 
-	case TIM5: 
-	case TIM6: 
-	case TIM7: 
-	case TIM8: 
+	case TIM2:
+	case TIM3:
+	case TIM4:
+		timer_set_prescaler(_tm, (rcc_apb1_frequency * 2) / freq - 1);  // imposta il registro PSC
+		break;
+
+	case TIM5:
+	case TIM6:
+	case TIM7:
+	case TIM8:
 		timer_set_prescaler(_tm, (rcc_apb1_frequency * 2) / freq - 1);  // imposta il registro PSC
 		break;
 	default:
-		halt(fn, __LINE__);
-		break;
+		HALT;
 	}
 
 	// imposta il valore nell'auto--reload register (ARR)
@@ -168,7 +175,7 @@ void Timer::begin(int freq)
 	// Quando il contatore raggiunge ARR e va a ZERO (se conta UP) o da Zero va a ARR (se conta down)
 	// si genera un evento "update event ==> UE"
 	// Che di solito provoca un UI ==> update interrupt
-	timer_set_period(_tm, 5000); // imposta il registro ARR
+	timer_set_period(_tm, maxCount); // imposta il registro ARR
 
 	switch (_tm)
 	{
@@ -176,13 +183,12 @@ void Timer::begin(int freq)
 	case TIM2: S_Timer[2] = this; break;
 	case TIM3: S_Timer[3] = this; break;
 	case TIM4: S_Timer[4] = this; break;
+
 	case TIM5: S_Timer[5] = this; break;
 	case TIM6: S_Timer[6] = this; break;
 	case TIM7: S_Timer[7] = this; break;
 	case TIM8: S_Timer[8] = this; break;
-	default:
-			   halt(fn, __LINE__);
-			   break;
+	default: HALT;
 	}
 
 	switch (_tm)
@@ -195,9 +201,13 @@ void Timer::begin(int freq)
 		break;
 	default:
 		timer_set_oc_value(_tm, TIM_OC1, 1000); // CCR1/2/3 a seconda se TIM_OC1/2/3
+		timer_set_oc_value(_tm, TIM_OC2, 2000); // CCR1/2/3 a seconda se TIM_OC1/2/3
+		timer_set_oc_value(_tm, TIM_OC3, 3000); // CCR1/2/3 a seconda se TIM_OC1/2/3
+		timer_set_oc_value(_tm, TIM_OC4, 4000); // CCR1/2/3 a seconda se TIM_OC1/2/3
+
 		timer_enable_counter(_tm); // imposta un flag in CR1
 		timer_enable_preload(_tm); // imposta un flag in CR1 
-		timer_enable_irq(_tm, TIM_DIER_CC1IE | TIM_DIER_UIE); // Capture/compare 1 interrupt enable. --- Update Interrupt enable
+		timer_enable_irq(_tm, TIM_DIER_CC4IE | TIM_DIER_CC3IE | TIM_DIER_CC2IE | TIM_DIER_CC1IE | TIM_DIER_UIE); // Capture/compare 1 interrupt enable. --- Update Interrupt enable
 		break;
 	}
 }
@@ -209,7 +219,25 @@ void Timer::irq()
 		// Clear compare interrupt flag. 
 		timer_clear_flag(_tm, TIM_SR_CC1IF);
 
-		this->CompareInterrupt();
+		this->CompareInterrupt(1);
+	}
+	if (timer_get_flag(_tm, TIM_SR_CC2IF)) 
+	{
+		// Clear compare interrupt flag. 
+		timer_clear_flag(_tm, TIM_SR_CC2IF);
+		this->CompareInterrupt(2);
+	}
+	if (timer_get_flag(_tm, TIM_SR_CC3IF)) 
+	{
+		// Clear compare interrupt flag. 
+		timer_clear_flag(_tm, TIM_SR_CC3IF);
+		this->CompareInterrupt(3);
+	}
+	if (timer_get_flag(_tm, TIM_SR_CC4IF)) 
+	{
+		// Clear compare interrupt flag. 
+		timer_clear_flag(_tm, TIM_SR_CC4IF);
+		this->CompareInterrupt(4);
 	}
 
 	// UIF: Update interrupt flag
@@ -227,6 +255,7 @@ extern "C" void tim1_cc_isr(void) { if (S_Timer[1]) S_Timer[1]->irq(); }
 extern "C" void tim2_isr(void) { if (S_Timer[2]) S_Timer[2]->irq(); }
 extern "C" void tim3_isr(void) { if (S_Timer[3]) S_Timer[3]->irq(); }
 extern "C" void tim4_isr(void) { if (S_Timer[4]) S_Timer[4]->irq(); }
+
 extern "C" void tim5_isr(void) { if (S_Timer[5]) S_Timer[5]->irq(); }
 extern "C" void tim6_isr(void) { if (S_Timer[6]) S_Timer[6]->irq(); }
 extern "C" void tim7_isr(void) { if (S_Timer[7]) S_Timer[7]->irq(); }
@@ -329,11 +358,21 @@ public:
 protected:
 	void UpdateInterrupt()
 	{
-		if (start) gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+		//if (start) gpio_toggle(GPIOC, GPIO13);	// LED on/off 
+		gpio_set(GPIOB, GPIO12);
+		gpio_set(GPIOB, GPIO13);
+		gpio_set(GPIOB, GPIO14);
+		gpio_set(GPIOC, GPIO13);
 	}
-	void CompareInterrupt()
+	void CompareInterrupt(int oc)
 	{
-		//if (start) gpio_toggle(GPIOB, GPIO12);	// LED on/off 
+		switch (oc)
+		{
+		case 1: gpio_clear(GPIOB, GPIO12); break;
+		case 2: gpio_clear(GPIOB, GPIO13); break;
+		case 3: gpio_clear(GPIOB, GPIO14); break;
+		case 4: gpio_clear(GPIOC, GPIO13); break;
+		}
 	}
 };
 
@@ -344,6 +383,7 @@ void cb()
 	gpio_toggle(GPIOB, GPIO12);	// LED on/off 
 	static int nn = 0;
 	Serial.println(nn++);
+	Serial.print("+");
 	Serial.println(rtc_counter);
 }
 
@@ -355,13 +395,13 @@ int main()
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();
 
 	gpio_setup();
-	tm2.begin(5000);
+	tm2.begin(5000, 5000);
 
 	systick_setup();
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
 	rtc_setup();
 
-	if (true)
+	if (false)
 	{
 		for (int i = 0; i < 10; ++i)
 		{
@@ -375,7 +415,7 @@ int main()
 		}
 	}
 
-	rtc_cb = cb;
+	//rtc_cb = cb;
 
 	start = true;
 	for (;;);

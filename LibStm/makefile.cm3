@@ -7,6 +7,7 @@ LIBOPENCM3_LIB?=os
 
 
 CPPFLAGS+=$(O)
+CPPFLAGS+=$(G)
 CPPFLAGS+=-mthumb -mcpu=cortex-m3 -msoft-float -mfix-cortex-m3-ldrd
 CPPFLAGS+=-fno-common -ffunction-sections -fdata-sections
 CPPFLAGS+=-MD -Wundef
@@ -39,12 +40,12 @@ $(TARGET).elf : $(OBJ_DIR)/lib.$(LIBOPENCM3_LIB) $(OBJ)
 $(OBJ_DIR)/%.o : %.cpp
 	@echo $<
 	@mkdir -p $(@D)
-	$(E)arm-none-eabi-g++ $(G) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+	$(E)arm-none-eabi-g++ -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 $(OBJ_DIR)/%.o : %.c
 	@echo $<
 	@mkdir -p $(@D)
-	$(E)arm-none-eabi-gcc $(G) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
+	$(E)arm-none-eabi-gcc -c $(CPPFLAGS) $(CFLAGS) $< -o $@
 
 $(OBJ_DIR):
 	@mkdir $(OBJ_DIR)

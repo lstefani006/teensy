@@ -1,4 +1,3 @@
-
 TARGET=miniblink
 SRC=miniblink.cpp 
 SRC+=rtc_setup.cpp usart_setup.cpp uprintf.cpp spi_setup.cpp ring.cpp systick_setup.cpp
@@ -14,7 +13,8 @@ CPPFLAGS+=-I.
 
 E=
 W=3
-O=-Os -g
+O=-O0
+G=-g
 ############################################
 
 include ../LibStm/makefile.cm3
