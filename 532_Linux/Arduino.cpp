@@ -24,13 +24,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-// Work-around to claim uart interface using the c_iflag (software input processing) from the termios struct
-#  define CCLAIMED 0x80000000
-//
-
 void setup();
 void loop();
-
 
 int main()
 {
@@ -39,10 +34,10 @@ int main()
 		loop();
 }
 
-int millis(void)
+unsigned long millis(void)
 {
-	static int tzero = -1;
-	if (tzero < 0)
+	static unsigned long tzero = (unsigned long)-1;
+	if (tzero == (unsigned long)-1)
 	{
 		struct timespec ts;
 		clock_gettime(CLOCK_MONOTONIC, &ts );
@@ -55,6 +50,12 @@ int millis(void)
 		return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000L) - tzero;
 	}
 }
+void delay(unsigned long msec) 
+{ 
+	usleep(msec * msec); 
+}
+
+///////////////////////////////////////////////////////////////////////////////////
 
 SerialClass Serial;
 
@@ -77,7 +78,6 @@ void SerialClass::print(uint32_t ch) { printf("%u", ch);fflush(stdout);  }
 
 ///////////////////////////////7
 
-void delay(int msec) { usleep(msec * msec); }
 ///////////////////////////////7
 HardwareSerial Serial1;
 

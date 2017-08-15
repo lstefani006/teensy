@@ -14,3 +14,5 @@
 */obj
 teensy_loader_cli
 .obj
+tags
+leo.gdbinit

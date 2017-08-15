@@ -11,16 +11,17 @@ CCOMMON= \
 		 -I$(ARDUINO)/hardware/arduino/avr/cores/arduino \
 		 -I$(ARDUINO)/hardware/arduino/avr/variants/eightanaloginputs
 
-CFLAGS+=$(CCOMMON) $(WC)
-CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++14 -fno-threadsafe-statics \
-		  -fno-exceptions
+CFLAGS+=$(CCOMMON)
+CXXFLAGS+=$(CCOMMON) -std=gnu++14 -fno-threadsafe-statics -fno-exceptions
+
+CFLAGS+=$(WC)
+CXXFLAGS+=$(WCXX)
 
 
-ifndef ECHO
-	ECHO=@
-endif
+ECHO?=@
 
 
+##################################################
 
 .obj/%.o : %.cpp | .obj
 	@echo $<

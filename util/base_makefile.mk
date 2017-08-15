@@ -52,3 +52,5 @@ ifeq ($(shell test $(W) -ge 4; echo $$?),0)
 	WC+=$(WCOMMON_4)
 	WCXX+=$(WCOMMON_4) -Weffc++
 endif
+
+

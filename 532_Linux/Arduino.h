@@ -38,7 +38,7 @@ extern SerialClass Serial;
 
 typedef bool boolean;
 
-void delay(int msec);
-int millis();
+void delay(unsigned long msec);
+unsigned long  millis();
 
 #endif // __Arduino_h__

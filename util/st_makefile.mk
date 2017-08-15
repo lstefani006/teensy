@@ -60,6 +60,9 @@ CXXFLAGS+=$(CF_CXX_LIB) \
 		  -Wextra \
 		  -std=gnu++14
 
+CFLAGS+=$(WC)
+CXXFLAGS+=$(WCXX)
+
 ##########################
 
 OBJ_DIR=.obj_st

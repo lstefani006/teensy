@@ -10,8 +10,11 @@ CCOMMON=-Os \
 		-D__MK20DX256__ -DTEENSYDUINO=128 -DARDUINO=10608 -DF_CPU=72000000 -DUSB_SERIAL -DLAYOUT_US_ENGLISH \
 		-I$(ARDUINO)/hardware/teensy/avr/cores/teensy3
 
-CFLAGS+=$(CCOMMON) $(WC)
-CXXFLAGS+=$(CCOMMON) $(WCXX) -std=gnu++11 -fno-exceptions -felide-constructors -fno-rtti
+CFLAGS+=$(CCOMMON)
+CXXFLAGS+=$(CCOMMON) -std=gnu++11 -fno-exceptions -felide-constructors -fno-rtti
+
+CFLAGS+=$(WC)
+CXXFLAGS+=$(WCXX)
 
 OBJ_DIR=.obj3
 LIB_DIR=.lib3
