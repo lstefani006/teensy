@@ -68,7 +68,6 @@ compile_commands.json :
 
 .PHONY: lib.clean gdb map upload
 
-
 $(OBJ_DIR)/lib.debug:
 	@mkdir -p $(@D)
 	touch $(OBJ_DIR)/lib.debug

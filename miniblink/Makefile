@@ -1,6 +1,6 @@
 TARGET=miniblink
 SRC=miniblink.cpp 
-SRC+=rtc_setup.cpp usart_setup.cpp uprintf.cpp spi_setup.cpp ring.cpp systick_setup.cpp
+SRC+=rtc_setup.cpp usart_setup.cpp uprintf.cpp spi_setup.cpp ring.cpp systick_setup.cpp Timer.cpp
 OBJ_DIR=.obj
 
 VPATH+=../util
@@ -12,7 +12,7 @@ CPPFLAGS+=-I../LibStm/LeoStm
 CPPFLAGS+=-I.
 
 E=
-W=3
+W=4
 O=-O0
 G=-g
 ############################################
