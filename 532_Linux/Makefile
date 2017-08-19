@@ -1,6 +1,6 @@
 TARGET=532_HSU
-SRC+=iso14443a_uid.cpp
-#SRC+=./android_hce.cpp
+#SRC+=iso14443a_uid.cpp
+SRC+=./android_hce.cpp
 
 SRC+=emulatetag.cpp llcp.cpp mac_link.cpp PN532.cpp snep.cpp
 SRC+=PN532_HSU.cpp

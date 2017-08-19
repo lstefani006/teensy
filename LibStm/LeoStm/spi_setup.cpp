@@ -142,10 +142,10 @@ void SPIClass::setDataMode(SPI_MODE mode)
    uint32_t rcc_apb2_frequency = 8000000;
    uint32_t rcc_ahb_frequency = 8000000;
    */
-void SPIClass::setSpeedMaximum(int f)
+void SPIClass::setSpeedMaximum(uint32_t f)
 {
 	// la frequenza del clock sul SPI
-	int hz;
+	uint32_t hz;
 	switch (_spi)
 	{
 	case SPI1: hz = rcc_apb2_frequency; break;
@@ -153,7 +153,7 @@ void SPIClass::setSpeedMaximum(int f)
 	default: HALT;
 	}
 
-	int baudrate;
+	uint8_t baudrate;
 	/***/if (hz / 2 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_2;
 	else if (hz / 4 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_4;
 	else if (hz / 8 <= f) baudrate = SPI_CR1_BR_FPCLK_DIV_8;

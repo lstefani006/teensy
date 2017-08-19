@@ -16,9 +16,34 @@
 
 #include <Arduino.h>
 
+/*
+#define SystemCoreClock (72*1000*1000)
+#pragma GCC push_options
+#pragma GCC optimize ("O3")
+void delayUS_DWT(uint32_t us) {
+	volatile uint32_t cycles = (SystemCoreClock/1000000L)*us;
+	volatile uint32_t start = DWT->CYCCNT;
+	do  {
+	} while(DWT->CYCCNT - start < cycles);
+}
+#pragma GCC pop_options
+*/
+
+
 extern "C" void __cxa_pure_virtual() { 
 	HALT;
 }
+
+extern "C" void *__dso_handle;
+void *__dso_handle = nullptr;
+
+void* operator new(size_t objsize) { return malloc(objsize); } 
+void operator delete(void* obj) { if (obj) free(obj); } 
+void operator delete(void* obj, size_t) { if (obj) free(obj); } 
+
+void* operator new[](size_t objsize) { return malloc(objsize); } 
+void operator delete[](void* obj) { if (obj) free(obj); } 
+void operator delete[](void* obj, size_t) { if (obj) free(obj); } 
 
 const char *halt_fn = nullptr;
 int halt_ln = 0;
@@ -97,7 +122,7 @@ static uint16_t getGPIO(int pin)
    GPIO_CNF_OUTPUT_OPENDRAIN        0x01 // Digital Output Open Drain.
    GPIO_CNF_OUTPUT_ALTFN_PUSHPULL   0x02 // Alternate Function Output Pushpull. 
    GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN  0x03 // Alternate Function Output Open Drain.
-*/
+   */
 void pinMode(int pin, int mode) 
 {
 	rcc_periph_clken ro;
@@ -154,14 +179,14 @@ int digitalRead(int pin)
 	return gpio_get(gpioport, gpios) != 0 ? HIGH : LOW;
 }
 
-uint8_t rx[16];
-uint8_t tx[256];
+static uint8_t rx[64];
+static uint8_t tx[64];
 USARTIRQ Serial(USART1);
+
+SPIClass SPI(SPI1);
 
 void setup();
 void loop();
-
-SPIClass SPI(SPI1);
 
 int main()
 {
@@ -169,32 +194,24 @@ int main()
 	// hsi => oscillatore RC interno
 	// lse => 32768Khz external clock
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();
-
 	systick_setup();
-	//rtc_setup();
+	rtc_setup();
 	Serial.begin(rx, sizeof(rx), tx, sizeof(tx));
-	//Serial.begin();
-	
-	/*
-	ST::digitalWrite(PC13, HIGH);
-	ST::digitalWrite(PC13, LOW);
 
-	if (ST::digitalRead(PC13))
+	if (true)
 	{
 		pinMode(PC13, OUTPUT);
-		digitalWrite(PC13, HIGH);
-		for (int i = 0; i < 20; ++i)
+		for (int i = 0; i < 10; ++i)
 		{
 			if (digitalRead(PC13) == HIGH)
 				digitalWrite(PC13, LOW);
 			else
 				digitalWrite(PC13, HIGH);
-			delay(500);
+			delay(250);
 		}
 	}
-	*/
 
-	Serial.printf("ciao");
+	Serial.printf(".... starting .... \n");
 
 	setup();
 	while(1)

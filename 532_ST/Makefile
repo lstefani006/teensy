@@ -15,7 +15,7 @@ CPPFLAGS+=-I../PN532/PN532
 TAGS+=$(HOME)/teensy/PN532/PN532_SPI
 TAGS+=$(HOME)/teensy/PN532/PN532
 
-E=
+E=@
 W=3
 
 include ../LibStm/LeoStm/Makefile

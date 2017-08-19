@@ -33,10 +33,10 @@ enum SPI_MODE : int
 
 struct SPISettings
 {
-	SPISettings(int speedMaximum , BIT_ORDER bitOrder , SPI_MODE mode) 
+	SPISettings(uint32_t speedMaximum , BIT_ORDER bitOrder , SPI_MODE mode) 
 		: SpeedMaximum(speedMaximum), BitOrder(bitOrder), SpiMode(mode) {}
 
-	int SpeedMaximum;
+	uint32_t SpeedMaximum;
 	BIT_ORDER BitOrder;
 	SPI_MODE SpiMode;
 };
@@ -62,7 +62,7 @@ public:
 	void setBitOrder(BIT_ORDER dataOrder);
 	void setDataMode(SPI_MODE mode);
 	void setClockDivider(SPI_CLOCK_DIV divider);
-	void setSpeedMaximum(int speed);
+	void setSpeedMaximum(uint32_t speed);
 
 	uint32_t SR()  const;
 	uint32_t CR1() const;

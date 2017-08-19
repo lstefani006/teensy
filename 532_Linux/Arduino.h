@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 class HardwareSerial
 {
@@ -37,6 +38,7 @@ public:
 extern SerialClass Serial;
 
 typedef bool boolean;
+typedef uint8_t byte;
 
 void delay(unsigned long msec);
 unsigned long  millis();

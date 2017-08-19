@@ -47,9 +47,10 @@ ifndef ARDUINO
 SRC += des.cpp des3.cpp rsa.cpp aes.cpp endian.cpp debug.cpp asn1.cpp
 endif
 
-include ../util/makefile.mk
+include ~/teensy/util/makefile.mk
 
-tags : 
-	hdrtag *.c *.cpp *.h *.hpp \
+eetags:
+	ctags *.cpp *.hpp \
 		$(TEENSY)/*.cpp $(TEENSY)/*.c \
-		$(TEENSY)/*.hpp $(TEENSY)/*.h
+		$(TEENSY)/*.hpp $(TEENSY)/*.h \
+		../rfid/src/*.cpp

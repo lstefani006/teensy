@@ -5,7 +5,7 @@ G?=-g
 OBJ_DIR?=.obj
 ############################################
 
-include ../util/base_makefile.mk
+include ~/teensy/util/base_makefile.mk
 
 CPPFLAGS+=$(O) $(G)
 CPPFLAGS+=-MD

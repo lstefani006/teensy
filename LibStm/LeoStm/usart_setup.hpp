@@ -30,7 +30,7 @@ enum Format { HEX, DEC };
 class USART
 {
 public:
-	USART(int usart) : _usart(usart) {}
+	USART(uint32_t usart) : _usart(usart) {}
 
 	void begin();
 	void begin(int /*speed*/) {} // per compatibilità
@@ -51,7 +51,7 @@ public:
 	USART& println(int n, Format f);
 
 private:
-	int _usart;
+	uint32_t _usart;
 };
 
 

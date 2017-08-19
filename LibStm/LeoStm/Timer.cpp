@@ -15,31 +15,30 @@ Timer *S_Timer2 = nullptr;
 Timer *S_Timer3 = nullptr;
 Timer *S_Timer4 = nullptr;
 
+Timer::~Timer()
+{
+}
+
 void Timer::irq()
 {
 	// CC1IF: Capture/compare 1 interrupt flag
 	if (timer_get_flag(_tm, TIM_SR_CC1IF)) 
 	{
-		// Clear compare interrupt flag. 
 		timer_clear_flag(_tm, TIM_SR_CC1IF);
-
 		this->CompareInterrupt(1);
 	}
 	if (timer_get_flag(_tm, TIM_SR_CC2IF)) 
 	{
-		// Clear compare interrupt flag. 
 		timer_clear_flag(_tm, TIM_SR_CC2IF);
 		this->CompareInterrupt(2);
 	}
 	if (timer_get_flag(_tm, TIM_SR_CC3IF)) 
 	{
-		// Clear compare interrupt flag. 
 		timer_clear_flag(_tm, TIM_SR_CC3IF);
 		this->CompareInterrupt(3);
 	}
 	if (timer_get_flag(_tm, TIM_SR_CC4IF)) 
 	{
-		// Clear compare interrupt flag. 
 		timer_clear_flag(_tm, TIM_SR_CC4IF);
 		this->CompareInterrupt(4);
 	}
@@ -47,18 +46,16 @@ void Timer::irq()
 	// UIF: Update interrupt flag
 	if (timer_get_flag(_tm, TIM_SR_UIF)) 
 	{
-		// Clear compare interrupt flag. 
 		timer_clear_flag(_tm, TIM_SR_UIF);
-
 		this->UpdateInterrupt();
 	}
 }
 
 extern "C" void tim1_up_isr(void) { if (S_Timer1) S_Timer1->irq(); }
 extern "C" void tim1_cc_isr(void) { if (S_Timer1) S_Timer1->irq(); }
-extern "C" void tim2_isr(void) { if (S_Timer2) S_Timer2->irq(); }
-extern "C" void tim3_isr(void) { if (S_Timer3) S_Timer3->irq(); }
-extern "C" void tim4_isr(void) { if (S_Timer4) S_Timer4->irq(); }
+extern "C" void tim2_isr(void)    { if (S_Timer2) S_Timer2->irq(); }
+extern "C" void tim3_isr(void)    { if (S_Timer3) S_Timer3->irq(); }
+extern "C" void tim4_isr(void)    { if (S_Timer4) S_Timer4->irq(); }
 
 static void gpio_enable_clock(uint32_t port) 
 {
@@ -71,7 +68,7 @@ static void gpio_enable_clock(uint32_t port)
 	default: HALT;
 	};
 }
-void Timer::begin(int freq, int maxCount)
+void Timer::begin(uint32_t freq, uint32_t maxCount)
 {
 	switch (_tm)
 	{
@@ -242,4 +239,9 @@ void Timer::setOutputCompareDigIO(OutputCompareType oc, uint32_t value)
 	}
 	timer_set_oc_mode(_tm, noc, /*TIM_OCM_TOGGLE*/ TIM_OCM_PWM1);
 	timer_enable_oc_output(_tm, noc);
+}
+
+uint32_t Timer::getCounter()
+{
+	return timer_get_counter(_tm);
 }
