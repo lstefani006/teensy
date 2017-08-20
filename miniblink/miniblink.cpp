@@ -9,6 +9,7 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/rtc.h>
 #include <libopencm3/stm32/spi.h>
+#include <libopencm3/stm32/dac.h>
 
 #include <Arduino.h>
 
@@ -30,6 +31,20 @@ static void gpio_setup(void)
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
 }
+static void dac_setup(void)
+{
+	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO5);
+	dac_disable(CHANNEL_2);
+	dac_disable_waveform_generation(CHANNEL_2);
+	dac_enable(CHANNEL_2);
+	dac_set_trigger_source(DAC_CR_TSEL2_SW);
+}
+
+/*
+		uint16_t target = input_adc0 / 2;
+		dac_load_data_buffer_single(target, RIGHT12, CHANNEL_2);
+		dac_software_trigger(CHANNEL_2);
+		*/
 
 
 ///////////////////////////////////////////////////////////////////////
