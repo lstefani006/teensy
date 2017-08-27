@@ -1,6 +1,7 @@
 TARGET=miniblink
 SRC=miniblink.cpp 
 SRC+=rtc_setup.cpp usart_setup.cpp uprintf.cpp spi_setup.cpp ring.cpp systick_setup.cpp Timer.cpp Arduino.cpp
+SRC+=dma.cpp
 OBJ_DIR=.obj
 
 VPATH+=../util

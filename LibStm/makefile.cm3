@@ -13,6 +13,7 @@ CPPFLAGS+=-fno-common -ffunction-sections -fdata-sections
 CPPFLAGS+=-MD -Wundef
 CPPFLAGS+=-DSTM32F1
 CPPFLAGS+=-I$(OPENCM3_DIR)/include 
+CPPFLAGS+=-fmax-errors=2  # interrompe la compilazio dopo N errori
 
 CXXFLAGS+=-std=c++17 -fno-rtti -fno-exceptions
 
@@ -118,15 +119,24 @@ info:
 disable_write_protection:
 	~/Arduino/hardware/Arduino_STM32/tools/linux64/stm32flash/stm32flash -k /dev/ttyUSB0
 
+.PHONY: tags
 tags: $(SRC)
+	rm -f tags qqq?.tags
 	ctags -R . \
 		$(TAGS) \
+		$(OPENCM3_DIR)/lib/stm32/*.c \
 		$(OPENCM3_DIR)/lib/stm32/common/*.c \
 		$(OPENCM3_DIR)/lib/stm32/f1/*.c \
-		/home/leo/teensy/LibStm/libopencm3/include/libopencm3/stm32/*.h \
-		/home/leo/teensy/LibStm/libopencm3/include/libopencm3/stm32/f1/*.h \
-		/home/leo/teensy/LibStm/libopencm3/include/libopencm3/stm32/common/*.h \
-		/home/leo/teensy/LibStm/libopencm3/include/libopencm3/cm3/*.h
+		$(OPENCM3_DIR)/lib/cm3/*.c \
+		$(OPENCM3_DIR)/include/libopencm3/stm32/*.h \
+		$(OPENCM3_DIR)/include/libopencm3/stm32/f1/*.h \
+		$(OPENCM3_DIR)/include/libopencm3/stm32/common/*.h \
+		$(OPENCM3_DIR)/include/libopencm3/cm3/*.h
+	grep -v f24.h tags      > qqq1.tags
+	grep -v f24.c qqq1.tags > qqq2.tags
+	mv qqq2.tags tags
+	rm -f qqq?.tags
+
 
 
 -include $(OBJ:.o=.d)
