@@ -27,3 +27,24 @@ git push origin --tags    <-- i tags non sono esportati in remoto... cosi si esp
 git tag                   <-- fa vedere i tag disponibili
 
 git reset --hard "1.0"    <-- butta via tutte le modifiche e riporta il tutto alla versione 1.0
+##################################
+
+Branch
+
+git branch
+ritorna la lista dei branch disponibili e con * quello corrente
+
+git branch pippo
+crea il branch pippo
+
+git checkout pippo
+fa lavorare sul branch
+ATTENZIONE i file non committati saranno visibili con git status
+sia in "pippo" che nel "master"
+Se in "pippo" si farà commit i file con le modifiche andranno nel branch "pippo"
+mentre si fa git checkout master si ritorna al master
+e fare git checkout master per vedere i file originali.
+COMUQUE per tranqillità prima di fare un branch COMMITTARE nel master.
+
+git push -u origin db:db
+pubblica le modifiche in remoto
