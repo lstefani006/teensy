@@ -49,3 +49,9 @@ COMUQUE per tranqillità prima di fare un branch COMMITTARE nel master.
 git push -u origin db:db
 pubblica le modifiche in remoto
 
+
+infine 
+git checkout master
+git merge db                          <=== fa subito commit .... pericoloso
+git merge db --no-commit --no-ff      <=== lascia i file da committare.
+
