@@ -1,0 +1,35 @@
+{
+	"configurations": [
+		{
+			"name": "Linux",
+			"includePath": [
+				"${workspaceRoot}",
+				"${workspaceRoot}/include",
+				"/home/leo/arduino-1.8.2/hardware/arduino/avr/cores/arduino",
+				"/home/leo/arduino-1.8.2/hardware/tools/avr/lib/gcc/avr/4.9.2/include",
+				"/home/leo/arduino-1.8.2/hardware/tools/avr/avr/include"
+			],
+			"defines": [
+				"ARDUINO=10608",
+				"ARDUINO_AVR_PRO",
+				"ARDUINO_ARCH_AVR",
+				"__AVR_ATmega328P__" // defined with -mmcu=atmega328p
+			],
+			"intelliSenseMode": "clang-x64",
+			"browse": {
+				"path": [
+					"${workspaceRoot}",
+					"${workspaceRoot}/include",
+					"/home/leo/arduino-1.8.2/hardware/arduino/avr/cores/arduino",
+					"/home/leo/arduino-1.8.2/hardware/tools/avr/lib/gcc/avr/4.9.2/include",
+					"/home/leo/arduino-1.8.2/hardware/tools/avr/avr/include",
+					"/home/leo/arduino-1.8.2/hardware/arduino/avr/variants/eightanaloginputs",
+					"/home/leo/arduino-1.8.2/hardware/arduino/avr/libraries/SPI/src"
+				],
+				"limitSymbolsToIncludedHeaders": true,
+				"databaseFilename": ""
+			}
+		}
+	],
+	"version": 3
+}
