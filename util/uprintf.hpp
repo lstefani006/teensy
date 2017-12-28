@@ -3,7 +3,6 @@
 
 #include <stdarg.h>
 
-
 struct upf_t
 {
 	bool (*pf)(char ch, void *ag);

@@ -45,7 +45,7 @@ LIB_CXXFLAGS= \
 			  -DF_CPU=80000000L -DLWIP_OPEN_SRC   -DARDUINO=10608 -DARDUINO_ESP8266_ESP01 -DARDUINO_ARCH_ESP8266 -DARDUINO_BOARD=ESP8266_ESP01  -DESP8266 -I$L/cores/esp8266 -I$L/variants/generic 
 
 CXXFLAGS+= $(COMMON) \
-		   -D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -I$L/tools/sdk/include -I$L/tools/sdk/lwip/include \
+		   -DESP8266 -D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -I$L/tools/sdk/include -I$L/tools/sdk/lwip/include \
 		   -Icore -w -Os -g -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -falign-functions=4 -std=c++11  \
 		   -ffunction-sections -fdata-sections -DF_CPU=80000000L -DLWIP_OPEN_SRC   -DARDUINO=10608 -DARDUINO_ESP8266_ESP01 -DARDUINO_ARCH_ESP8266 -DARDUINO_BOARD=ESP8266_ESP01  -DESP8266 \
 			-I$L/cores/esp8266 -I$L/variants/generic
