@@ -88,7 +88,7 @@ extern "C" void rtc_isr(void)
 			cnt -= 1;
 
 			int nd = M == 2 && leapYear(Y) ? 29 : months[M-1];
-			if (nd == D)
+			if (nd == D+1)
 			{
 				D = 1;
 				M += 1;

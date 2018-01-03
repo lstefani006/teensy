@@ -2,6 +2,7 @@ TARGET     = $(BUILDDIR)/leo
 LIBS       = SPI Wire
 SRCDIR     = src
 INCLUDEDIR = include
+BOARD      = ARDUINO_PRO
 
 ##############################################################
 ARDUINO=/home/leo/arduino-1.8.2
@@ -54,8 +55,8 @@ OBJS      += $(addprefix $(BUILDDIR)/, $(addsuffix .o, $(notdir $(foreach lib, $
 CORE_OBJS += $(addprefix $(BUILDDIR)/, $(addsuffix .o, $(notdir $(call find_source, $(COREDIR)))))
 
 VPATH += $(shell find $(SRCDIR) -type d)
-VPATH += $(foreach lib, $(LIBS), $(shell find $(LIBDIR)/$(lib)/src -type d))
 VPATH += $(shell find $(COREDIR) -type d)
+VPATH += $(foreach lib, $(LIBS), $(shell find $(LIBDIR)/$(lib)/src -type d))
 
 .PHONY: all clean run
 
