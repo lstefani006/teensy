@@ -6,4 +6,4 @@ make -f ../makeEspArduino/makeEspArduino.mk \
 	LWIP_VARIANT=v2mss536     \
 	$*
 
-awk -f esp.awk /home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/boards.txt
+#awk -f esp.awk /home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/boards.txt
