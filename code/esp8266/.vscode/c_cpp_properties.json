@@ -5,15 +5,15 @@
 			"includePath": [
 				"${workspaceRoot}",
 				"${workspaceRoot}/include",
-				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/cores/esp8266",
-				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/tools/sdk/include",
-				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/variants/generic",
-				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/tools/sdk/lwip/include",
+				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/cores/esp8266",
+				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/include",
+				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/variants/generic",
+				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/lwip/include",
 				"/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/lib/gcc/xtensa-lx106-elf/4.8.2/include/",
 				"/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/xtensa-lx106-elf/include/c++/4.8.2",
 				"/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/xtensa-lx106-elf/include/c++/4.8.2/xtensa-lx106-elf",
-				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src",
-				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WebServer/src"
+				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/libraries/ESP8266WiFi/src",
+				"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/libraries/ESP8266WebServer/src"
 			],
 			"defines": [
 				"__ets__",
@@ -32,15 +32,15 @@
 				"path": [
 					"${workspaceRoot}",
 					"${workspaceRoot}/include",
-					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/cores/esp8266",
-					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/tools/sdk/include",
-					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/variants/generic",
-					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/tools/sdk/lwip/include",
+					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/cores/esp8266",
+					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/include",
+					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/variants/generic",
+					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/lwip/include",
 					"/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/lib/gcc/xtensa-lx106-elf/4.8.2/include/",
 					"/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/xtensa-lx106-elf/include/c++/4.8.2",
 					"/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/xtensa-lx106-elf/include/c++/4.8.2/xtensa-lx106-elf",
-					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi/src",
-					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WebServer/src"
+					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/libraries/ESP8266WiFi/src",
+					"/home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/libraries/ESP8266WebServer/src"
 				],
 				"limitSymbolsToIncludedHeaders": true,
 				"databaseFilename": ""
