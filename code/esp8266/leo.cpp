@@ -6,11 +6,13 @@
 #include <ArduinoOTA.h>
 #include <DateTime.hpp>
 #include <ESP8266mDNS.h>
+#include <NtpTime.hpp>
 
 ESP8266WebServer server(8123);
 OneWire oneWire(13);
 DallasTemperature sensors(&oneWire);
 
+/*
 class NtpTime
 {
   public:
@@ -106,7 +108,7 @@ class NtpTime
 	WiFiUDP _udp;
 	int _t0;
 };
-
+*/
 const char *print_statuus(wl_status_t st)
 {
 	switch (st)
