@@ -19,10 +19,10 @@ int uprintf(upf_t cb, const __FlashStringHelper *fmt, ...);
 extern upf_t uprintf_cb;
 
 int uprintf(const char *fmt, ...);
-
-int usprintf(char *b, int bsz, const char *fmt, ...);
+int usprintf(int sz, char *b, const char *fmt, ...);
 
 #ifdef ARDUINO
+int usprintf(int sz, char *b, const __FlashStringHelper *fmt, ...);
 int uprintf(const __FlashStringHelper *fmt, ...);
 #endif
 

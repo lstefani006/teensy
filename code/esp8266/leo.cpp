@@ -15,6 +15,9 @@
 ESP8266WebServer server(8123);
 OneWire oneWire(13);
 DallasTemperature sensors(&oneWire);
+NtpTime ntp;
+float s_last_temp;
+DateTime s_last_time;
 
 const char *print_statuus(wl_status_t st)
 {
@@ -52,14 +55,6 @@ void blink(int n, int pin = 2)
 			digitalWrite(pin, LOW);
 	}
 }
-
-NtpTime ntp;
-
-//DateTime s_tm[6 * 24];
-//float s_temp[6 * 24];
-//int s_ti = 0;
-float s_last_temp;
-DateTime s_last_time;
 
 void setup()
 {
@@ -129,67 +124,144 @@ void setup()
 		if (!f)
 			Serial << "cannot open leo.txt\n";
 		f.close();
+
+		FSInfo fs_info;
+		SPIFFS.info(fs_info);
+
+#define A(a)          \
+	Serial.print(#a); \
+	Serial.println(a)
+		A(fs_info.usedBytes);
+		A(fs_info.totalBytes);
 	}
 
 	sensors.setCheckForConversion(false);
 	sensors.begin();
 
 	server.on("/", []() {
-		blink(1);
-		String msg = "<html>";
 
-		upf_t e;
-		e.ag = &msg;
-		e.pf = [](char c, void *a) { ((String *)a)->concat(c); return true; };
-
-		msg += "<head>";
-		msg += "<script src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js'></script>";
-		msg += "<link rel='stylesheet' src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css' />";
-		msg += "</head>";
-		msg += "<body>";
-		msg += "<h0>Temperature</h0>";
-		msg += "<br/>";
-		uprintf(e, "<span>Ora = %s</span><br/>", s_last_time.toString().c_str());
-		uprintf(e, "<span>Temp = %f</span><br/>\n", s_last_temp);
-		msg += "<br/>";
-		msg += "<br/>";
-		msg += "<div style='width:600px; height:400px;' id='graphdiv'></div>";
-		msg += "<script type='text/javascript'>\n";
-		msg += "g = new Dygraph(\n";
-		msg += "document.getElementById('graphdiv'),\n";
-
-		msg += "[\n";
+		if (true)
 		{
-			auto f = SPIFFS.open("/leo.txt", "r");
-			if (f)
+			char b[50];
+
+			server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+			server.sendHeader("Pragma", "no-cache");
+			server.sendHeader("Expires", "-1");
+			server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+			server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+
+			server.sendContent_P(PSTR("<html>\n"));
+			
+			server.sendContent_P(PSTR("<head>\n"));
+			server.sendContent("<script src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js'></script>\n");
+			server.sendContent("<link rel='stylesheet' src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css' />\n");
+			server.sendContent("</head>\n");
+			
+			server.sendContent("<body>\n");
+			server.sendContent("<h0>Temperature</h0>\n");
+			server.sendContent("<br/>\n");
+
+			usprintf(50, b, "<span>Ora = %s</span><br/>\n", s_last_time.toString().c_str());
+			server.sendContent(b);
+			usprintf(50, b, "<span>Temp = %f</span><br/>\n", s_last_temp);
+			server.sendContent(b);
+			server.sendContent("<br/>\n");
+			server.sendContent("<br/>\n");
+			server.sendContent("<div style='width:600px; height:400px;' id='graphdiv'></div>\n");
+			server.sendContent("<script type='text/javascript'>\n");
+			server.sendContent("g = new Dygraph(\n");
+			server.sendContent("document.getElementById('graphdiv'),\n");
+			server.sendContent("[\n");
+			if (true)
 			{
-				bool first = true;
-				while (f.available())
+				auto f = SPIFFS.open("/leo.txt", "r");
+				if (f)
 				{
-					auto ss = f.readStringUntil('\n');
-					if (ss[0] == '#')
-						continue;
-					msg += !first ? "," : " ";
-					msg += ss;
-					msg += "\n";
-					first = false;
+					bool first = true;
+					while (f.available())
+					{
+						auto ss = f.readStringUntil('\n');
+						if (ss[0] == '#')
+							continue;
+						server.sendContent(!first ? "," : " ");
+						server.sendContent(ss);
+						server.sendContent("\n");
+						first = false;
+					}
+					f.close();
 				}
-				f.close();
 			}
+			server.sendContent("],\n");
+			server.sendContent("{\n");
+			server.sendContent("title: 'Temperatura Casa'\n");
+			server.sendContent(",showRoller: true\n");
+			server.sendContent(",valueRange: [-10, 50]\n");
+			server.sendContent(",labels: ['x', 'Temp']\n");
+			//msg += ",axes: { x: { axisLabelFormatter: function(d, gran, opts) { return Dygraph.dateAxisLabelFormatter(new Date(d.getTime()), gran, opts); }}\n";
+			server.sendContent("}\n");
+			server.sendContent(");\n");
+			server.sendContent("</script>\n");
+			server.sendContent("</body>\n");
+			server.sendContent("</html>\n");
+			server.client().stop();
 		}
-		msg += "\n";
-		msg += "],\n";
-		msg += "{\n";
-		msg += "title: 'Temperatura Casa'\n";
-		msg += ",showRoller: true\n";
-		msg += ",valueRange: [-10, 50]\n";
-		msg += ",labels: ['x', 'Temp']\n";
-		//msg += ",axes: { x: { axisLabelFormatter: function(d, gran, opts) { return Dygraph.dateAxisLabelFormatter(new Date(d.getTime()), gran, opts); }}\n";
-		msg += "}\n";
-		msg += ");\n";
-		msg += "</script>\n";
-		msg += "</body></html>";
-		server.send(200, "text/html", msg);
+		else
+		{
+			blink(1);
+			String msg = "<html>";
+			upf_t e;
+			e.ag = &msg;
+			e.pf = [](char c, void *a) { ((String *)a)->concat(c); return true; };
+
+			msg += "<head>";
+			msg += "<script src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js'></script>";
+			msg += "<link rel='stylesheet' src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css' />";
+			msg += "</head>";
+			msg += "<body>";
+			msg += "<h0>Temperature</h0>";
+			msg += "<br/>";
+			uprintf(e, "<span>Ora = %s</span><br/>", s_last_time.toString().c_str());
+			uprintf(e, "<span>Temp = %f</span><br/>\n", s_last_temp);
+			msg += "<br/>";
+			msg += "<br/>";
+			msg += "<div style='width:600px; height:400px;' id='graphdiv'></div>";
+			msg += "<script type='text/javascript'>\n";
+			msg += "g = new Dygraph(\n";
+			msg += "document.getElementById('graphdiv'),\n";
+
+			msg += "[\n";
+			{
+				auto f = SPIFFS.open("/leo.txt", "r");
+				if (f)
+				{
+					bool first = true;
+					while (f.available())
+					{
+						auto ss = f.readStringUntil('\n');
+						if (ss[0] == '#')
+							continue;
+						msg += !first ? "," : " ";
+						msg += ss;
+						msg += "\n";
+						first = false;
+					}
+					f.close();
+				}
+			}
+			msg += "\n";
+			msg += "],\n";
+			msg += "{\n";
+			msg += "title: 'Temperatura Casa'\n";
+			msg += ",showRoller: true\n";
+			msg += ",valueRange: [-10, 50]\n";
+			msg += ",labels: ['x', 'Temp']\n";
+			//msg += ",axes: { x: { axisLabelFormatter: function(d, gran, opts) { return Dygraph.dateAxisLabelFormatter(new Date(d.getTime()), gran, opts); }}\n";
+			msg += "}\n";
+			msg += ");\n";
+			msg += "</script>\n";
+			msg += "</body></html>";
+			server.send(200, "text/html", msg);
+		}
 	});
 	server.begin();
 
@@ -217,9 +289,11 @@ void setup()
 
 		// NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
 		Serial.println("Start updating " + type);
+		SPIFFS.end();
 	});
 
 	ArduinoOTA.onEnd([]() {
+		SPIFFS.begin();
 		Serial.println("\nEnd");
 	});
 
@@ -265,7 +339,7 @@ void loop()
 	auto ss = s_last_time.toString();
 	uprintf("%s T=%f\n", ss.c_str(), s_last_temp);
 
-	auto time = s_last_time.toDateTime();
+	auto time = s_last_time.toTS();
 	auto temp = s_last_temp;
 
 	static DateTime s_last;
@@ -282,7 +356,7 @@ void loop()
 		{
 			char bb[64];
 			bb[0] = 0;
-			usprintf(bb, 64, "[new Date('%04d-%02d-%02dT%02d:%02d:%02d'), %f]", time.YYYY, time.MM, time.DD, time.hh, time.mm, time.ss, temp);
+			usprintf(64, bb, F("[new Date('%04d-%02d-%02dT%02d:%02d:%02d'), %f]"), time.YYYY, time.MM, time.DD, time.hh, time.mm, time.ss, temp);
 
 			f.println(bb);
 			f.close();

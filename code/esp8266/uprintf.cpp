@@ -457,7 +457,7 @@ struct p
 	int sz;
 	int i;
 };
-int usprintf(char *b, int bsz, const char *fmt, ...)
+int usprintf(int bsz, char *b, const char *fmt, ...)
 {
 	p pp;
 	pp.i = 0;
@@ -481,7 +481,32 @@ int usprintf(char *b, int bsz, const char *fmt, ...)
 	va_end(args);
 	return rc;
 }
+#ifdef ARDUINO
+int usprintf(int bsz, char *b, const __FlashStringHelper *fmt, ...)
+{
+	p pp;
+	pp.i = 0;
+	pp.pt = b;
+	pp.sz = bsz;
 
+	upf_t cb;
+	cb.ag = &pp;
+	cb.pf = [](char c, void *a) {
+		p *rr = (p *)a;
+		if (rr->i + 1 >= rr->sz)
+			return false;
+		rr->pt[rr->i + 0] = c;
+		rr->pt[rr->i + 1] = 0;
+		rr->i += 1;
+		return true;
+	};
+	va_list args;
+	va_start(args, fmt);
+	int rc = uvprintf(cb, true, (const char *)fmt, args);
+	va_end(args);
+	return rc;
+}
+#endif
 	/////////////////////////////////////////////////////////////////////////////////
 
 #ifdef ARDUINO

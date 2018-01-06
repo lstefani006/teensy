@@ -4,7 +4,6 @@
 #include <DateTime.hpp>
 #include <WiFiUdp.h>
 
-
 class NtpTime
 {
   public:
@@ -25,4 +24,3 @@ class NtpTime
 };
 
 #endif
-

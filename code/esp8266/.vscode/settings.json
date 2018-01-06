@@ -8,5 +8,7 @@
 		"initializer_list": "cpp",
 		"functional": "cpp"
 	},
-	"git.ignoreLimitWarning": true
+	"git.ignoreLimitWarning": true,
+
+	"editor.insertSpaces": false
 }

@@ -1,7 +1,6 @@
 #include <NtpTime.hpp>
 #include "ESP8266WiFi.h"
 
-
 void NtpTime::begin(int localPort)
 {
 	_udp.begin(localPort);

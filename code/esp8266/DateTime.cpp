@@ -24,7 +24,7 @@ void DateTime::Set(int YYYY, int MM, int DD, int hh, int mm, int ss)
 	this->_epoch = e;
 }
 
-DateTime::ts DateTime::toDateTime() const
+DateTime::ts DateTime::toTS() const
 {
 	auto e = _epoch;
 
@@ -56,21 +56,21 @@ DateTime::ts DateTime::toDateTime() const
 String DateTime::toString() const
 {
 	char b[20];
-	DateTime::ts t = toDateTime();
-	usprintf(b, sizeof(b), "%04d/%02d/%02d %02d:%02d:%02d", t.YYYY, t.MM, t.DD, t.hh, t.mm, t.ss);
+	DateTime::ts t = toTS();
+	usprintf(sizeof(b), b, F("%04d/%02d/%02d %02d:%02d:%02d"), t.YYYY, t.MM, t.DD, t.hh, t.mm, t.ss);
 	return b;
 }
 String DateTime::toDateString() const
 {
 	char b[20];
-	DateTime::ts t = toDateTime();
-	usprintf(b, sizeof(b), "%04d/%02d/%02d", t.YYYY, t.MM, t.DD);
+	DateTime::ts t = toTS();
+	usprintf(sizeof(b), b, F("%04d/%02d/%02d"), t.YYYY, t.MM, t.DD);
 	return b;
 }
 String DateTime::toTimeString() const
 {
 	char b[20];
-	DateTime::ts t = toDateTime();
-	usprintf(b, sizeof(b), "%02d:%02d:%02d", t.hh, t.mm, t.ss);
+	DateTime::ts t = toTS();
+	usprintf(sizeof(b), b, F("%02d:%02d:%02d"), t.hh, t.mm, t.ss);
 	return b;
 }

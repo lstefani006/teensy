@@ -24,7 +24,7 @@ class DateTime
 	void Set(int YYYY, int MM, int DD, int hh = 0, int mm = 0, int ss = 0);
 	void Set(const DateTime::ts &t) { Set(t.YYYY, t.MM, t.DD, t.hh, t.mm, t.ss); }
 
-	ts toDateTime() const;
+	ts toTS() const;
 
 	String toString() const;
 	String toDateString() const;
@@ -40,6 +40,5 @@ inline int32_t operator-(const DateTime &a, const DateTime &b)
 {
 	return a.Epoch() - b.Epoch();
 }
-
 
 #endif
