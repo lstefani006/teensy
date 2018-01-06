@@ -467,7 +467,7 @@ int usprintf(char *b, int bsz, const char *fmt, ...)
 	upf_t cb;
 	cb.ag = &pp;
 	cb.pf = [](char c, void *a) {
-		p *rr = ((p *)a);
+		p *rr = (p *)a;
 		if (rr->i + 1 >= rr->sz)
 			return false;
 		rr->pt[rr->i + 0] = c;

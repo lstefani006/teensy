@@ -133,6 +133,7 @@ namespace ArduionoSerialMonitor
 				catch (Exception ex)
 				{
 					Console.WriteLine("Task.Run error. {0}", ex);
+					return ;
 				}
 			});
 

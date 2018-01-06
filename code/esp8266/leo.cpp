@@ -8,107 +8,14 @@
 #include <ESP8266mDNS.h>
 #include <NtpTime.hpp>
 
+#include <FS.h>
+
+#include "leo.hpp"
+
 ESP8266WebServer server(8123);
 OneWire oneWire(13);
 DallasTemperature sensors(&oneWire);
 
-/*
-class NtpTime
-{
-  public:
-	void begin(int localPort = 2390)
-	{
-		_udp.begin(localPort);
-		_tt.SetEpoch(0);
-	}
-
-	bool valid() const { return _tt.Epoch() != 0; }
-
-	void handle()
-	{
-		auto t1 = millis() / 1000;
-
-		if (_tt.Epoch() == 0 || t1 - _t0 >= 3600)
-		{
-			if (readTime())
-				_t0 = t1;
-		}
-	}
-
-	DateTime toDateTime() const
-	{
-		if (_tt.Epoch() == 0)
-			return _tt;
-
-		auto t1 = millis() / 1000;
-		DateTime r = _tt;
-		r.AddSeconds(t1 - _t0);
-		return r;
-	}
-
-  private:
-	bool readTime()
-	{
-		Serial.println("sending NTP packet...");
-		const int NTP_PACKET_SIZE = 48;		// NTP time stamp is in the first 48 bytes of the message
-		byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
-
-		IPAddress timeServerIP; // time.nist.gov NTP server address
-		WiFi.hostByName("time.nist.gov", timeServerIP);
-
-		// set all bytes in the buffer to 0
-		memset(packetBuffer, 0, NTP_PACKET_SIZE);
-		// Initialize values needed to form NTP request
-		// (see URL above for details on the packets)
-		packetBuffer[0] = 0b11100011; // LI, Version, Mode
-		packetBuffer[1] = 0;		  // Stratum, or type of clock
-		packetBuffer[2] = 6;		  // Polling Interval
-		packetBuffer[3] = 0xEC;		  // Peer Clock Precision
-		// 8 bytes of zero for Root Delay & Root Dispersion
-		packetBuffer[12] = 49;
-		packetBuffer[13] = 0x4E;
-		packetBuffer[14] = 49;
-		packetBuffer[15] = 52;
-
-		// all NTP fields have been given values, now
-		// you can send a packet requesting a timestamp:
-		_udp.beginPacket(timeServerIP, 123); //NTP requests are to port 123
-		_udp.write(packetBuffer, NTP_PACKET_SIZE);
-		_udp.endPacket();
-
-		delay(1000);
-		int cb = _udp.parsePacket();
-		if (!cb)
-			return false;
-
-		// We've received a packet, read the data from it
-		_udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-
-		//the timestamp starts at byte 40 of the received packet and is four bytes,
-		// or two words, long. First, esxtract the two words:
-
-		unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
-		unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
-		// combine the four bytes (two words) into a long integer
-		// this is NTP time (seconds since Jan 1 1900):
-		unsigned long secsSince1900 = highWord << 16 | lowWord;
-
-		// now convert NTP time into everyday time:
-		// Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-		const unsigned long seventyYears = 2208988800UL;
-		// subtract seventy years:
-		unsigned long epoch = secsSince1900 - seventyYears;
-
-		this->_tt.SetEpoch(epoch + 3600);
-
-		return true;
-	}
-
-	DateTime _tt;
-	WiFiUDP _udp;
-	int _t0;
-};
-*/
 const char *print_statuus(wl_status_t st)
 {
 	switch (st)
@@ -148,9 +55,9 @@ void blink(int n, int pin = 2)
 
 NtpTime ntp;
 
-DateTime s_tm[6 * 24];
-float s_temp[6 * 24];
-int s_ti = 0;
+//DateTime s_tm[6 * 24];
+//float s_temp[6 * 24];
+//int s_ti = 0;
 float s_last_temp;
 DateTime s_last_time;
 
@@ -169,33 +76,32 @@ void setup()
 
 	blink(3);
 
-	WiFi.mode(WIFI_STA);
-	WiFi.disconnect();
-	int n = WiFi.scanNetworks();
-	Serial.println("scan done");
-	if (n == 0)
-		Serial.println("no networks found");
-	else
+	if (false)
 	{
-		Serial.print(n);
-		Serial.println(" networks found");
-		for (int i = 0; i < n; ++i)
+		WiFi.mode(WIFI_STA);
+		WiFi.disconnect();
+		int n = WiFi.scanNetworks();
+		Serial.println("scan done");
+		if (n == 0)
+			Serial.println("no networks found");
+		else
 		{
-			// Print SSID and RSSI for each network found
-			Serial.print(i + 1);
-			Serial.print(": ");
-			Serial.print(WiFi.SSID(i));
-			Serial.print(" (");
-			Serial.print(WiFi.RSSI(i));
-			Serial.print(")");
-			Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
-			delay(10);
+			Serial.print(n);
+			Serial.println(" networks found");
+			for (int i = 0; i < n; ++i)
+			{
+				// Print SSID and RSSI for each network found
+				Serial << (i + 1) << ": " << WiFi.SSID(i) << " (" << WiFi.RSSI(i) << ")"
+					   << ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*") << "\n";
+				delay(10);
+			}
 		}
+		blink(3);
 	}
-	blink(3);
 	Serial.println();
-
 	Serial.println("Connecting");
+
+	WiFi.setAutoConnect(true);
 	WiFi.mode(WIFI_STA);
 	WiFi.begin("Vodafone-11394415", "agyeiickkqbduukzzjpisbou");
 
@@ -204,17 +110,26 @@ void setup()
 		auto st = WiFi.status();
 		if (st == WL_CONNECTED)
 			break;
-		Serial.print(i);
-		Serial.print(" => ");
-		Serial.println(print_statuus(st));
+		Serial << i << " => " << print_statuus(st) << "\n";
 		delay(500);
 	}
 
-	blink(10);
 	Serial.println();
 	Serial.println("WiFi connected");
 	Serial.println("IP address: ");
 	Serial.println(WiFi.localIP());
+	blink(10);
+
+	// Initialize file system.
+	if (!SPIFFS.begin())
+		Serial.println("Failed to mount file system");
+	else
+	{
+		auto f = SPIFFS.open("/leo.txt", "r");
+		if (!f)
+			Serial << "cannot open leo.txt\n";
+		f.close();
+	}
 
 	sensors.setCheckForConversion(false);
 	sensors.begin();
@@ -236,21 +151,38 @@ void setup()
 		msg += "<br/>";
 		uprintf(e, "<span>Ora = %s</span><br/>", s_last_time.toString().c_str());
 		uprintf(e, "<span>Temp = %f</span><br/>\n", s_last_temp);
-		msg += "<div id='graphdiv'></div>";
+		msg += "<br/>";
+		msg += "<br/>";
+		msg += "<div style='width:600px; height:400px;' id='graphdiv'></div>";
 		msg += "<script type='text/javascript'>\n";
 		msg += "g = new Dygraph(\n";
 		msg += "document.getElementById('graphdiv'),\n";
 
 		msg += "[\n";
-		for (auto i = 0; i < s_ti; ++i)
 		{
-			msg += (i > 0) ? "," : " ";
-			DateTime::ts t = s_tm[i].toDateTime();
-			uprintf(e, "[new Date('%04d-%02d-%02dT%02d:%02d:%02d'), %f]\n", t.YYYY, t.MM, t.DD, t.hh, t.mm, t.ss, s_temp[i]);
+			auto f = SPIFFS.open("/leo.txt", "r");
+			if (f)
+			{
+				bool first = true;
+				while (f.available())
+				{
+					auto ss = f.readStringUntil('\n');
+					if (ss[0] == '#')
+						continue;
+					msg += !first ? "," : " ";
+					msg += ss;
+					msg += "\n";
+					first = false;
+				}
+				f.close();
+			}
 		}
+		msg += "\n";
 		msg += "],\n";
 		msg += "{\n";
-		msg += "valueRange: [-10, 50]\n";
+		msg += "title: 'Temperatura Casa'\n";
+		msg += ",showRoller: true\n";
+		msg += ",valueRange: [-10, 50]\n";
 		msg += ",labels: ['x', 'Temp']\n";
 		//msg += ",axes: { x: { axisLabelFormatter: function(d, gran, opts) { return Dygraph.dateAxisLabelFormatter(new Date(d.getTime()), gran, opts); }}\n";
 		msg += "}\n";
@@ -264,13 +196,13 @@ void setup()
 	ntp.begin();
 
 	// Port defaults to 8266
-	// ArduinoOTA.setPort(8266);
+	ArduinoOTA.setPort(8266);
 
 	// Hostname defaults to esp8266-[ChipID]
 	ArduinoOTA.setHostname("ESP_OTA_LEO");
 
 	// No authentication by default
-	// ArduinoOTA.setPassword("admin");
+	ArduinoOTA.setPassword("spectrum");
 
 	// Password can be set with it's md5 value as well
 	// MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
@@ -311,8 +243,6 @@ void setup()
 	ArduinoOTA.begin();
 }
 
-DateTime s_last;
-
 void loop()
 {
 	server.handleClient();
@@ -335,24 +265,27 @@ void loop()
 	auto ss = s_last_time.toString();
 	uprintf("%s T=%f\n", ss.c_str(), s_last_temp);
 
-	// ogni 10 minuti
-	if (s_last_time - s_last >= 60 * 10)
-	{
-		blink(10);
+	auto time = s_last_time.toDateTime();
+	auto temp = s_last_temp;
 
+	static DateTime s_last;
+
+	// ogni minuto
+	if (s_last_time - s_last >= 60)
+	{
 		s_last = s_last_time;
 
-		if (s_ti >= int(sizeof(s_temp) / sizeof(s_temp[0])))
+		blink(2);
+
+		auto f = SPIFFS.open("/leo.txt", "a");
+		if (f)
 		{
-			for (auto i = 1; i < int(sizeof(s_temp) / sizeof(s_temp[0])); ++i)
-			{
-				s_temp[i - 1] = s_temp[i];
-				s_tm[i - 1] = s_tm[i];
-			}
-			s_ti--;
+			char bb[64];
+			bb[0] = 0;
+			usprintf(bb, 64, "[new Date('%04d-%02d-%02dT%02d:%02d:%02d'), %f]", time.YYYY, time.MM, time.DD, time.hh, time.mm, time.ss, temp);
+
+			f.println(bb);
+			f.close();
 		}
-		s_tm[s_ti] = s_last_time;
-		s_temp[s_ti] = s_last_temp;
-		s_ti += 1;
 	}
 }
