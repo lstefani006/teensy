@@ -6,7 +6,10 @@
 		"iostream": "cpp",
 		"array": "cpp",
 		"initializer_list": "cpp",
-		"functional": "cpp"
+		"functional": "cpp",
+		"type_traits": "cpp",
+		"tuple": "cpp",
+		"utility": "cpp"
 	},
 	"git.ignoreLimitWarning": true,
 

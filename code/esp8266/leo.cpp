@@ -151,12 +151,12 @@ void setup()
 			server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
 
 			server.sendContent_P(PSTR("<html>\n"));
-			
+
 			server.sendContent_P(PSTR("<head>\n"));
 			server.sendContent("<script src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js'></script>\n");
 			server.sendContent("<link rel='stylesheet' src='//cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css' />\n");
 			server.sendContent("</head>\n");
-			
+
 			server.sendContent("<body>\n");
 			server.sendContent("<h0>Temperature</h0>\n");
 			server.sendContent("<br/>\n");
@@ -172,21 +172,44 @@ void setup()
 			server.sendContent("g = new Dygraph(\n");
 			server.sendContent("document.getElementById('graphdiv'),\n");
 			server.sendContent("[\n");
+
+			float tMin = 100;
+			float tMax = -100;
 			if (true)
 			{
 				auto f = SPIFFS.open("/leo.txt", "r");
+
+				// un campione al minuto 60 * 24 ==> 1 giorno
 				if (f)
 				{
+					const char *pp = ",[new Date('2018-01-06T13:45:13'), 14.81]\n";
+					int nrighe = f.size() / strlen(pp);
+					if (nrighe >= 24 * 60)
+						nrighe -= 24 * 60;
+
 					bool first = true;
 					while (f.available())
 					{
 						auto ss = f.readStringUntil('\n');
 						if (ss[0] == '#')
 							continue;
-						server.sendContent(!first ? "," : " ");
-						server.sendContent(ss);
-						server.sendContent("\n");
-						first = false;
+
+						if (nrighe > 0)
+							nrighe -= 1;
+						else
+						{
+							pp = strchr(ss.c_str(), ')') + 2;
+							auto t = atof(pp);
+							if (t > tMax)
+								tMax = t;
+							if (t < tMin)
+								tMin = t;
+
+							server.sendContent(!first ? "," : " ");
+							server.sendContent(ss);
+							server.sendContent("\n");
+							first = false;
+						}
 					}
 					f.close();
 				}
@@ -195,12 +218,22 @@ void setup()
 			server.sendContent("{\n");
 			server.sendContent("title: 'Temperatura Casa'\n");
 			server.sendContent(",showRoller: true\n");
-			server.sendContent(",valueRange: [-10, 50]\n");
+
+			usprintf(50, b, ",valueRange: [%d, %d]\n", int(tMin - 1), int(tMax + 1));
+			server.sendContent(b);
+			//server.sendContent(",valueRange: [-10, 50]\n");
+
 			server.sendContent(",labels: ['x', 'Temp']\n");
 			//msg += ",axes: { x: { axisLabelFormatter: function(d, gran, opts) { return Dygraph.dateAxisLabelFormatter(new Date(d.getTime()), gran, opts); }}\n";
 			server.sendContent("}\n");
 			server.sendContent(");\n");
 			server.sendContent("</script>\n");
+
+			server.sendContent("<span>");
+			usprintf(50, b, ",%f %f", tMin, tMax);
+			server.sendContent(b);
+			server.sendContent("</span>");
+
 			server.sendContent("</body>\n");
 			server.sendContent("</html>\n");
 			server.client().stop();
