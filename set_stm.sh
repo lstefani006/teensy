@@ -1,6 +1,6 @@
 
-if [ -e $HOME/gcc-site/cortex-m3-gcc-7.1.0 ] ; then
-	export PATH=$PATH:$HOME/gcc-site/cortex-m3-gcc-7.1.0/bin
+if [ -e $HOME/gcc-site/cortex-m3-gcc-7.3.0 ] ; then
+	export PATH=$PATH:$HOME/gcc-site/cortex-m3-gcc-7.3.0/bin
 fi
 
 export PATH=$PATH:~/teensy

@@ -1,4 +1,3 @@
-
 # ho modificato il file
 # /home/leo/.arduino15/packages/esp8266/hardware/esp8266/2.4.0/platform.txt
 # nella sezione 
@@ -6,15 +5,15 @@
 # ho tolto il -w ==> altrimenti il compilatore ignora il CPP_EXTRA
 
 EMAKE=make -f ../makeEspArduino/makeEspArduino.mk \
-	  ESP_ADDR=192.168.1.12 \
-	  ESP_PORT=8266 \
-	  ESP_PWD=spectrum \
+	ESP_ADDR=192.168.1.12     \
+	ESP_PORT=8266             \
+	ESP_PWD=spectrum          \
 	BUILD_DIR=./build         \
 	SKETCH=./leo.cpp          \
 	FLASH_DEF=4M1M            \
 	LWIP_VARIANT=v2mss536     \
 	CPP_EXTRA="-Wall -Wextra" \
-#	VERBOSE=0 \
+#	VERBOSE=0                 \
 
 all:
 	$(EMAKE)

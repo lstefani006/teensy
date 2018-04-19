@@ -18,7 +18,9 @@ export PATH=$PATH:$HOME/teensy
 
 ########################################
 
-if [ -e $HOME/gcc-site/avr-gcc-7.2.0 ] ; then
+if [ -e $HOME/gcc-site/avr-gcc-7.3.0 ] ; then
+	export PATH=$PATH:$HOME/gcc-site/avr-gcc-7.3.0/bin
+elif [ -e $HOME/gcc-site/avr-gcc-7.2.0 ] ; then
 	export PATH=$PATH:$HOME/gcc-site/avr-gcc-7.2.0/bin
 elif [ -e $HOME/gcc-site/avr-gcc-7.1.0 ] ; then
 	export PATH=$PATH:$HOME/gcc-site/avr-gcc-7.1.0/bin

@@ -6,7 +6,7 @@
 
 class NtpTime
 {
-  public:
+public:
 	void begin(int localPort = 2390);
 
 	bool valid() const { return _tt.Epoch() != 0; }
@@ -15,7 +15,7 @@ class NtpTime
 
 	DateTime toDateTime() const;
 
-  private:
+private:
 	bool readTime();
 
 	DateTime _tt;

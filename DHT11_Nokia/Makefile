@@ -9,14 +9,14 @@ else
 endif
 
 ifdef TEENSY
-	VPATH     +=$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree
+	VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree
 	CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/TimerThree
 else
-	VPATH     +=$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
+	VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
 	CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/TimerOne
 endif
 
-VPATH     +=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
+VPATH+=$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 CXXFLAGS+=-I$(ARDUINO)/hardware/teensy/avr/libraries/SPI
 
 TARGET=DHT11.hex

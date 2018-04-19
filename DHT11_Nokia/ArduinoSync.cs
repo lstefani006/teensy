@@ -8,8 +8,6 @@ using System.Collections.Generic;
 
 class MainClass 
 {
-
-
 	static void Main() 
 	{
 		try 

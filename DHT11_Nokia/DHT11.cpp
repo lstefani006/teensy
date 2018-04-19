@@ -101,8 +101,12 @@ static time_t syncProvider()
 {
 	rtc.GetTime(); 
 
+	upf_t cb;
+	cb.pf = [](char ch, void *) { Serial.write(ch); return true; };
+	cb.ag = nullptr;
+
 	// se poi c'è il PC attaccato.... aggiorno....
-	uprintf([](char ch) { Serial.write(ch); return true; }, F("7"));
+	uprintf(cb, F("7"));
 
 	// se per caso ho una data valida.....
 	if (rtc.Y() >= 2016 && rtc.Y() < 2050)
@@ -126,7 +130,8 @@ void setup()
 	pinMode(PIN_LED, OUTPUT);
 	analogWrite(PIN_LED, 0);  // massima luce.. compatibilmente con la resistenza di 100ohm
 
-	uprintf_cb = [] (char ch) { lcd.write(ch); return true; };
+	uprintf_cb.pf = [] (char ch, void *) { lcd.write(ch); return true; };
+	uprintf_cb.ag = nullptr;
 
 	rtc.GetTime();
 	uprintf(F("%04d/%02d/%02d\n"), rtc.Y(), rtc.M(), rtc.D());
