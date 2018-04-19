@@ -117,7 +117,6 @@ static time_t syncProvider()
 
 void setup()
 {
-
 	Serial.begin(38400);
 	rtc.begin();
 	spi.begin();
