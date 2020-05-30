@@ -1,9 +1,0 @@
-{
-	"terminal.integrated.env.linux": {
-		"PATH": "/home/leo/.platformio/penv/bin:/usr/lib/oracle/product/11.2.0/xe/bin:/home/leo/bin:/usr/lib/oracle/product/11.2.0/xe/bin:/home/leo/bin:/usr/lib/oracle/product/11.2.0/xe/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/bin:/home/leo/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2/bin"
-	},
-	"files.associations": {
-		"iostream": "cpp"
-	},
-	"git.ignoreLimitWarning": true
-}
