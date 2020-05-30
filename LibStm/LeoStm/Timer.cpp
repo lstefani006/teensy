@@ -95,7 +95,7 @@ void Timer::begin(uint32_t freq, uint32_t maxCount)
 	}
 
 	// reset del timer
-	timer_reset(_tm);
+	//non esiste piu timer_reset(_tm);
 
 	// set del fattore di divisione, dell'edge, del UP/DOWN
 	timer_set_mode(_tm, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP); // imposta falgs in CR1

@@ -54,7 +54,7 @@ static void timer_setup(int PERIOD)
 {
 	/* Enable TIM2 clock. */
 	rcc_periph_clock_enable(RCC_TIM2);
-	timer_reset(TIM2);
+	//non esiste piu timer_reset(TIM2);
 
 	/* Timer global mode: - No divider, Alignment edge, Direction up */
 	timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);

@@ -318,8 +318,8 @@ public:
 		*dcport |=  dcpinmask;
 		*csport &= ~cspinmask;
 
-		spiwrite(uint16_t(color) >> 8);
-		spiwrite(uint16_t(color));
+		spiwrite(uint8_t(uint16_t(color) >> 8));
+		spiwrite(uint8_t(color));
 
 		*csport |= cspinmask;
 		spi_end();

@@ -13,17 +13,6 @@ int led = LED_BUILTIN;
 #	endif
 #endif
 
-// the setup routine runs once when you press reset:
-void setup()
-{
-	pinMode(led, OUTPUT);
-	Serial.begin(38400);
-	/*
-	   while (!Serial) ; // wait for Arduino Serial Monitor
-	   Serial.println("Ciao");
-	   */
-}
-
 void blink(int msec)
 {
 	digitalWrite(led, HIGH);
@@ -32,6 +21,24 @@ void blink(int msec)
 	delay(msec);
 }
 
+// the setup routine runs once when you press reset:
+void setup()
+{
+	pinMode(led, OUTPUT);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		blink(200);
+	}
+
+	Serial.begin(38400);
+	/*
+	   while (!Serial) ; // wait for Arduino Serial Monitor
+	   Serial.println("Ciao");
+	   */
+}
+
+
 float f = 0;
 void loop()
 {
@@ -39,7 +46,8 @@ void loop()
 	   auto p = new char [100];
 	   delete []p;
 	   */
-	blink(100);
+	blink(200);
+	   Serial.println("Ciao");
 
 	/*
 	   f += 0.1f;

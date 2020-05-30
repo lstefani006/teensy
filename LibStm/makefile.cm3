@@ -17,7 +17,7 @@ CPPFLAGS+=-fmax-errors=2  # interrompe la compilazio dopo N errori
 
 CXXFLAGS+=-std=c++17 -fno-rtti -fno-exceptions
 
-include ../util/base_makefile.mk
+include ~/teensy/util/base_makefile.mk
 
 CXXFLAGS+=$(WCXX)
 CFLAGS+=$(WC)
@@ -30,7 +30,7 @@ OBJ:=$(patsubst %.o,$(OBJ_DIR)/%.o,$(notdir $(OBJ)))
 all : $(TARGET).elf
 
 $(TARGET).elf : $(OBJ_DIR)/lib.$(LIBOPENCM3_LIB) $(OBJ)
-	$(E)arm-none-eabi-gcc --static -nostartfiles -Tstm32-h103.ld -mthumb \
+	$(E)arm-none-eabi-gcc --static -nostartfiles -T./stm32-h103.ld -mthumb \
 		-mcpu=cortex-m3 -msoft-float -mfix-cortex-m3-ldrd \
 		-Wl,-Map=$(TARGET).map -Wl,--gc-sections \
 		-L$(OPENCM3_DIR)/lib $(OBJ) -lopencm3_stm32f1 -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group -o $(TARGET).elf
@@ -77,12 +77,12 @@ $(OBJ_DIR)/lib.debug:
 $(OBJ_DIR)/lib.os:
 	@mkdir -p $(@D)
 	touch $(OBJ_DIR)/lib.os
-	make -C ../LibStm/libopencm3 V=1
+	make -C ~/teensy/LibStm/libopencm3 V=1
 
 lib.clean:
 	rm -f $(OBJ_DIR)/lib.os
 	rm -f $(OBJ_DIR)/lib.debug
-	make -C ../LibStm/libopencm3 V=1 clean
+	make -C ~/teensy/LibStm/libopencm3 V=1 clean
 
 libopencm3: $(OBJ_DIR)/lib.os
 	@echo libopencm3 built

@@ -168,10 +168,13 @@ public:
 	}
 	int8_t Len()
 	{
+		return len(v);
+		/*
 		int8_t ret = 0;
 		while (NumToBin())
 			++ret;
 		return ret;
+		*/
 	}
 	char Next()
 	{
@@ -181,6 +184,23 @@ public:
 	}
 
 private:
+	static int8_t len(unsigned long v)
+	{
+		if (v == 0)
+			return 1;
+
+		auto k = 1UL << (sizeof(unsigned long)*8 - 1);
+		while ((v & k) == 0)
+			k = k >> 1;
+
+		int8_t n = 0;
+		while (k)
+		{
+			k = k >> 1;
+			n++;
+		}
+		return n;
+	}
 	bool NumToBin()
 	{
 		Y_BEGIN();

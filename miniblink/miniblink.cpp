@@ -20,16 +20,15 @@
 
 static void gpio_setup(void)
 {
-	rcc_periph_clock_enable(RCC_GPIOA);
-	rcc_periph_clock_enable(RCC_GPIOB);
+//	rcc_periph_clock_enable(RCC_GPIOA);
+//	rcc_periph_clock_enable(RCC_GPIOB);
 	rcc_periph_clock_enable(RCC_GPIOC);
-
 	gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 
-	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
+//	gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
 
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
+//	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO0);
+//	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
 }
 static void dac_setup(void)
 {
@@ -49,6 +48,7 @@ static void dac_setup(void)
 
 ///////////////////////////////////////////////////////////////////////
 
+/*
 class Timer2 : public Timer
 {
 public:
@@ -75,20 +75,32 @@ protected:
 
 Timer2 tm2;
 
+*/
 void setup()
 {
-	gpio_setup();
+//	gpio_setup();
 
+	/*
 	tm2.begin(5000, 5000);
 	tm2.setUpdateIrq();
 	tm2.setOutputCompareDigIO(Timer::OC1, 1000);
 	tm2.setOutputCompareDigIO(Timer::OC2, 2000);
 	tm2.setOutputCompareIrq(Timer::OC3, 3000);
 	tm2.setOutputCompareIrq(Timer::OC4, 5000);
+	*/
 }
+int nn = 0;
 
 void loop() 
 {
-	delay(1013);
-	Serial.println(tm2.getCounter());
+	Serial.print("starting \n");
+
+	static bool b = false;
+	b = !b;
+	if (b)
+			gpio_set(GPIOC, GPIO13);
+	else
+			gpio_clear(GPIOC, GPIO13);
+	delay(200);
+//	Serial.println(tm2.getCounter());
 }

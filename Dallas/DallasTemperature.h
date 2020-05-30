@@ -63,6 +63,9 @@ typedef uint8_t DeviceAddress[8];
 class DallasTemperature
 {
 public:
+    typedef uint8_t ScratchPad[9];
+    // reads scratchpad and returns the raw temperature
+    int16_t calculateTemperature(const uint8_t*, uint8_t*);
 
     DallasTemperature();
     DallasTemperature(OneWire*);
@@ -228,7 +231,6 @@ public:
 #endif
 
 private:
-    typedef uint8_t ScratchPad[9];
 
     // parasite power on or off
     bool parasite;
@@ -249,8 +251,6 @@ private:
     // Take a pointer to one wire instance
     OneWire* _wire;
 
-    // reads scratchpad and returns the raw temperature
-    int16_t calculateTemperature(const uint8_t*, uint8_t*);
 
     int16_t millisToWaitForConversion(uint8_t);
 
