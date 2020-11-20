@@ -138,14 +138,16 @@ class String
 public:
 	String() { _pt = strdup(""); }
 	String(const String &r) { _pt = strdup(r._pt); }
-	String(const char *r) { _pt = strdup(r); }
+	explicit String(const char *s) { _pt = strdup(s ? s : ""); }
 	~String() { free(_pt); }
 	int Len() const { return strlen(_pt); }
 	
 	const String & operator = (const String &r) { free(_pt); _pt = strdup(r._pt); return *this; }
+	const String & operator = (const char *s) { free(_pt); _pt = strdup(s ? s : ""); return *this; }
 
 	const char * c_str() const { return _pt; }
 
+	void Append(const String &r) { Append(this->_pt); }
 	void Append(const char *p)
 	{
 		int sz = 1 + strlen(_pt) + strlen(p);
@@ -155,6 +157,7 @@ public:
 		free(_pt);
 		_pt = t;
 	}
+	int Cmp(const String &r) { return strcmp(this->_pt, r._pt); }
 private:
 	char *_pt;
 };

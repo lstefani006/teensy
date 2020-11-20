@@ -27,7 +27,7 @@
 #define COMMAND (uint8_t)0b00000000
 
 SD1306::SD1306(ESP32_I2C &i2c, int width, int height)
-	: i2c(i2c)
+	: i2c(i2c), Log(nullptr)
 {
 	_WIDTH = width;
 	_HEIGHT = height;

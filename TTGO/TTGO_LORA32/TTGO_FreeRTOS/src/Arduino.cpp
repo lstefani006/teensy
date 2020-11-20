@@ -2,7 +2,7 @@
 #include <string.h>
 
 SPIClass::SPIClass(gpio_num_t clk, gpio_num_t mosi, gpio_num_t miso, gpio_num_t cs, gpio_num_t rst, gpio_num_t irq)
-	: clk(clk), mosi(mosi), miso(miso), cs(cs), rst(rst), irq(irq) {}
+	: spi(nullptr), clk(clk), mosi(mosi), miso(miso), cs(cs), rst(rst), irq(irq) {}
 
 void SPIClass::setup()
 {
@@ -47,58 +47,6 @@ void SPIClass::setup()
 	vTaskDelay(100 / portTICK_RATE_MS);
 }
 
-#if 0
-uint32_t SPIClass::lcd_get_id(int sz)
-{
-	//get_id cmd
-	lcd_cmd(0x04);
-
-	spi_transaction_t t;
-	memset(&t, 0, sizeof(t));
-	t.length = 8 * sz;
-	t.flags = SPI_TRANS_USE_RXDATA; // Receive into rx_data member of spi_transaction_t instead into memory at rx_buffer.
-	t.user = (void *)1;				// serve per pilotare il D/C - tramite il pre_cb
-
-	ESP_ERROR_CHECK(spi_device_polling_transmit(this->spi, &t));
-	return *(uint32_t *)t.rx_data;
-}
-
-/* Send a command to the LCD. Uses spi_device_polling_transmit, which waits
-	* until the transfer is complete.
-	*
-	* Since command transactions are usually small, they are handled in polling
-	* mode for higher speed. The overhead of interrupt transactions is more than
-	* just waiting for the transaction to complete.
-	*/
-void SPIClass::lcd_cmd(uint8_t cmd)
-{
-	spi_transaction_t t;
-	memset(&t, 0, sizeof(t));									 //Zero out the transaction
-	t.length = 8;												 //Command is 8 bits
-	t.tx_buffer = &cmd;											 //The data is the cmd itself
-	t.user = (void *)0;											 //D/C needs to be set to 0
-	ESP_ERROR_CHECK(spi_device_polling_transmit(this->spi, &t)); //Transmit!
-}
-
-/* Send data to the LCD. Uses spi_device_polling_transmit, which waits until the
-	* transfer is complete.
-	*
-	* Since data transactions are usually small, they are handled in polling
-	* mode for higher speed. The overhead of interrupt transactions is more than
-	* just waiting for the transaction to complete.
-	*/
-void SPIClass::lcd_data(const uint8_t *data, int len)
-{
-	if (len == 0)
-		return; //no need to send anything
-	spi_transaction_t t;
-	memset(&t, 0, sizeof(t));									 //Zero out the transaction
-	t.length = len * 8;											 //Len is in bytes, transaction length is in bits.
-	t.tx_buffer = data;											 //Data
-	t.user = (void *)1;											 //D/C needs to be set to 1
-	ESP_ERROR_CHECK(spi_device_polling_transmit(this->spi, &t)); //Transmit!
-}
-#endif
 
 uint8_t SPIClass::transfer(uint8_t data)
 {

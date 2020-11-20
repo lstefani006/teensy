@@ -5,19 +5,9 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
 
-extern "C"
-{
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/gpio.h"
-#include "driver/i2c.h"
-#include "driver/spi_master.h"
-#include "nvs_flash.h"
-#include "nvs.h"
-}
+#include "FT.hpp"
 
 #include "ssd1306/ssd1306_i2c.h"
 #include "ssd1306/fonts.hpp"
@@ -44,93 +34,44 @@ extern "C"
 ESP32_I2C i2c(I2C_NUM_0, OLED_SDA, OLED_SCL, OLED_RST, 0x3C);
 SD1306 OLED(i2c, SCREEN_WIDTH, SCREEN_HEIGHT);
 SD1306_Driver dr(OLED);
-
-// gpio_num_t clk, gpio_num_t mosi, gpio_num_t miso, gpio_num_t cs, gpio_num_t rst, gpio_num_t irq
 SPIClass SPI(LORA_SCK, LORA_MOSI, LORA_MISO, LORA_CS, LORA_RST, LORA_IRQ);
 
 const gpio_num_t BLINK_GPIO = gpio_num_t::GPIO_NUM_2;
 
-void blink_task(void *pvParameter)
+struct BlinkTask : public FT::Task
 {
-	gpio_pad_select_gpio(BLINK_GPIO);
-	/* Set the GPIO as a push/pull output */
-	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
-	while (1)
+	void Run()
 	{
-		/* Blink off (output low) */
-		gpio_set_level(BLINK_GPIO, 0);
-		vTaskDelay(500 / portTICK_RATE_MS);
-		/* Blink on (output high) */
-		gpio_set_level(BLINK_GPIO, 1);
-		vTaskDelay(500 / portTICK_RATE_MS);
-	}
-}
-
-class Time
-{
-	int hh = 9;
-	int mm = 13;
-	int ss = 0;
-
-public:
-	Time();
-
-	void Inc()
-	{
-		ss += 1;
-		if (ss < 60)
-			return;
-		ss = 0;
-		mm += 1;
-		if (mm < 60)
-			return;
-		mm = 0;
-		hh += 1;
-		if (hh < 24)
-			return;
-		hh = 0;
-	}
-
-	String Print()
-	{
-		char b[100];
-		sprintf(b, "%02d:%02d:%02d", hh, mm, ss);
-		return b;
+		gpio_pad_select_gpio(BLINK_GPIO);
+		/* Set the GPIO as a push/pull output */
+		gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+		while (1)
+		{
+			/* Blink off (output low) */
+			gpio_set_level(BLINK_GPIO, 0);
+			vTaskDelay(500 / portTICK_RATE_MS);
+			/* Blink on (output high) */
+			gpio_set_level(BLINK_GPIO, 1);
+			vTaskDelay(500 / portTICK_RATE_MS);
+		}
 	}
 };
 
-Time::Time()
+FT::Queue<void> loraIrqEvent(2);
+
+void onLoraIrq()
 {
-	hh = 0;
-	mm = 0;
-	ss = 0;
+	loraIrqEvent.SendFromISR();
 }
 
-static xQueueHandle gpio_evt_queue = NULL;
-bool rxIrq = true;
-bool txIrq = true;
-
-volatile bool rxDone = false;
-void onReceive(int n)
+class HelloTask : public FT::Task
 {
-	rxDone = true;
+	void Run() override;
+};
 
-	static int nn = n;
-	xQueueSendFromISR(gpio_evt_queue, &nn, NULL);
-}
-
-volatile bool txDone = false;
-void onTxDone()
+void HelloTask::Run()
 {
-	txDone = true;
-	
-	LoRa.disableInvertIQ();
-	LoRa.receive();
-}
-
-void hello_task(void *pvParameter)
-{
-	Time G_time;
+	int G_time = 0;
 
 	dr.clear();
 	dr.setCursor(0, 4);
@@ -143,79 +84,51 @@ void hello_task(void *pvParameter)
 	else
 		printf("LORA NOT OK\n");
 
-	if (rxIrq)
-		LoRa.onReceive(onReceive);
-	if (txIrq)
-		LoRa.onTxDone(onTxDone);
+	LoRa.onIrq(onLoraIrq);
 
-	LoRa.disableInvertIQ();
+	//LoRa.disableInvertIQ();
 	LoRa.receive();
-
-	gpio_evt_queue = xQueueCreate(10, sizeof(int));
-	// auto lastTx = millis() + 1000;
 
 	while (1)
 	{
-		int nrx;
-		if (xQueueReceive(gpio_evt_queue, &nrx, /*portMAX_DELAY*/ 1000 / portTICK_RATE_MS) == pdTRUE)
+		if (loraIrqEvent.Receive(400) == false)
 		{
-			String r;
-			for (int i = 0; i < nrx; ++i)
-			{
-				char b[2];
-				b[0] = LoRa.read();
-				b[1] = 0;
-				r.Append(b);
-			}
+			// timeout
+			G_time++;
+			char b[14];
+			sprintf(b, "%d", G_time);
+			String s(b);
 
-			String v("RX int=");
-			v.Append(r.c_str());
-			dr.setCursor(0, 32);
+			dr.setCursor(0, 8 * 6);
 			dr.setFont(font_05x07);
-			dr.drawString(v.c_str());
-		}
-		if (txDone)
-		{
-			txDone = false;
-			printf("TRASMESSO\n");
-		}
-		if (rxDone)
-		{
-			rxDone = false;
-			printf("RICEVUTO\n");
-
-		}
-
-		if (/*millis() >= lastTx*/ true)
-		{
-
-			G_time.Inc();
-			dr.setCursor(0, 16);
-			dr.setFont(font_05x07);
-			dr.drawString(G_time.Print().c_str());
-			printf("TX=%s\n", G_time.Print().c_str());
+			dr.drawString(b);
+			printf("TX=%s\n", b);
 
 			LoRa.idle();
-			LoRa.enableInvertIQ();
-
-			auto s = G_time.Print();
+			//LoRa.enableInvertIQ();
 			LoRa.beginPacket();
 			LoRa.write((const uint8_t *)s.c_str(), s.Len());
-
-			if (txIrq)
-				LoRa.endPacket(/*async*/ true);
-			else
-				LoRa.endPacket(/*async*/ false);
-			// lastTx = millis() + 1000;
+			LoRa.endPacket(/*async*/ true);
 		}
-
-		if (!rxIrq)
+		else
 		{
-			auto n = LoRa.parsePacket();
-			if (n)
+			int nx = LoRa.HandleIrq();
+			switch (nx)
 			{
-				String r("RX no int=");
-				while (LoRa.available())
+			case -1: // TX done
+				//LoRa.disableInvertIQ();
+				LoRa.receive();
+				printf("TX OK\n");
+				break;
+
+			case -2: // niente da fare
+				printf("CRC\n");
+				break;
+
+			default: // nx caratteri da ricevere
+			{
+				String r;
+				for (int i = 0; i < nx; ++i)
 				{
 					char b[2];
 					b[0] = LoRa.read();
@@ -223,36 +136,40 @@ void hello_task(void *pvParameter)
 					r.Append(b);
 				}
 
-				dr.setCursor(0, 32);
+				String v("RX=");
+				v.Append(r.c_str());
+				dr.setCursor(0, 0 * 8);
 				dr.setFont(font_05x07);
-				dr.drawString(r.c_str());
+				dr.drawString(v.c_str());
+
+				auto rssi = LoRa.packetRssi();
+				auto sn = LoRa.packetSnr();
+				auto fe = LoRa.packetFrequencyError();
+
+				std::ostringstream s1;
+				s1 << "RSSI= " << rssi << "     ";
+				std::ostringstream s2;
+				s2 << "SN  = " << sn << "     ";
+				std::ostringstream s3;
+				s3 << "FE  = " << fe << "     ";
+
+				dr.setCursor(0, 1 * 8);
+				dr.drawString(s1.str().c_str());
+				dr.setCursor(0, 2 * 8);
+				dr.drawString(s2.str().c_str());
+				dr.setCursor(0, 3 * 8);
+				dr.drawString(s3.str().c_str());
+
+				printf("%s\n", v.c_str());
+				break;
+			}
 			}
 		}
 	}
 }
 
-void lora_task(void *pvParameter)
-{
-	for (;;)
-	{
-		auto n = LoRa.parsePacket();
-		if (n)
-		{
-			String r;
-			while (LoRa.available())
-			{
-				char b[2];
-				b[0] = LoRa.read();
-				b[1] = 0;
-				r.Append(b);
-			}
-
-			dr.setCursor(0, 32);
-			dr.setFont(font_05x07);
-			dr.drawString(r.c_str());
-		}
-	}
-}
+BlinkTask blink;
+HelloTask hello;
 
 extern "C" void app_main()
 {
@@ -263,59 +180,6 @@ extern "C" void app_main()
 	OLED.setup();
 	dr.setup(); // <= fa partire il task
 
-	//LoRa.setFrequency(868E6);
-
-	xTaskCreate(&blink_task, "blink_task", 4048, NULL, 5, NULL);
-	xTaskCreate(&hello_task, "hello_task", 4048, NULL, 5, NULL);
-	//xTaskCreate(&lora_task, "lora_task", 4048, NULL, 5, NULL);
+	blink.Create(4048, "blink_task");
+	hello.Create(4048, "hello_task");
 }
-
-////////////////////////
-
-class LoRa_Driver
-{
-	QueueHandle_t _h;
-
-	static void S_Task(void *pv) { ((LoRa_Driver *)pv)->Task(); }
-
-public:
-	LoRa_Driver() { _h = nullptr; }
-	void setup()
-	{
-		_h = xQueueCreate(16, sizeof(std::vector<uint8_t> *));
-		xTaskCreate(&S_Task, "LORA", 4048, this, 5, nullptr);
-	}
-
-	void sendPacket(const std::vector<uint8_t> &v)
-	{
-		auto d = new std::vector<uint8_t>(v);
-		xQueueSend(_h, &d, portMAX_DELAY);
-	}
-
-	void Task()
-	{
-		for (;;)
-		{
-			std::vector<uint8_t> *d = nullptr;
-			if (xQueueReceive(_h, &d, /*portMAX_DELAY*/ 100 / portTICK_RATE_MS) == pdTRUE)
-			{
-				LoRa.beginPacket();
-				LoRa.write(d->data(), d->size());
-				LoRa.endPacket();
-				delete d;
-			}
-			else
-			{
-				auto n = LoRa.parsePacket();
-				if (n)
-				{
-					auto b = new std::vector<uint8_t>();
-					while (LoRa.available())
-					{
-						b->push_back(LoRa.read());
-					}
-				}
-			}
-		}
-	}
-};
